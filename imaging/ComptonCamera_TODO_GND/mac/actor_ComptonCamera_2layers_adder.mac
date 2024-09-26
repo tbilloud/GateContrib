@@ -7,7 +7,7 @@
 /gate/actor/CC_digi_BB/attachTo                         BB
 
 
-/gate/actor/CC_digi_BB/save                               output/CC_adder.root
+/gate/actor/CC_digi_BB/save                               output/adder/CC_adder.root
 
 
 /gate/actor/CC_digi_BB/saveHitsTree                           0

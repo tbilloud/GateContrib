@@ -38,6 +38,8 @@
 
 /control/execute mac/actor_ComptonCamera_2layers_idealProcessing.mac
 
+
+/control/execute mac/actor_statistics_ideal.mac
 # ============================
 # == INITIALIZE             ==
 # ===========================

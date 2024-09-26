@@ -1,3 +1,4 @@
+import os
 import matplotlib
 matplotlib.get_backend()
 matplotlib.use("TkAgg")
@@ -50,17 +51,11 @@ colors = ['r', 'b','g','c','m','y','k' ]
 markers=['o','v','^','s','x','d','+','*','h']
 
 
-#path='/Users/etxebeste/gateworkdir/GateContrib/imaging/ComptonCamera/output/adder/'
-#path='/Users/etxebeste/gateworkdir/GateContrib/imaging/ComptonCamera/output/clustering/'
-path='/Users/etxebeste/gateworkdir/GateContrib/imaging/ComptonCamera/output/ideal/'
+#path='../output/adder/CC_adder_sequenceCoincidence.root'
+#path='../output/clustering/CC_clustering_sequenceCoincidence.root'
+path='../output/ideal/CC_idealprocessing_sequenceCoincidence.root'
 
-
-#nameSeqCoin="CC_adder_sequenceCoincidence.root"
-#nameSeqCoin="CC_clustering_sequenceCoincidence.root"
-nameSeqCoin="CC_idealprocessing_sequenceCoincidence.root"
-
-
-file_SeqCoinc= uproot.open(path+nameSeqCoin)
+file_SeqCoinc= uproot.open(os.path.abspath(path))
 
 IsIdealdata=True
 

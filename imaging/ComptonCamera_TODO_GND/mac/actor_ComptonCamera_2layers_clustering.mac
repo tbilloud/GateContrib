@@ -7,7 +7,7 @@
 /gate/actor/CC_digi_BB/attachTo                         BB
 
 
-/gate/actor/CC_digi_BB/save                               output/CC_clustering.root
+/gate/actor/CC_digi_BB/save                               output/clustering/CC_clustering.root
 
 
 

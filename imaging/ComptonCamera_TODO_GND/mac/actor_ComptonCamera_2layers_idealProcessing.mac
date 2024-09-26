@@ -5,7 +5,7 @@
 
 /gate/actor/addActor  ComptonCameraActor                CC_digi_BB
 /gate/actor/CC_digi_BB/attachTo                         BB
-/gate/actor/CC_digi_BB/save                               output/CC_idealprocessing.root
+/gate/actor/CC_digi_BB/save                               output/ideal/CC_idealprocessing.root
 
 
 /gate/actor/CC_digi_BB/saveHitsTree                           0
