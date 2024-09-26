@@ -1,23 +1,6 @@
-
-
-
-
-/gate/source/addSource gammaP
-/gate/source/gammaP/gps/particle gamma
-/gate/source/gammaP/gps/energytype Mono
-/gate/source/gammaP/gps/monoenergy 662 keV
-/gate/source/gammaP/setActivity 0.0847 MBq
-
-#/gate/source/gammaP/gps/type Plane
-#/gate/source/gammaP/gps/shape Circle
-#/gate/source/gammaP/gps/radius  0.25 mm
-/gate/source/gammaP/gps/angtype iso
-/gate/source/gammaP/gps/centre 0. 0.0 0.0 mm
-
-
-
-/gate/source/list
-
-
-
-
+/gate/source/addSource Na22
+/gate/source/Na22/gps/particle ion
+/gate/source/Na22/gps/ion 11 22 0 0
+/gate/source/Na22/setActivity 847 kBq
+/gate/source/Na22/gps/angtype iso
+/gate/source/Na22/gps/centre 0. 0.0 0.0 mm

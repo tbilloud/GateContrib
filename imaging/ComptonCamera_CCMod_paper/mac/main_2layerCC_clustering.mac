@@ -22,6 +22,7 @@
 #/gate/physics/addPhysicsList Shielding_LIV
 #/gate/physics/addPhysicsList Shielding_EMZ
 /gate/physics/addPhysicsList emstandard_opt4
+/gate/physics/addProcess RadioactiveDecay
 /control/execute                  mac/cuts.mac
 
 #=============================
