@@ -163,7 +163,7 @@ plt.savefig(path+"E1_ER.png", bbox_inches="tight", facecolor='white', edgecolor=
 
 
 fig2_ = plt.figure()
-plt.hist(ER, bins=nbins,range=(Emin,Emax),histtype='step',lw='2',color='b')
+plt.hist(ER, bins=nbins,range=(Emin,Emax),histtype='step',lw=2,color='b')
 plt.xlabel("ER (keV)", fontsize=12)
 plt.savefig(path+"ER.png", bbox_inches="tight", facecolor='white', edgecolor='none')
 
