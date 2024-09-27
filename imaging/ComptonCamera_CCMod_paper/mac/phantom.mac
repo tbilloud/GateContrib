@@ -1,5 +1,3 @@
-
-
 /gate/world/daughters/name  sourceEncaps
 /gate/world/daughters/insert cylinder
 /gate/sourceEncaps/placement/setTranslation 0.0 0. 0.0 cm
@@ -8,7 +6,6 @@
 /gate/sourceEncaps/setMaterial PMMA
 /gate/sourceEncaps/placement/alignToZ
 
-
-#/gate/sourceEncaps/vis/forceWireframe 1 
+#/gate/sourceEncaps/vis/forceWireframe 1
 #/gate/sourceEncaps/vis/setColor red
 
