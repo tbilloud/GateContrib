@@ -22,7 +22,7 @@
 /gate/scatterer/geometry/setXLength                2.72 cm
 /gate/scatterer/geometry/setYLength                2.68 cm
 /gate/scatterer/geometry/setZLength                0.5 cm
-/gate/scatterer/setMaterial             LYSO-Ce-Hilger
+/gate/scatterer/setMaterial             LaBr3
 #/gate/scatterer/vis/setVisible 1
 #/gate/scatterer/vis/setColor             green
 
@@ -33,4 +33,4 @@
 /gate/absorber/geometry/setXLength                3.24 cm
 /gate/absorber/geometry/setYLength                3.6 cm
 /gate/absorber/geometry/setZLength                1.00 cm
-/gate/absorber/setMaterial             LYSO-Ce-Hilger
+/gate/absorber/setMaterial             LaBr3
