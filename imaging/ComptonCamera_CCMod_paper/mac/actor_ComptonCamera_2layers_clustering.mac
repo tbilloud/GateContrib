@@ -27,7 +27,7 @@
 
 
 /gate/digitizer/layers/insert clustering
-/gate/digitizer/layers/clustering/setAcceptedDistance 6 mm
+/gate/digitizer/layers/clustering/setAcceptedDistance 3 mm
 /gate/digitizer/layers/clustering/setRejectionMultipleClusters 0
 
 

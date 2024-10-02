@@ -1,5 +1,4 @@
-/control/alias time 100
-/control/execute                   mac/verbosity.mac
+/control/alias time 0.01
 
 # ============================
 # == LOAD DATABASE           ==
@@ -19,8 +18,6 @@
 # ============================
 # ==  PHYSICS             ==
 # ===========================
-#/gate/physics/addPhysicsList Shielding_LIV
-#/gate/physics/addPhysicsList Shielding_EMZ
 /gate/physics/addPhysicsList emstandard_opt4
 /gate/physics/addProcess RadioactiveDecay
 /control/execute                  mac/cuts.mac
@@ -29,7 +26,6 @@
 #== ACTOR
 #==========================================
 /control/execute mac/actor_ComptonCamera_2layers_clustering.mac
-/control/execute mac/actor_statistics_clustering.mac
 
 # ============================
 # == INITIALIZE             ==
@@ -39,7 +35,6 @@
 # ============================
 # ==  VISUALIZATION            ==
 # ===========================
-#/vis/disable
 #/control/execute                     mac/visu.mac
 
 # ============================
@@ -52,19 +47,12 @@
 # ============================
 /gate/application/noGlobalOutput
 
-#====================================================
-#  R A N D O M   E N G I N E  A N D  S E E D
-#====================================================
-#/control/execute                   mac/SetSeed_MersenneTwister.mac
-/control/execute                   mac/SetSeed_MersenneTwister_fixed.mac
-
 #=====================================================
 #   M E A S U R E M E N T   S E T T I N G S   
 #=====================================================
 /gate/application/setTimeSlice  {time} s
 /gate/application/setTimeStart   0.00   s
 /gate/application/setTimeStop    {time} s
-##/gate/application/setTotalNumberOfPrimaries 500
 /gate/application/startDAQ
 
 exit
