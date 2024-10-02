@@ -11,7 +11,7 @@
 
 
 
-/gate/actor/CC_digi_BB/saveHitsTree                           1
+/gate/actor/CC_digi_BB/saveHitsTree                           0
 /gate/actor/CC_digi_BB/saveSinglesTree                        1
 /gate/actor/CC_digi_BB/saveCoincidencesTree                   1
 /gate/actor/CC_digi_BB/saveCoincidenceChainsTree              1
