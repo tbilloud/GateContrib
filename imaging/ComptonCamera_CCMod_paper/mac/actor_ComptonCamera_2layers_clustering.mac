@@ -18,6 +18,13 @@
 /gate/digitizer/layers/clustering/setAcceptedDistance 3 mm
 /gate/digitizer/layers/clustering/setRejectionMultipleClusters 0
 
+/gate/digitizer/layers/insert energyThresholder
+/gate/digitizer/layers/energyThresholder/setThreshold 70 keV
+#/gate/digitizer/layers/energyThresholder/setLaw solidAngleWeighted
+#/gate/digitizer/layers/energyThresholder/solidAngleWeighted/setRentangleLengthX 3 mm
+#/gate/digitizer/layers/energyThresholder/solidAngleWeighted/setRentangleLengthY 3 mm
+#/gate/digitizer/layers/energyThresholder/solidAngleWeighted/setZSense4Readout 1
+
 /gate/digitizer/layers/insert localBlurring  
 /gate/digitizer/layers/localBlurring/chooseNewVolume scatterer
 /gate/digitizer/layers/localBlurring/scatterer/setResolution 0.12
