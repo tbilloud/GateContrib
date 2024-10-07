@@ -5,7 +5,7 @@ matplotlib.get_backend()
 import matplotlib.pyplot as plt
 import uproot
 
-path = '../output/LYSO_200/CC_clustering_Singles.root'
+path = '../output/CC_Singles.root'
 pSingles = uproot.open(os.path.abspath(path) + ':Singles')
 print(pSingles.num_entries, 'singles')
 energy_scatterer = 1000 * pSingles.arrays(['energy'], '(energy>0) & (layerName=="scatterer_phys")')['energy']

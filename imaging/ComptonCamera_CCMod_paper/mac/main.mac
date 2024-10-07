@@ -1,4 +1,4 @@
-/control/alias time 0.01
+/control/alias time 0.05
 
 # ============================
 # == LOAD DATABASE           ==
@@ -25,7 +25,7 @@
 #=============================
 #== ACTOR
 #==========================================
-/control/execute mac/actor_ComptonCamera_2layers_clustering.mac
+/control/execute mac/actor.mac
 
 # ============================
 # == INITIALIZE             ==
@@ -40,7 +40,7 @@
 # ============================
 # == SOURCE                 ==
 # ============================
-/control/execute                     mac/pointlikesource_centered.mac
+/control/execute                     mac/source_Na22.mac
 
 # ============================
 # == OUTPUT                ==

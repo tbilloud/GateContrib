@@ -3,7 +3,7 @@
 ######################################################################################
 /gate/actor/addActor  ComptonCameraActor                CC_digi_BB
 /gate/actor/CC_digi_BB/attachTo                         BB
-/gate/actor/CC_digi_BB/save                               output/CC_clustering.root
+/gate/actor/CC_digi_BB/save                               output/CC.root
 /gate/actor/CC_digi_BB/saveHitsTree                           0
 /gate/actor/CC_digi_BB/saveSinglesTree                        1
 /gate/actor/CC_digi_BB/saveCoincidencesTree                   1

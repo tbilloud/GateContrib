@@ -10,18 +10,6 @@ A detailed description of the CCMod actor can be found in  https://doi.org/10.10
 Digitization is further explained in the supplementary material associated with the article.
 
 Digitization chain is applied to the detector layers (absorberSD, scattererSD)
-Three different examples are included namely adder, ideal processing and clustering.
-
-*actor_ComptonCamera_2layers_adder.mac
-*actor_ComptonCamera_2layers_idealProcessing.mac
-*actor_ComptonCamera_2layers_clustering.mac
-
-
-with the corresponding three main files for each digitization 
-
-*main_2layerCC_adder.mac
-*main_2layerCC_ideal.mac
-*main_2layerCC_clustering.mac
 
   
 More information about the  digitization modules can be found in https://opengate.readthedocs.io/en/latest/compton_camera_imaging_simulations.html.
@@ -29,7 +17,7 @@ More information about the  digitization modules can be found in https://opengat
 ## Output
 
 By default two .root output files are created one for singles and another one for  sequence coincidences.
-There are three folders namely ideal, adder and clustering with reference output data. These files were generated using v9.0 (tag),  6781 value for the seed and a simulation time of 100 s.
+There is a folder with reference output data. These files were generated using v9.2 (tag).
 
 
 ## Tools: Analysis (python script)

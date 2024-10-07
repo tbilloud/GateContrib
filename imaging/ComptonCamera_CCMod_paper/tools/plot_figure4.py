@@ -13,8 +13,7 @@ import awkward as ak
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 pandas.set_option('display.max_columns', 20), pandas.set_option('display.width', 400)
 
-# path = '../output/LYSO_200/CC_clustering_Coincidences.root'
-path = '../output/LaBr3_10/CC_clustering_Coincidences.root'
+path = '../output/CC_Coincidences.root'
 max_events = -1 # -1 for all
 
 events = uproot.open(os.path.abspath(path) + ':Coincidences')
@@ -69,12 +68,3 @@ ax2.set_xlim(xmin=0, xmax=1400)
 # ax3.set_xlim(xmin=0, xmax=2000)
 plt.tight_layout()
 plt.show()
-
-
-
-# path = '../output/LYSO_200/CC_clustering_Coincidences.root'
-# events = uproot.open(os.path.abspath(path) + ':Coincidences')
-# print(events.arrays(['coincID', 'energy', 'layerName'],library='pd').head())
-# # data = events.arrays(['coincID', 'time', 'energy', 'layerName'], '(energy>0)', library='np')#[:1000]
-# data = events.arrays(['coincID', 'energy', 'layerName'], '(energy>0) & (layerName=="scatterer_phys")')
-# data.show()
