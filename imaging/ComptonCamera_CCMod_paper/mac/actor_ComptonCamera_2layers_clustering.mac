@@ -1,7 +1,6 @@
-# ============================
-# == actor              ==
-# ============================
-
+######################################################################################
+########################### ACTOR (2.1.2 section in paper) ###########################
+######################################################################################
 /gate/actor/addActor  ComptonCameraActor                CC_digi_BB
 /gate/actor/CC_digi_BB/attachTo                         BB
 /gate/actor/CC_digi_BB/save                               output/CC_clustering.root
@@ -14,45 +13,82 @@
 /gate/actor/CC_digi_BB/numberOfTotScatterers                    1
 /gate/actor/CC_digi_BB/specifysourceParentID 0
 
+######################################################################################
+##################### DIGITIZER (2.1.3 section in paper) #############################
+######################################################################################
+# From paper:
+# Digitizer modules can be classified into three different categories:
+# The first one corresponds to those that spatially regroup hits to take into account the characteristics of the signal generation in the detector such as grid discretization module which simulates the response of pixelated or strip detectors.
+# The second one corresponds to modules that modify the observable values of the singles such as Depth of Interaction (DoI) modeling or 3-dimensional spatial resolution module.
+# The last category comprises those modules that filter the singles such as energy threshold modules.
+
+# DIGITIZER MODULE CATEGORY 1: 'singles' creation (hit regrouping)
 /gate/digitizer/layers/insert clustering
 /gate/digitizer/layers/clustering/setAcceptedDistance 3 mm
 /gate/digitizer/layers/clustering/setRejectionMultipleClusters 0
+/gate/digitizer/layers/insert adder
 
-/gate/digitizer/layers/insert energyThresholder
-/gate/digitizer/layers/energyThresholder/setThreshold 70 keV
-#/gate/digitizer/layers/energyThresholder/setLaw solidAngleWeighted
-#/gate/digitizer/layers/energyThresholder/solidAngleWeighted/setRentangleLengthX 3 mm
-#/gate/digitizer/layers/energyThresholder/solidAngleWeighted/setRentangleLengthY 3 mm
-#/gate/digitizer/layers/energyThresholder/solidAngleWeighted/setZSense4Readout 1
-
-/gate/digitizer/layers/insert localBlurring  
+# DIGITIZER MODULE CATEGORY 2: 'singles' modification
+/gate/digitizer/layers/insert localBlurring
 /gate/digitizer/layers/localBlurring/chooseNewVolume scatterer
 /gate/digitizer/layers/localBlurring/scatterer/setResolution 0.12
 /gate/digitizer/layers/localBlurring/scatterer/setEnergyOfReference 511 keV
 /gate/digitizer/layers/localBlurring/chooseNewVolume absorber
 /gate/digitizer/layers/localBlurring/absorber/setResolution 0.14
 /gate/digitizer/layers/localBlurring/absorber/setEnergyOfReference 511 keV
-
 /gate/digitizer/layers/insert sp3Dlocalblurring
 /gate/digitizer/layers/sp3Dlocalblurring/chooseNewVolume scatterer
 /gate/digitizer/layers/sp3Dlocalblurring/scatterer/setSigma 1.5 1.5 0.0 mm
 /gate/digitizer/layers/sp3Dlocalblurring/chooseNewVolume absorber
 /gate/digitizer/layers/sp3Dlocalblurring/absorber/setSigma 2.0 2.0 0.0 mm
-
 /gate/digitizer/layers/insert DoImodel
 /gate/digitizer/layers/DoImodel/setAxis 0 0 1
 /gate/digitizer/layers/DoImodel/setDoIModel DoIBlurrNegExp
 /gate/digitizer/layers/DoImodel/DoIBlurrNegExp/setExpInvDecayConst -2.85144 mm
 /gate/digitizer/layers/DoImodel/DoIBlurrNegExp/setCrysEntranceFWHM 8 mm
 
-/gate/digitizer/Coincidences/setWindow 50. ns 
+# DIGITIZER MODULE CATEGORY 3: 'singles' filtering
+# From paper:
+# ... a local threshold was applied at pixel level where if at least the effective energy of one of the clusters was
+# above the threshold the whole event was accepted for processing ... a slightly higher global energy threshold of 85
+# keV was also applied to the total energy deposition in each layer to both data sets.
 
-#/gate/digitizer/name sequenceCoincidence
-#/gate/digitizer/insert coincidenceChain
-#/gate/digitizer/sequenceCoincidence/addInputName Coincidences
-#/gate/digitizer/sequenceCoincidence/insert sequenceRecon
-#/gate/digitizer/sequenceCoincidence/sequenceRecon/setSequencePolicy axialDist2Source
-#
-#/gate/digitizer/sequenceCoincidence/insert multiplesKiller
+#/gate/digitizer/layers/insert energyThresholder
+#/gate/digitizer/layers/energyThresholder/setThreshold 70 keV
+#/gate/digitizer/layers/energyThresholder/setLaw solidAngleWeighted
+#/gate/digitizer/layers/energyThresholder/solidAngleWeighted/setRentangleLengthX 3 mm
+#/gate/digitizer/layers/energyThresholder/solidAngleWeighted/setRentangleLengthY 3 mm
+#/gate/digitizer/layers/energyThresholder/solidAngleWeighted/setZSense4Readout 1
+
+#/gate/digitizer/layers/insert localEnergyThresholder
+#/gate/digitizer/layers/localEnergyThresholder/chooseNewVolume absorber
+#/gate/digitizer/layers/localEnergyThresholder/absorber/setThreshold 70 keV
+#/gate/digitizer/layers/localEnergyThresholder/absorber/setLaw solidAngleWeighted
+#/gate/digitizer/layers/localEnergyThresholder/absorber/solidAngleWeighted/setRentangleLengthX 3 mm
+#/gate/digitizer/layers/localEnergyThresholder/absorber/solidAngleWeighted/setRentangleLengthY 3 mm
+#/gate/digitizer/layers/localEnergyThresholder/absorber/solidAngleWeighted/setZSense4Readout 1
+#/gate/digitizer/layers/localEnergyThresholder/chooseNewVolume scatterer
+#/gate/digitizer/layers/localEnergyThresholder/scatterer/setThreshold 70 keV
+#/gate/digitizer/layers/localEnergyThresholder/scatterer/setLaw solidAngleWeighted
+#/gate/digitizer/layers/localEnergyThresholder/scatterer/solidAngleWeighted/setRentangleLengthX 3 mm
+#/gate/digitizer/layers/localEnergyThresholder/scatterer/solidAngleWeighted/setRentangleLengthY 3 mm
+#/gate/digitizer/layers/localEnergyThresholder/scatterer/solidAngleWeighted/setZSense4Readout 1
+#/gate/digitizer/layers/insert energyThresholder
+#/gate/digitizer/layers/energyThresholder/setThreshold 85 keV
+
+######################################################################################
+####################### SORTER (2.1.4 section in paper) ##############################
+######################################################################################
+/gate/digitizer/Coincidences/setWindow 50. ns
+
+######################################################################################
+################ COINCIDENCE PROCESSING (2.1.5 section in paper) #####################
+######################################################################################
+/gate/digitizer/name sequenceCoincidence
+/gate/digitizer/insert coincidenceChain
+/gate/digitizer/sequenceCoincidence/addInputName Coincidences
+/gate/digitizer/sequenceCoincidence/insert sequenceRecon
+/gate/digitizer/sequenceCoincidence/sequenceRecon/setSequencePolicy axialDist2Source
+/gate/digitizer/sequenceCoincidence/insert multiplesKiller
 
 
