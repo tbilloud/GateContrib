@@ -12,8 +12,8 @@
 /gate/BB/geometry/setYLength                4.0 cm
 /gate/BB/geometry/setZLength                7.6 cm
 /gate/BB/setMaterial             Air
-#/gate/BB/vis/setVisible 1
-#/gate/BB/vis/setColor             white
+/gate/BB/vis/setVisible 1
+/gate/BB/vis/setColor             white
 
 #===================PLANE1 (centre at  5.55 cm global system)=======================
 /gate/BB/daughters/name                    scatterer
@@ -23,8 +23,6 @@
 /gate/scatterer/geometry/setYLength                2.68 cm
 /gate/scatterer/geometry/setZLength                0.5 cm
 /gate/scatterer/setMaterial             LaBr3
-#/gate/scatterer/vis/setVisible 1
-#/gate/scatterer/vis/setColor             green
 
 #=========================PLANE2 (centre at  10.8 cm global system)=============================================================================
 /gate/BB/daughters/name                    absorber
