@@ -1,0 +1,10 @@
+# A 22Na source was simulated with an activity of 847 kBq and a diameter of 0.5 mm ...
+# A simulation time of 200 s was set leading to around 20000 accepted coincidences.
+# The simulation lasted around 14 hours on a single Intel(R) Xeon(R) CPU E5-2620 @ 2.00GHz.
+# TODO: I don't get 20000 coincidences with 200s unless I remove some digitizer modules...
+/gate/source/addSource Na22
+/gate/source/Na22/gps/particle ion
+/gate/source/Na22/gps/ion 11 22 0 0
+/gate/source/Na22/setActivity 847 kBq
+/gate/source/Na22/gps/angtype iso
+/gate/source/Na22/gps/centre 0. 0.0 0.0 mm

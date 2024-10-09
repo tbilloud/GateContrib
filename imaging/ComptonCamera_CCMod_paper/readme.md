@@ -3,7 +3,7 @@
 This example shows the simulation of a Compton Camera.
  
 ## Set-up
-The  camera consists  of two  scintillator crystals (CC_2planes.mac). The structure of the camera is not included in this example. Only sensitive volumes are included.
+The  camera consists  of two  scintillator crystals (geometry.mac). The structure of the camera is not included in this example. Only sensitive volumes are included.
   
 ## CCMod actor:
 A detailed description of the CCMod actor can be found in  https://doi.org/10.1088/1361-6560/ab6529.

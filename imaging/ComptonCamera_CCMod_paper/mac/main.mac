@@ -8,7 +8,7 @@
 # ===========================
 # ==   GEOMETRY            ==
 # ===========================
-/control/execute                     mac/CC_2planes.mac
+/control/execute                     mac/geometry.mac
 
 # ===========================
 # ==   PHANTOM            ==
@@ -37,17 +37,17 @@
 # ============================
 # ==  VISUALIZATION         ==
 # ============================
-/control/execute                     mac/visu.mac
+#/control/execute                     mac/visu.mac
 
 # ============================
 # == SOURCE                 ==
 # ============================
-/control/execute                     mac/source_Na22.mac
+/control/execute                     mac/source.mac
 
 # ============================
 # == OUTPUT                 ==
 # ============================
-/gate/application/noGlobalOutput
+/gate/application/noGlobalOutput # avoids output related to PET/SPECT systems
 
 #====================================================
 #  R A N D O M   E N G I N E  A N D  S E E D
