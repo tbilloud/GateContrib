@@ -1,4 +1,6 @@
-/control/alias time 0.05
+/control/alias time 0.2
+/control/alias out output
+/control/alias seed 6781
 
 # ===========================
 # == LOAD DATABASE         ==
@@ -26,8 +28,6 @@
 # == ACTORS                  ==
 # =============================
 /control/execute mac/actor.mac
-/gate/actor/addActor     SimulationStatisticActor stat
-/gate/actor/stat/save    output/stats.txt
 
 # ============================
 # == INITIALIZE             ==
@@ -37,7 +37,7 @@
 # ============================
 # ==  VISUALIZATION         ==
 # ============================
-#/control/execute                     mac/visu.mac
+# /control/execute                     mac/visu.mac
 
 # ============================
 # == SOURCE                 ==
@@ -53,7 +53,7 @@
 #  R A N D O M   E N G I N E  A N D  S E E D
 #====================================================
 /gate/random/setEngineName MersenneTwister
-/gate/random/setEngineSeed 6781
+/gate/random/setEngineSeed {seed} # 6781
 
 #=====================================================
 #   M E A S U R E M E N T   S E T T I N G S   

@@ -1,9 +1,12 @@
 ######################################################################################
 ########################### ACTOR (2.1.2 section in paper) ###########################
 ######################################################################################
+/gate/actor/addActor     SimulationStatisticActor stat
+/gate/actor/stat/save    {out}/stats.txt
+
 /gate/actor/addActor  ComptonCameraActor                CC_digi_BB
 /gate/actor/CC_digi_BB/attachTo                         BB
-/gate/actor/CC_digi_BB/save                               output/CC.root
+/gate/actor/CC_digi_BB/save                               {out}/CC.root
 /gate/actor/CC_digi_BB/saveHitsTree                           1
 /gate/actor/CC_digi_BB/saveSinglesTree                        1
 /gate/actor/CC_digi_BB/saveCoincidencesTree                   1
@@ -22,8 +25,14 @@
 # - The 3rd comprises those modules that filter the singles such as energy threshold modules.
 
 # CATEGORY 1: 'singles' creation (hit regrouping)
-# The clustering module was selected to group the hits within an acceptance distance of 3 mm, which corresponds to the
-# SiPM pixel size. ... Then, the conventional adder was applied to generate a single signal per layer and per event
+# - The clustering module was selected to group the hits within an acceptance distance of 3 mm, which corresponds to the
+# SiPM pixel size.
+# - Then, the maximum deposited energy in a SiPM pixel of the array (Ec effect,i) was approximated analytically without
+# the generation and transport of optical photons using the MPM, namely the Model of Pixel response for a SiPM array
+# coupled to a Monoblock, see figure 1. This effective energy at pixel level was obtained for each cluster by weighting
+# its energy by the fraction of the solid angle subtended by a virtual pixel centered at the cluster X-Y position at the
+# readout surface of the crystal. TODO: how to do that here? looks like a feature for the thresholder
+# - Then, the conventional adder was applied to generate a single signal per layer and per event
 # where the energy corresponds to the total deposited energy of all the clusters in the layer and the position to the
 # energy weighted centroid position.
 /gate/digitizer/layers/insert clustering
@@ -68,10 +77,6 @@
 #   global thresholder.
 /gate/digitizer/layers/insert energyThresholder
 /gate/digitizer/layers/energyThresholder/setThreshold 85 keV
-/gate/digitizer/layers/energyThresholder/setLaw solidAngleWeighted
-/gate/digitizer/layers/energyThresholder/solidAngleWeighted/setRentangleLengthX 3 mm
-/gate/digitizer/layers/energyThresholder/solidAngleWeighted/setRentangleLengthY 3 mm
-/gate/digitizer/layers/energyThresholder/solidAngleWeighted/setZSense4Readout 1
 
 ######################################################################################
 ####################### SORTER (2.1.4 section in paper) ##############################
