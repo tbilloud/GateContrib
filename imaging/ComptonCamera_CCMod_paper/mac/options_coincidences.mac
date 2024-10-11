@@ -1,0 +1,20 @@
+################################################################################################
+# The GEOMETRY of your system that is needed to identify  the layers using the volumeID of the hits
+################################################################################################
+/gate/geometry/setMaterialDatabase data/GateMaterials.db
+/control/execute mac/geometry.mac
+
+################################################################################################
+# Your options for the DIGITIZATION. An example with an adder and an energy blurring
+################################################################################################
+/gate/digitizer/name sequenceCoincidence
+/gate/digitizer/insert coincidenceChain
+/gate/digitizer/sequenceCoincidence/addInputName Coincidences
+/gate/digitizer/sequenceCoincidence/insert sequenceRecon
+/gate/digitizer/sequenceCoincidence/sequenceRecon/setSequencePolicy axialDist2Source
+/gate/digitizer/sequenceCoincidence/insert multiplesKiller
+
+################################################################################################
+# INITIALIZE is needed to recover volumeID from hits using DetectorConstruction
+################################################################################################
+/gate/run/initialize
