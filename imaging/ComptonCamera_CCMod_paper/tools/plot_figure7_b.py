@@ -65,15 +65,13 @@ def calculate_intersections_with_z_plane(row, hist):
     direction_vector = row['direction_vector']
     opening_angle = row['opening_angle']
 
+    # Calculate the intersection points of the cone with the plane
+    # TODO: the following block is wrong
     # Calculate the parameter t for the intersection
     t = (z_plane - apex[2]) / direction_vector[2]
-
     # Calculate the intersection point on the cone's axis
     x_intersection = apex[0] + t * direction_vector[0]
     y_intersection = apex[1] + t * direction_vector[1]
-
-    # Calculate the intersection points of the cone with the plane
-    # TODO: the following block is wrong
     # Calculate the radius of the intersection circle
     r = (z_plane - apex[2]) * np.tan(opening_angle)
     # Generate points on the intersection circle
