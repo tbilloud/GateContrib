@@ -7,7 +7,7 @@ import pandas as pd
 pandas().set_option('display.max_columns', 100), pandas().set_option('display.width', 1000)
 
 # Define the path to the ROOT file and energy cut
-path = '../output/seed1_time100/'
+path = '../output/test_data/'
 energy_cut = '(energy1+energyR>0.6)' # MeV
 energy_tot = 1.275 # MeV
 

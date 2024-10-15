@@ -8,7 +8,7 @@ from matplotlib.style.core import library
 pandas.set_option('display.max_columns', 100), pandas.set_option('display.width', 400), pandas.set_option(
     'display.max_rows', 1000)
 
-path = '../output/seed1_time100/'
+path = '../output/test_data/'
 #path = '/media/billoud/Volume/CT/GATE/LaBr3_adder_thl_100/'
 nevent_printed = 10
 

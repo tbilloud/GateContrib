@@ -9,7 +9,7 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 pandas.set_option('display.max_columns', 20), pandas.set_option('display.width', 400)
 
-path = '../output/seed1_time100/CC_Coincidences.root'
+path = '../output/test_data/CC_Coincidences.root'
 bins = 300
 
 tree = uproot.open(os.path.abspath(path) + ':Coincidences')

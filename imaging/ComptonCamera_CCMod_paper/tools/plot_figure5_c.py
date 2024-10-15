@@ -10,7 +10,7 @@ import uproot
 # Usage: GateDigit_seqCoinc2Cones CC_sequenceCoincidence.root CC_Cones.root
 # There is a bug however: it requires the tree in CC_sequenceCoincidence.root to have a 'sublayerID' branch which is not
 # present in the output of the GateDigit_seqCoincidence executable. Thus, I add a dummy column first with:
-# path = '../output/seed1_time100/'
+# path = '../output/test_data/'
 # with uproot.recreate(path+'CC_sequenceCoincidence.root') as file:
 #     df = tree.arrays(library='pd')
 #     df['sublayerID'] = -1
@@ -26,7 +26,7 @@ import uproot
 # in the layers. When the total deposited energy was below 600 keV, E0 was assigned to the 511 keV photon and otherwise
 # to the 1275 keV photon.
 
-path = '../output/seed1_time100/'
+path = '../output/test_data/'
 bins = [50, 50]
 
 tree = uproot.open(path + 'CC_Cones.root:Cones')

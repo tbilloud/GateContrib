@@ -5,7 +5,7 @@ matplotlib.get_backend()
 import matplotlib.pyplot as plt
 import uproot
 
-path = '../output/seed1_time100/CC_Singles.root'
+path = '../output/test_data/CC_Singles.root'
 bins = 100
 
 pSingles = uproot.open(os.path.abspath(path) + ':Singles')
