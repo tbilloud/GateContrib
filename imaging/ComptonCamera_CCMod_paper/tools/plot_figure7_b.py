@@ -8,7 +8,8 @@ pandas().set_option('display.max_columns', 100), pandas().set_option('display.wi
 
 # Define the path to the ROOT file and energy cut
 path = '../output/test_data/'
-energy_cut = '(energy1+energyR>0.6)' # MeV
+# energy_cut = '(energy1+energyR>0.6)' # MeV
+energy_cut = '(energy1+energyR>0.6) & (energy1+energyR<1.275)' # MeV
 energy_tot = 1.275 # MeV
 
 tree = uproot.open(path + 'CC_Cones.root:Cones')
