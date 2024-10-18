@@ -1,9 +1,10 @@
+import time
 import numpy as np
 import uproot
 from uproot.extras import pandas
 import matplotlib.pyplot as plt
 import pandas as pd
-
+import napari
 pandas().set_option('display.max_columns', 100), pandas().set_option('display.width', 1000)
 
 # Define the path to the ROOT file and energy cut
@@ -26,6 +27,8 @@ df = tree.arrays(
 #   G4double m_E1;            // energy deposition of the first interaction
 #   G4double m_E2;            // energy deposition of the second interaction
 #   G4double m_ER;            // Total energy deposition except E1
+
+tstart = time.time()
 
 # Function to calculate the direction vector
 def calculate_direction_vector(row):
@@ -52,45 +55,75 @@ df_cone['opening_angle'] = df.apply(calculate_opening_angle, axis=1)
 df_cone['apex_x'] = df['globalPosX1']
 df_cone['apex_y'] = df['globalPosY1']
 df_cone['apex_z'] = df['globalPosZ1']
-print(df_cone[:])
-
-# Define the z-coordinate of the plane
-z_plane = 0
-r = 50
-hist, xedges, yedges = np.histogram2d([], [], bins=100, range=[[-r, r], [-r, r]])
 
 
 # Function to calculate all intersection points with the plane at z = z_plane and update the histogram
-def calculate_intersections_with_z_plane(row, hist):
+def stack_ellipses(row, hist, z_plane):
+
     apex = np.array([row['apex_x'], row['apex_y'], row['apex_z']])
     direction_vector = row['direction_vector']
     opening_angle = row['opening_angle']
 
-    # Calculate the intersection points of the cone with the plane
-    # TODO: the following block is wrong
-    # Calculate the parameter t for the intersection
-    t = (z_plane - apex[2]) / direction_vector[2]
-    # Calculate the intersection point on the cone's axis
-    x_intersection = apex[0] + t * direction_vector[0]
-    y_intersection = apex[1] + t * direction_vector[1]
-    # Calculate the radius of the intersection circle
-    r = (z_plane - apex[2]) * np.tan(opening_angle)
-    # Generate points on the intersection circle
-    theta = np.linspace(0, 2 * np.pi, 100)
-    x_circle = x_intersection + r * np.cos(theta)
-    y_circle = y_intersection + r * np.sin(theta)
+    # Normalize the axis
+    axis = direction_vector / np.linalg.norm(direction_vector)
+    # Plane normal is along the z-axis
+    plane_normal = np.array([0, 0, 1])
+    # Calculate the cosine and sine of the cone angle
+    cos_angle = np.cos(opening_angle)
+    sin_angle = np.sin(opening_angle)
+    # Calculate the dot product of the axis and the plane normal
+    dot_product = np.dot(axis, plane_normal)
+    # Check if the cone and plane are parallel
+    if np.abs(dot_product) < 1e-6:
+        print("The cone and plane are parallel and do not intersect.")
+        return
+    # Calculate the intersection point
+    d = (z_plane - apex[2]) / dot_product
+    intersect_p = apex + d * axis
+    # Calculate the radius of the intersection ellipse
+    radius = np.abs(d * sin_angle / cos_angle)  # Ensure radius is positive
+    # Calculate the direction of the major and minor axes of the ellipse
+    major_ax_d = np.cross(axis, plane_normal)
+    major_ax_d = major_ax_d / np.linalg.norm(major_ax_d)
+    minor_ax_d = np.cross(plane_normal, major_ax_d)
+    # Calculate the lengths of the major and minor axes
+    major_ax_l = radius / np.sqrt(1 - dot_product**2)
+    minor_ax_l = radius
+    theta = np.linspace(0, 2 * np.pi, 1000)
+    # Parametric equations for the ellipse
+    x_circle = intersect_p[0] + major_ax_l * np.cos(theta) * major_ax_d[0] + minor_ax_l * np.sin(theta) * minor_ax_d[0]
+    y_circle = intersect_p[1] + major_ax_l * np.cos(theta) * major_ax_d[1] + minor_ax_l * np.sin(theta) * minor_ax_d[1]
 
     # Update the histogram
     hist_update, _, _ = np.histogram2d(x_circle, y_circle, bins=[xedges, yedges])
+    hist_update[hist_update > 0] = 1  # TODO
     hist += hist_update
 
 
-# Apply the function to each row in the dataframe
-df_cone[:5].apply(lambda row: calculate_intersections_with_z_plane(row, hist), axis=1)
 
-# Plot the 2D histogram
-plt.figure(figsize=(8, 6))
-plt.imshow(hist, origin='lower', cmap='viridis', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]])
-plt.xlabel('x (mm)')
-plt.ylabel('y (mm)')
-plt.show()
+# Define the z-coordinate of the plane
+plane_side = 100 # mm, centered at (0, 0) in world coordinates
+plane_bins = 100
+plane_z = range(0, 51, 1) # mm, z-coordinates of planes perpendicular
+xedges = np.linspace(-plane_side / 2, plane_side / 2, plane_bins + 1)
+yedges = np.linspace(-plane_side / 2, plane_side / 2, plane_bins + 1)
+
+hist_stack = np.zeros((len(plane_z), plane_bins, plane_bins))
+print(len(plane_z))
+for i,z in enumerate(plane_z):
+    print(i, '/', len(plane_z))
+    hist, _, _ = np.histogram2d([], [], bins=[xedges, yedges])
+    df_cone[:].apply(lambda row: stack_ellipses(row, hist, z), axis=1)
+
+    # # Separate 2D histograms for each z-plane
+    # plt.imshow(hist, origin='lower')
+    # plt.colorbar()
+    # plt.title(f'z = {z_plane}')
+    # plt.show()
+
+    # 3D histogram stack
+    # TODO:
+    hist_stack[i] = hist
+
+napari.view_image(hist_stack, rgb=False, colormap='viridis')
+napari.run()

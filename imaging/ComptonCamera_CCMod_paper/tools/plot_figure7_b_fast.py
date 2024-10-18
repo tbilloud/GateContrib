@@ -11,9 +11,6 @@ path = '../output/test_data/'
 # energy_cut = '(energy1+energyR>0.6)' # MeV
 energy_cut = '(energy1+energyR>0.6) & (energy1+energyR<1.275)' # MeV (adapt to E0)
 E0 = 1.275 # MeV, incident gamma energy (adapt to energy_cut)
-plane_side = 100 # mm, centered at (0, 0) in world coordinates
-plane_bins = 100
-plane_z = range(-50, 50, 1) # mm, z-coordinates of planes perpendicular
 
 tree = uproot.open(path + 'CC_Cones.root:Cones')
 print(tree.num_entries, 'entries in tree Cones')
@@ -52,29 +49,33 @@ def stack_ellipses(df, z_plane):
     x = intersect[:, 0][:, None] + maj_l[:, None] * c * maj_d[:, 0][:, None] + min_l[:, None] * s * min_d[:, 0][:, None]
     y = intersect[:, 1][:, None] + maj_l[:, None] * c * maj_d[:, 1][:, None] + min_l[:, None] * s * min_d[:, 1][:, None]
 
-    hist, _, _ = cp.histogram2d(x.ravel(), y.ravel(), bins=[xedges, yedges])
+    print(x.shape, y.shape)
 
-
+    hist, _, _ = cp.histogram2d(x.ravel(), y.ravel(), bins=[xedges, yedges], density=True)
+    # hist[hist > 0] = 1 # TODO binarize individual ellipses instead of the whole stack
     return hist
 
 
+
+plane_side = 100 # mm, centered at (0, 0) in world coordinates
+plane_bins = 100
+plane_z = range(0, 51, 50) # mm, z-coordinates of planes perpendicular
 xedges = cp.linspace(-plane_side / 2, plane_side / 2, plane_bins + 1)
 yedges = cp.linspace(-plane_side / 2, plane_side / 2, plane_bins + 1)
 
-# # Separate 2D histograms for each z-plane
-# for z_plane in plane_z:
-#     tstart = time.time()
-#     hist = stack_ellipses(df[2:4], z_plane)
-#     print('Time taken:', time.time() - tstart)
-#     plt.imshow(hist.get(), origin='lower')
-#     plt.colorbar()
-#     plt.title(f'z = {z_plane}')
-#     plt.show()
-
+# Separate 2D histograms for each z-plane
+for z in plane_z:
+    tstart = time.time()
+    hist = stack_ellipses(df[2:3], z)
+    print('Time taken:', time.time() - tstart)
+    plt.imshow(hist.get(), origin='lower')
+    plt.colorbar()
+    plt.title(f'z = {z}')
+    plt.show()
 
 # # # 3D histogram stack
-tstart = time.time()
-hist_stack = cp.array([stack_ellipses(df[:], z_plane) for z_plane in plane_z])
-print('Time taken:', time.time() - tstart)
-napari.view_image(hist_stack.get(), rgb=False, colormap='viridis')
-napari.run()
+# tstart = time.time()
+# hist_stack = cp.array([stack_ellipses(df[:], z) for z in plane_z])
+# print('Time taken:', time.time() - tstart)
+# napari.view_image(hist_stack.get(), rgb=False, colormap='viridis')
+# napari.run()
