@@ -33,6 +33,7 @@ def stack_ellipses(df, z_plane):
     direction = direction / cp.linalg.norm(direction, axis=1, keepdims=True)
     energy1 = cp.array(df['energy1'].values)
     cosT = 1 - (0.511 * energy1) / (E0 * (E0 - energy1))
+    # TODO: check if opening angle is nan
 
     # Calculate ellipse parameters in plane
     dot_products = direction[:, 2]
@@ -54,7 +55,10 @@ def stack_ellipses(df, z_plane):
     y = center[:, 1][:, None] + maj_l[:, None] * c * maj_d[:, 1][:, None] + min_l[:, None] * s * min_d[:, 1][:, None]
 
     hist, _, _ = cp.histogram2d(x.ravel(), y.ravel(), bins=[xedges, yedges], density=False)
+    ##############################################
+    # TODO: for 3D reconstruction, ellipse histograms should be weighted according to distance to apex
     # hist[hist > 0] = 1 # TODO binarize individual ellipses instead of the whole stack
+    ##############################################
     return hist
 
 
