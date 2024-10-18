@@ -1,5 +1,4 @@
 import sys
-
 import numpy as np
 import cupy as cp
 from matplotlib import pyplot as plt
@@ -60,9 +59,11 @@ plt.show()
 ######################################################
 #y, x = np.ogrid[:diameter, :diameter] # TODO try that option
 x, y = np.linspace(-r, r, resolution), np.linspace(-r, r, resolution)[:, None] # 4x faster than np.meshgrid
-ellipse_equation = ((x - u) / h1) ** 2 + ((y - v) / w1) ** 2
-ellipse_array = np.isclose(ellipse_equation, 1, atol=0.05)
-plt.imshow(ellipse_array, cmap='gray', origin='lower')
+ellipse1 = ((x - u) / h1) ** 2 + ((y - v) / w1) ** 2
+ellipse2 = ((x - u) / h2) ** 2 + ((y - v) / w2) ** 2
+hist1 = np.isclose(ellipse1, 1, atol=0.05)
+hist2 = np.isclose(ellipse2, 1, atol=0.05)
+plt.imshow(hist1+hist2, cmap='gray', origin='lower')
 plt.show()
 # sys.exit()
 
