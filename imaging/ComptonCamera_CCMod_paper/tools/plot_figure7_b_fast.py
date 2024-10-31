@@ -26,9 +26,15 @@ yedges = cp.linspace(-plane_side / 2, plane_side / 2, plane_bins + 1)
 
 tree = uproot.open(path + 'CC_Cones.root:Cones')
 print(tree.num_entries, 'entries in tree Cones')
-df_cone = tree.arrays(cut=energy_cut, library='pd')[2:8]
+df_cone = tree.arrays(cut=energy_cut, library='pd')[:]
+print(len(df_cone), 'entries in tree Cones after energy cuts')
 print('Number of cones with at least one NaN parameter:', df_cone.isnull().any(axis=1).sum())
+print(df_cone['IsTrueCoind'].value_counts())
 plane_normal = cp.array([0, 0, 1])
+# TODO: filter bad events:
+#  - false coincidences (IsTrueCoind == False)
+#  - NaN values
+#  - cosT out of bounds (i.e. wrong energy values)
 
 
 def stack_ellipses(df, z_plane):
@@ -39,12 +45,10 @@ def stack_ellipses(df, z_plane):
     direction = direction / cp.linalg.norm(direction, axis=1, keepdims=True)
     E1 = cp.array(df['energy1'].values)
     cosT = 1 - (0.511 * E1) / (E0 * (E0 - E1)) # equation 1a in paper
+    print('for z = ',z_plane,',', cp.sum((cosT < -1) | (cosT > 1)), 'cosT out of bounds')
 
     # Calculate ellipse parameters in plane
     dot_products = direction[:, 2]
-    # if np.abs(dot_product) < plane_cone_dirs:
-    #     print("The cone and plane are parallel and do not intersect.")
-    #     return
     d = (z_plane - apex[:, 2]) / dot_products
     center = apex + d[:, None] * direction # intersection points between cone's axes and plane
     sinT = cp.sqrt(1 - cosT ** 2)
@@ -63,10 +67,13 @@ def stack_ellipses(df, z_plane):
     y = center[:, 1][:, None] + maj_l[:, None] * c * maj_d[:, 1][:, None] + min_l[:, None] * s * min_d[:, 1][:, None]
 
     # Fill the histogram
-    hist_stack, _, _ = cp.histogram2d(x.ravel(), y.ravel(), bins=[xedges, yedges], density=True)
     ##############################################
     # TODO: for 3D reconstruction, ellipse histograms should be weighted according to distance to apex
-    # hist_stack[hist_stack > 0] = 1 # TODO binarize individual ellipses instead of the whole stack
+    # distance_apexZ_planeZ = cp.abs(apex[:, 2][:, None] - z_plane)
+    # weights = cp.repeat(distance_apexZ_planeZ, n_ellipse_points, axis=1)
+    # hist_stack, _, _ = cp.histogram2d(x.ravel(), y.ravel(), bins=[xedges, yedges], weights=weights.ravel())
+    hist_stack, _, _ = cp.histogram2d(x.ravel(), y.ravel(), bins=[xedges, yedges])
+    # TODO binarize individual ellipses (not whole stack)
     ##############################################
     return hist_stack
 
