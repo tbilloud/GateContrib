@@ -27,11 +27,3 @@ tree = uproot.open(path+'CC_sequenceCoincidence.root:sequenceCoincidence')
 print(tree.num_entries, 'entries in tree sequenceCoincidence')
 df_SC = tree.arrays(library='pd')
 print(df_SC[:5])
-
-# # Add dummy sublayerID to sequenceCoincidence
-# with uproot.recreate(path+'CC_sequenceCoincidence_new.root') as file:
-#     df = tree.arrays(library='pd')
-#     df['sublayerID'] = -1
-#     file["sequenceCoincidence"] = df
-# tree_new = uproot.open(path+'CC_sequenceCoincidence_new.root:sequenceCoincidence')
-# print(tree_new.keys())

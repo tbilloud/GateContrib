@@ -9,17 +9,10 @@ import uproot
 # This executable is compiled with the other offline processing tools but is not mentioned in the website or paper...
 # Usage: GateDigit_seqCoinc2Cones CC_sequenceCoincidence.root CC_Cones.root
 # There is a bug however: it requires the tree in CC_sequenceCoincidence.root to have a 'sublayerID' branch which is not
-# present in the output of the GateDigit_seqCoincidence executable. Thus, I add a dummy column first with:
-# path = '../output/test_data/'
-# with uproot.recreate(path+'CC_sequenceCoincidence.root') as file:
-#     df = tree.arrays(library='pd')
-#     df['sublayerID'] = -1
-#     file["sequenceCoincidence"] = df
-#
-#   From Gate source code:
-#   G4double m_E1;            // energy deposition of the first interaction
-#   G4double m_E2;            // energy deposition of the second interaction
-#   G4double m_ER;            // Total energy deposition except E1
+# present in the output of the GateDigit_seqCoincidence executable. Add a dummy column with add_sublayerID_TBranch.py
+# In the output file, there is a tree 'Cones' where (according to Gate source code):
+# - energy1 is the energy deposited by the 1st interaction
+# - energyR is the total energy deposition except energy1
 #
 # From the paper:
 # For the comparison with experimental data, the initial energy E0 was estimated from the sum of the energy deposition
