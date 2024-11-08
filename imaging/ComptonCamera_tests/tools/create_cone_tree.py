@@ -1,3 +1,5 @@
+import time
+
 import uproot
 import subprocess
 import os
@@ -27,6 +29,7 @@ import os
 
 # ################## TO EDIT ###################
 path_data = '../output/'
+path_data='/home/billoud/Downloads/'
 file_name = 'CC_sequenceCoincidence.root'
 new_file_name = 'CC_sequenceCoincidence_new.root'
 path_executable = '/home/billoud/workspace/gate/Gate-9.2-QT-DIGIT-install/bin/GateDigit_seqCoinc2Cones'
@@ -40,7 +43,6 @@ with uproot.recreate(path_data + new_file_name) as file:
     df = tree.arrays(library='pd')
     df['sublayerID'] = -1
     file["sequenceCoincidence"] = df
-tree_new = uproot.open(path_data + 'CC_sequenceCoincidence_new.root:sequenceCoincidence')
 
 # Set environment variables
 os.environ['LD_LIBRARY_PATH'] = f"{path_gate}:{path_geant4}:{path_root}"
