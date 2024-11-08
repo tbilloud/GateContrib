@@ -8,17 +8,23 @@ pandas.set_option('display.max_rows', 1000)
 path = '../output/'
 nevent_printed = 10
 
-# Not processing Hits tree because I don't always save it (very large file)
+# Print some info about 'hist' => comment out if hit tree was not saved
+tree = uproot.open(path + 'CC_Hits.root:Hits')
+print(tree.num_entries, 'entries in tree Hits')
+df = tree.arrays(library='pd')
+print(df[df['eventID'] == 22819])
 
-# Print some info about 'singles' first
-tree = uproot.open(path + 'CC_Singles_new.root:Singles')
+# Print some info about 'singles'
+tree = uproot.open(path + 'CC_Singles.root:Singles')
 print(tree.num_entries, 'entries in tree Singles')
-df = tree.arrays(["eventID", "layerName", "time", "round(1000*energy)"], library='pd')
+df = tree.arrays(library='pd')
+print(df[:5])
 
 # Print info about coincidences
 tree = uproot.open(path + 'CC_Coincidences.root:Coincidences')
 print(tree.num_entries, 'entries in tree Coincidences')
-df = tree.arrays(["eventID ", 'coincID', "layerName", "time", "round(1000*energy)"], library='pd')
+df = tree.arrays(library='pd')
+print(df[:5])
 
 # Print info about coincidence sequences
 tree = uproot.open(path + 'CC_sequenceCoincidence.root:sequenceCoincidence')
@@ -26,7 +32,7 @@ print(tree.num_entries, 'entries in tree sequenceCoincidence')
 df = tree.arrays(library='pd')
 print(df[:5])
 
-# Print info about cones
+# Print info about cones => comment out if cone tree was not created (has to be done after simulation)
 tree = uproot.open(path + 'CC_Cones.root:Cones')
 print(tree.num_entries, 'entries in tree Cones')
 df = tree.arrays(library='pd')
