@@ -1,10 +1,10 @@
 /gate/source/addSource mysource
 
-/gate/source/mysource/gps/particle ion
-/gate/source/mysource/gps/ion 11 22 0 0
-#/gate/source/mysource/gps/particle gamma
-#/gate/source/mysource/gps/energytype Mono
-#/gate/source/mysource/gps/monoenergy 662 keV
+#/gate/source/mysource/gps/particle ion
+#/gate/source/mysource/gps/ion 11 22 0 0
+/gate/source/mysource/gps/particle gamma
+/gate/source/mysource/gps/energytype Mono
+/gate/source/mysource/gps/monoenergy 250 keV
 
 /gate/source/mysource/setActivity 847 kBq
 /gate/source/mysource/gps/angtype iso
