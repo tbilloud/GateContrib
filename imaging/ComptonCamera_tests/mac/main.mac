@@ -13,11 +13,6 @@
 /control/execute                     mac/geometry.mac
 
 # ===========================
-# ==   PHANTOM            ==
-# ===========================
-/control/execute                    mac/phantom.mac
-
-# ===========================
 # ==  PHYSICS              ==
 # ===========================
 /gate/physics/addPhysicsList emstandard_opt4
