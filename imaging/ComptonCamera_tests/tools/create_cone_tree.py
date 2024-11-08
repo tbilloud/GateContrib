@@ -1,8 +1,12 @@
-import time
-
+import sys
 import uproot
 import subprocess
 import os
+import pandas
+pandas.set_option('display.max_columns', 100)
+pandas.set_option('display.width', 400)
+pandas.set_option('display.max_rows', 1000)
+
 
 # This script create a ROOT tree with cone information, using a (non-documented) executable of Gate
 # The executable (GateDigit_seqCoinc2Cones) is created when compiling offline tools. See section 'Offline processing' in
@@ -29,7 +33,6 @@ import os
 
 # ################## TO EDIT ###################
 path_data = '../output/'
-path_data='/home/billoud/Downloads/'
 file_name = 'CC_sequenceCoincidence.root'
 new_file_name = 'CC_sequenceCoincidence_new.root'
 path_executable = '/home/billoud/workspace/gate/Gate-9.2-QT-DIGIT-install/bin/GateDigit_seqCoinc2Cones'
@@ -41,6 +44,8 @@ path_root = '/home/billoud/workspace/root/root_v6.30.08.Linux-ubuntu22.04-x86_64
 tree = uproot.open(path_data + file_name + ':sequenceCoincidence')
 with uproot.recreate(path_data + new_file_name) as file:
     df = tree.arrays(library='pd')
+    # Uncomment the following line to filter out events with multiple interactions in the same layer
+    # df = df.groupby('coincID').filter(lambda x: x['layerName'].nunique() > 1)
     df['sublayerID'] = -1
     file["sequenceCoincidence"] = df
 
