@@ -28,6 +28,6 @@ print(df[:5])
 
 # Print info about cones
 tree = uproot.open(path + 'CC_Cones.root:Cones')
-print(tree.num_entries, 'entries in tree sequenceCoincidence')
+print(tree.num_entries, 'entries in tree Cones')
 df = tree.arrays(library='pd')
 print(df[:5])
