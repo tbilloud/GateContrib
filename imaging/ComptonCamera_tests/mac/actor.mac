@@ -39,6 +39,7 @@
 /gate/digitizer/layers/clustering/setAcceptedDistance 3 mm
 /gate/digitizer/layers/clustering/setRejectionMultipleClusters 0
 /gate/digitizer/layers/insert adder
+#/gate/digitizer/layers/insert adderComptPhotIdeal
 
 # CATEGORY 2: 'singles' modification
 # The energy resolution was set to 8.5% at 511 keV in the first layer, with an energy dependence following the inverse
