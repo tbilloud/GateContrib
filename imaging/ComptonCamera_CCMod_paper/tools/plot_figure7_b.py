@@ -8,27 +8,25 @@ import pandas as pd
 import napari
 pd.set_option('display.width', 1000), pd.set_option('display.max_columns', None)
 
+# TODO: ellipse points seem wrong
+
 path = '../output/test_data/'
+# path = '/media/billoud/Volume/CT/GATE/3So100se/'
 energy_cut = '(energy1+energyR>0.6) & (energy1+energyR<1.275)'  # MeV, see section 2.2.3
 E0 = 1.275  # MeV, incident gamma energy (adapt to energy_cut)
 plane_side = 100  # mm, plane being centered at (0, 0) in world coordinates
-plane_bins = 100
-plane_z = range(-50, 50, 1)  # mm, z-coordinates of planes perpendicular
+plane_bins = 256
+plane_z = range(-128, 128, 1)  # mm, z-coordinates of planes perpendicular
 n_ellipse_points = 1000
 plane_cone_dirs = 1e-6
 
-xedges = np.linspace(-plane_side / 2, plane_side / 2, plane_bins + 1)
-yedges = np.linspace(-plane_side / 2, plane_side / 2, plane_bins + 1)
 # G4double m_E1; // energy deposition of the first interaction
 # G4double m_E2; // energy deposition of the second interaction
 # G4double m_ER; // Total energy deposition except E1
-# G4ThreeVector m_Pos1;  //
-# G4ThreeVector  m_Pos2; //  Second interaction
-# G4ThreeVector  m_Pos3; //  third interaction
 
 tree = uproot.open(path + 'CC_Cones.root:Cones')
 print(tree.num_entries, 'entries in tree Cones')
-df_cone = tree.arrays(cut=energy_cut, library='pd')[:]
+df_cone = tree.arrays(cut=energy_cut, library='pd')[2:3] # TODO
 print(len(df_cone), 'entries in tree Cones after energy cuts')
 print('Number of cones with at least one NaN parameter:', df_cone.isnull().any(axis=1).sum())
 print(df_cone['IsTrueCoind'].value_counts())
@@ -47,8 +45,8 @@ def stack_ellipses(row, hist_stack, z_plane):
     direction = direction / np.linalg.norm(direction)
     E1 = row['energy1']
     cosT = 1 - (0.511 * E1) / (E0 * (E0 - E1)) # equation 1a in paper
-    if cosT < -1 or cosT > 1:
-        print('for z =',z_plane,'and cone number',row.name,'cosT out of bounds')
+    # if cosT < -1 or cosT > 1:
+    #     print('for z =',z_plane,'and cone number',row.name,'cosT out of bounds')
 
     # Calculate ellipse parameters in plane
     dot_product = np.dot(direction, plane_normal)
@@ -78,12 +76,15 @@ def stack_ellipses(row, hist_stack, z_plane):
     ##############################################
     hist_stack += hist_update
 
-vol = np.zeros((len(plane_z), plane_bins, plane_bins))
+vol = np.zeros((plane_bins, plane_bins, len(plane_z)))
+xedges = np.linspace(-plane_side / 2, plane_side / 2, plane_bins + 1)
+yedges = np.linspace(-plane_side / 2, plane_side / 2, plane_bins + 1)
 for i, z in enumerate(plane_z):
+    print(i,z)
     tstart = time.time()
     hist_stack, _, _ = np.histogram2d([], [], bins=[xedges, yedges])
     df_cone.apply(lambda row: stack_ellipses(row, hist_stack, z), axis=1)
-    print(i,'/',len(plane_z), 'time', round(time.time() - tstart,2),'s')
+    # print(i,'/',len(plane_z), 'time', round(time.time() - tstart,2),'s')
 
     # ### Multiple 2D histograms ###
     # if i % 10 == 0:
@@ -93,7 +94,8 @@ for i, z in enumerate(plane_z):
     #     plt.show()
 
     ### 3D volume ###
-    vol[i] = hist_stack
+    vol[:,:,i] = hist_stack
 
-napari.view_image(vol, rgb=False, colormap='viridis')
+np.save("../output_plot_figure7_b/vol.npy", vol)
+napari.view_image(vol, colormap='gray_r')
 napari.run()

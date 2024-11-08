@@ -6,23 +6,20 @@ import uproot
 from uproot.extras import pandas
 import matplotlib.pyplot as plt
 
+# TODO: ellipse points seem wrong
+
 path = '../output/test_data/'
 energy_cut = '(energy1+energyR>0.6) & (energy1+energyR<1.275)'  # MeV, see section 2.2.3 of the paper
 E0 = 1.275  # MeV, incident gamma energy (adapt to energy_cut)
 plane_side = 100  # mm, plane being centered at (0, 0) in world coordinates
-plane_bins = 100
-plane_z = range(-50, 50, 1)  # mm, z-coordinates of planes perpendicular
+plane_bins = 256
+plane_z = range(-128, 128, 1)  # mm, z-coordinates of planes perpendicular
 n_ellipse_points = 1000
 plane_cone_dirs = 1e-6
 
-xedges = cp.linspace(-plane_side / 2, plane_side / 2, plane_bins + 1)
-yedges = cp.linspace(-plane_side / 2, plane_side / 2, plane_bins + 1)
 # G4double m_E1; // energy deposition of the first interaction
 # G4double m_E2; // energy deposition of the second interaction
 # G4double m_ER; // Total energy deposition except E1
-# G4ThreeVector m_Pos1;  //
-# G4ThreeVector  m_Pos2; //  Second interaction
-# G4ThreeVector  m_Pos3; //  third interaction
 
 tree = uproot.open(path + 'CC_Cones.root:Cones')
 print(tree.num_entries, 'entries in tree Cones')
@@ -77,6 +74,8 @@ def stack_ellipses(df, z_plane):
     ##############################################
     return hist_stack
 
+xedges = cp.linspace(-plane_side / 2, plane_side / 2, plane_bins + 1)
+yedges = cp.linspace(-plane_side / 2, plane_side / 2, plane_bins + 1)
 
 # ### Multiple 2D histograms ###
 # for z in plane_z:
@@ -92,5 +91,5 @@ def stack_ellipses(df, z_plane):
 tstart = time.time()
 vol = cp.array([stack_ellipses(df_cone[:], z) for z in plane_z])
 print('Time taken:', time.time() - tstart)
-napari.view_image(vol.get(), rgb=False, colormap='viridis')
+napari.view_image(vol.get(), colormap='gray_r', contrast_limits=[0, int(cp.max(vol))])
 napari.run()
