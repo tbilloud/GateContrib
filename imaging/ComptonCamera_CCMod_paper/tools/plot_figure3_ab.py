@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import uproot
 
 path = '../output/test_data/CC_Singles.root'
+#path = '../output/source_x30mm_time20/CC_Singles.root'
 bins = 100
 
 pSingles = uproot.open(os.path.abspath(path) + ':Singles')
