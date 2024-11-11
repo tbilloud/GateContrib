@@ -1,4 +1,4 @@
-/control/alias time 0.01
+/control/alias time 10
 /control/alias out output
 /control/alias seed 1
 
@@ -16,8 +16,6 @@
 # ==  PHYSICS              ==
 # ===========================
 /gate/physics/addPhysicsList emstandard_opt4
-#/gate/physics/addProcess RadioactiveDecay
-#/control/execute                  mac/cuts.mac
 
 # =============================
 # == ACTORS                  ==
