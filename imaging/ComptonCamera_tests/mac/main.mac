@@ -16,8 +16,8 @@
 # ==  PHYSICS              ==
 # ===========================
 /gate/physics/addPhysicsList emstandard_opt4
-/gate/physics/addProcess RadioactiveDecay
-/control/execute                  mac/cuts.mac
+#/gate/physics/addProcess RadioactiveDecay
+#/control/execute                  mac/cuts.mac
 
 # =============================
 # == ACTORS                  ==
