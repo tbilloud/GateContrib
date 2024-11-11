@@ -9,7 +9,7 @@ import numpy as np
 
 # Define the input and output file paths
 input_file_path = "../output/CC_sequenceCoincidence.root"
-output_file_path = "../output/CC_Cones_new.root"
+output_file_path = "../output/CC_Cones.root"
 
 # Open the input ROOT file and get the tree
 with uproot.open(input_file_path) as file:
