@@ -1,20 +1,20 @@
 ######################################################################################
 ########################### ACTOR (2.1.2 section in paper) ###########################
 ######################################################################################
-/gate/actor/addActor     SimulationStatisticActor stat
-/gate/actor/stat/save    {out}/stats.txt
-
+/gate/actor/addActor                                    SimulationStatisticActor stat
+/gate/actor/stat/save                                   {out}/stats.txt
 /gate/actor/addActor  ComptonCameraActor                CC_digi_BB
 /gate/actor/CC_digi_BB/attachTo                         BB
-/gate/actor/CC_digi_BB/save                               {out}/CC.root
-/gate/actor/CC_digi_BB/saveHitsTree                           1
-/gate/actor/CC_digi_BB/saveSinglesTree                        1
-/gate/actor/CC_digi_BB/saveCoincidencesTree                   1
-/gate/actor/CC_digi_BB/saveCoincidenceChainsTree              1
-/gate/actor/CC_digi_BB/absorberSDVolume                      absorber
-/gate/actor/CC_digi_BB/scattererSDVolume                    scatterer
-/gate/actor/CC_digi_BB/numberOfTotScatterers                    1
-/gate/actor/CC_digi_BB/specifysourceParentID 0
+/gate/actor/CC_digi_BB/save                             {out}/CC.root
+/gate/actor/CC_digi_BB/saveHitsTree                     1
+/gate/actor/CC_digi_BB/saveSinglesTree                  1
+/gate/actor/CC_digi_BB/saveCoincidencesTree             1
+/gate/actor/CC_digi_BB/saveCoincidenceChainsTree        1
+/gate/actor/CC_digi_BB/saveEventInfoTree                1
+/gate/actor/CC_digi_BB/absorberSDVolume                 absorber
+/gate/actor/CC_digi_BB/scattererSDVolume                scatterer
+/gate/actor/CC_digi_BB/numberOfTotScatterers            1
+/gate/actor/CC_digi_BB/specifysourceParentID            0
 
 ######################################################################################
 ##################### DIGITIZER (2.1.3 section in paper) #############################
@@ -37,15 +37,12 @@
 ######################################################################################
 ####################### SORTER (2.1.4 section in paper) ##############################
 ######################################################################################
-# After the digitization process, the generated singles were sorted using a TCW of 50 ns.
 /gate/digitizer/Coincidences/setWindow 50. ns
+/gate/digitizer/Coincidences/setAcceptancePolicy4CC keepIfMultipleVolumeNamesInvolved
 
 ######################################################################################
 ################ COINCIDENCE PROCESSING (2.1.5 section in paper) #####################
 ######################################################################################
-# The singles within the sequence coincidence were ordered by increasing axial distance to the source, i.e. first
-# singles in the first layer. It was considered that the majority of coincidences corresponds to forward scattering in
-# the scatterer followed by an interaction in the second layer.
 /gate/digitizer/name sequenceCoincidence
 /gate/digitizer/insert coincidenceChain
 /gate/digitizer/sequenceCoincidence/addInputName Coincidences
