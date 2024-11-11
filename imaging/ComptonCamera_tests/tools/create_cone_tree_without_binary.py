@@ -1,6 +1,12 @@
 import uproot
 import numpy as np
 
+# Create root file with cone tree, as would be done by GateDigit_seqCoinc2Cones
+# It also avoid bugs in GateDigit_seqCoinc2Cones:
+#  - GateDigit_seqCoinc2Cones requires a sublayerID in the input file (sequenceCoincidence.root) which is not present in Gate 9.2
+#  - the nSingles branch produced by GateDigit_seqCoinc2Cones has wrong values, i.e. only 1 instead of the number of singles in the coincidence
+# ! WARNING ! For now, only works when adderComptPhotIdeal is used in the simulation
+
 # Define the input and output file paths
 input_file_path = "../output/CC_sequenceCoincidence.root"
 output_file_path = "../output/CC_Cones_new.root"
@@ -48,6 +54,8 @@ for i in range(len(energy_ini)):
             globalPosX2.append(global_pos_x[i])
             globalPosY2.append(global_pos_y[i])
             globalPosZ2.append(global_pos_z[i])
+        else:
+            print(counter)
         counter += 1
 
     if i == len(energy_ini) - 1 or (event_id[i] != event_id[i+1] or run_id[i] != run_id[i+1]):
