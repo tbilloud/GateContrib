@@ -15,7 +15,3 @@
 /gate/scatterer/vis/setColor             green
 /gate/absorber/vis/setVisible 1
 /gate/absorber/vis/setColor             blue
-
-# Ensure the source is visible
-/gate/source/sphereSource/vis/setVisible 1
-/gate/source/sphereSource/vis/setColor red
