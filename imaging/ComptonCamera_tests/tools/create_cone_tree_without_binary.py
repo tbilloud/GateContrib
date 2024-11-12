@@ -55,8 +55,6 @@ for i in range(len(energy_ini)):
             globalPosX2.append(global_pos_x[i])
             globalPosY2.append(global_pos_y[i])
             globalPosZ2.append(global_pos_z[i])
-        else:
-            print(counter)
         counter += 1
 
     if i == len(energy_ini) - 1 or (event_id[i] != event_id[i+1] or run_id[i] != run_id[i+1]):
