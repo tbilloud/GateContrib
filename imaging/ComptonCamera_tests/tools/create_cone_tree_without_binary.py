@@ -5,11 +5,12 @@ import numpy as np
 # It also avoid bugs in GateDigit_seqCoinc2Cones:
 #  - GateDigit_seqCoinc2Cones requires a sublayerID in the input file (sequenceCoincidence.root) which is not present in Gate 9.2
 #  - the nSingles branch produced by GateDigit_seqCoinc2Cones has wrong values, i.e. only 1 instead of the number of singles in the coincidence
+#  - GateDigit_seqCoinc2Cones seems not to work for any output file name
 # ! WARNING ! For now, only works when adderComptPhotIdeal is used in the simulation
 
 # Define the input and output file paths
-input_file_path = "../point_source/output/source_phantom_defrise/CC_sequenceCoincidence.root"
-output_file_path = "../point_source/output/CC_Cones.root"
+input_file_path = "../single_layer/output/CC_sequenceCoincidence.root"
+output_file_path = "../single_layer/output/CC_Cones.root"
 
 # Open the input ROOT file and get the tree
 with uproot.open(input_file_path) as file:
