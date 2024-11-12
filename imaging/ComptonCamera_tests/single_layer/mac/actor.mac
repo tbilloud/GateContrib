@@ -16,19 +16,6 @@
 /gate/actor/CC_digi_BB/numberOfTotScatterers            1
 /gate/actor/CC_digi_BB/specifysourceParentID            0
 
-/gate/actor/addActor  ComptonCameraActor                CC_digi_BB2
-/gate/actor/CC_digi_BB2/attachTo                         BB2
-/gate/actor/CC_digi_BB2/save                             {out}/CC2.root
-/gate/actor/CC_digi_BB2/saveHitsTree                     1
-/gate/actor/CC_digi_BB2/saveSinglesTree                  1
-/gate/actor/CC_digi_BB2/saveCoincidencesTree             1
-/gate/actor/CC_digi_BB2/saveCoincidenceChainsTree        1
-/gate/actor/CC_digi_BB2/saveEventInfoTree                1
-/gate/actor/CC_digi_BB2/absorberSDVolume                 absorber
-/gate/actor/CC_digi_BB2/scattererSDVolume                scatterer
-/gate/actor/CC_digi_BB2/numberOfTotScatterers            1
-/gate/actor/CC_digi_BB2/specifysourceParentID            0
-
 ######################################################################################
 ##################### DIGITIZER (2.1.3 section in paper) #############################
 ######################################################################################

@@ -32,32 +32,3 @@
 /gate/absorber/geometry/setYLength         10 mm
 /gate/absorber/geometry/setZLength         1 mm
 /gate/absorber/setMaterial                 CdTe
-
-#======Boundary Box =====================
-/gate/world/daughters/name                 BB2
-/gate/world/daughters/insert               box
-/gate/BB2/placement/setTranslation          0 80 48 mm
-/gate/BB2/geometry/setXLength               10 mm
-/gate/BB2/geometry/setYLength               10 mm
-/gate/BB2/geometry/setZLength               2 mm
-/gate/BB2/setMaterial                       Vacuum
-/gate/BB2/vis/setVisible                    1
-/gate/BB2/vis/setColor                      red
-
-#==================== SCATTERER =========================
-/gate/BB2/daughters/name                    scatterer2
-/gate/BB2/daughters/insert                  box
-/gate/scatterer2/placement/setTranslation   0 0 -0.5 mm
-/gate/scatterer2/geometry/setXLength        10 mm
-/gate/scatterer2/geometry/setYLength        10 mm
-/gate/scatterer2/geometry/setZLength        1 mm
-/gate/scatterer2/setMaterial                Vacuum
-
-#================== ABSORBER =============================
-/gate/BB2/daughters/name                    absorber2
-/gate/BB2/daughters/insert                  box
-/gate/absorber2/placement/setTranslation    0 0 0.5 mm
-/gate/absorber2/geometry/setXLength         10 mm
-/gate/absorber2/geometry/setYLength         10 mm
-/gate/absorber2/geometry/setZLength         1 mm
-/gate/absorber2/setMaterial                 CdTe
