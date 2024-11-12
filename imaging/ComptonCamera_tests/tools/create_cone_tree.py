@@ -32,7 +32,7 @@ pandas.set_option('display.max_rows', 1000)
 # Error in <TTree::SetBranchAddress>: The pointer type given "Int_t" (3) does not correspond to the type needed "Long64_t" (16) by the branch: volumeID
 
 # ################## TO EDIT ###################
-path_data = '../output/'
+path_data = '../point_source/output/'
 file_name = 'CC_sequenceCoincidence.root'
 new_file_name = 'CC_sequenceCoincidence_new.root'
 path_executable = '/home/billoud/workspace/gate/Gate-9.2-QT-DIGIT-install/bin/GateDigit_seqCoinc2Cones'

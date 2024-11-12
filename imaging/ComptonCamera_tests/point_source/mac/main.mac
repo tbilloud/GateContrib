@@ -1,11 +1,11 @@
-/control/alias time 10
+/control/alias time 0.01
 /control/alias out output
 /control/alias seed 1
 
 # ===========================
 # == LOAD DATABASE         ==
 # ===========================
-/gate/geometry/setMaterialDatabase    data/GateMaterials.db
+/gate/geometry/setMaterialDatabase    ../data/GateMaterials.db
 
 # ===========================
 # ==   GEOMETRY            ==
@@ -30,7 +30,7 @@
 # ============================
 # ==  VISUALIZATION         ==
 # ============================
-# /control/execute                     mac/visu.mac
+/control/execute                     mac/visu.mac
 
 # ============================
 # == SOURCE                 ==

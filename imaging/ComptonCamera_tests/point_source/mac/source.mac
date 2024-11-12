@@ -1,0 +1,25 @@
+#/gate/source/addSource mysource
+#/gate/source/mysource/gps/particle gamma
+#/gate/source/mysource/gps/energytype Mono
+#/gate/source/mysource/gps/monoenergy 250 keV
+#/gate/source/mysource/setActivity 847 kBq
+#/gate/source/mysource/gps/angtype iso
+#/gate/source/mysource/gps/centre 0.0 0.0 0.0 mm
+
+# add a sphere source
+/gate/source/addSource sphereSource gps
+/gate/source/sphereSource/gps/particle gamma
+/gate/source/sphereSource/setActivity 1 kBq
+/gate/source/sphereSource/gps/energytype Mono
+/gate/source/sphereSource/gps/monoenergy 140.5 keV
+/gate/source/sphereSource/gps/pos/centre 0.0 0.0 0.0 mm
+/gate/source/sphereSource/gps/ang/type iso
+/gate/source/sphereSource/gps/ang/mintheta 0.0 deg
+/gate/source/sphereSource/gps/ang/maxtheta 180.0 deg
+/gate/source/sphereSource/gps/ang/minphi 0.0  deg
+/gate/source/sphereSource/gps/ang/maxphi 360.0 deg
+/gate/source/sphereSource/gps/type Volume
+/gate/source/sphereSource/gps/shape Cylinder
+/gate/source/sphereSource/gps/radius 100. mm
+/gate/source/sphereSource/gps/halfz 10. mm
+/gate/source/sphereSource/visualize 5000 red 10

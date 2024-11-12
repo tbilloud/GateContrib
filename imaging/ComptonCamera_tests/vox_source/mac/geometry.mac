@@ -1,15 +1,15 @@
 #======== World=================
-/gate/world/geometry/setXLength 20 mm
-/gate/world/geometry/setYLength 20 mm
-/gate/world/geometry/setZLength 150 mm
+/gate/world/geometry/setXLength 1000 mm
+/gate/world/geometry/setYLength 1000 mm
+/gate/world/geometry/setZLength 1000 mm
 /gate/world/setMaterial         Vacuum
 
 #======Boundary Box =====================
 /gate/world/daughters/name                 BB
 /gate/world/daughters/insert               box
-/gate/BB/placement/setTranslation          0 0 48 mm
-/gate/BB/geometry/setXLength               10 mm
-/gate/BB/geometry/setYLength               10 mm
+/gate/BB/placement/setTranslation          0 0 490 mm
+/gate/BB/geometry/setXLength               100 mm
+/gate/BB/geometry/setYLength               100 mm
 /gate/BB/geometry/setZLength               2 mm
 /gate/BB/setMaterial                       Vacuum
 /gate/BB/vis/setVisible                    1
@@ -19,8 +19,8 @@
 /gate/BB/daughters/name                    scatterer
 /gate/BB/daughters/insert                  box
 /gate/scatterer/placement/setTranslation   0 0 -0.5 mm
-/gate/scatterer/geometry/setXLength        10 mm
-/gate/scatterer/geometry/setYLength        10 mm
+/gate/scatterer/geometry/setXLength        100 mm
+/gate/scatterer/geometry/setYLength        100 mm
 /gate/scatterer/geometry/setZLength        1 mm
 /gate/scatterer/setMaterial                CdTe
 

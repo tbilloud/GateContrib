@@ -7,7 +7,7 @@ pandas.set_option('display.max_rows', 1000)
 
 # Script to print some info about root trees produced by CCMod actor
 # ! WARNING! comment out blocks if corresponding tree was not saved
-path = '../output/'
+path = '../point_source/output/'
 nentries_printed = 3
 
 # Info about electron escape
@@ -43,7 +43,7 @@ df = tree.arrays(library='pd')
 print(df[:nentries_printed])
 
 # # PrintInfo about 'cones' => comment out if cone tree was not created (has to be done after simulation)
-tree = uproot.open(path + 'CC_Cones.root:Cones')
-print(tree.num_entries, 'entries in tree Cones')
-df = tree.arrays(library='pd')
-print(df[:nentries_printed])
+# tree = uproot.open(path + 'CC_Cones.root:Cones')
+# print(tree.num_entries, 'entries in tree Cones')
+# df = tree.arrays(library='pd')
+# print(df[:nentries_printed])
