@@ -9,8 +9,8 @@ import numpy as np
 # ! WARNING ! For now, only works when adderComptPhotIdeal is used in the simulation
 
 # Define the input and output file paths
-input_file_path = "../cameraSingle/output/CC_sequenceCoincidence.root"
-output_file_path = "../cameraSingle/output/CC_Cones.root"
+input_file_path = "../sourcePoint_cameraSingle/output/CC_sequenceCoincidence.root"
+output_file_path = "../sourcePoint_cameraSingle/output/CC_Cones.root"
 
 # Open the input ROOT file and get the tree
 with uproot.open(input_file_path) as file:

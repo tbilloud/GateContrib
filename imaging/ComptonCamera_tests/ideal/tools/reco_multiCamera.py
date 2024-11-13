@@ -10,7 +10,7 @@ from pathlib import Path
 ##############################################################
 # Settings
 ##############################################################
-path = Path('../sourcePoint/output/')
+path = Path('../sourcePoint_cameraDouble/output/')
 E0 = 0.250  # MeV, incident gamma energy (adapt to energy_cut)
 vsize = (256, 256, 256)
 vpitch = 1
