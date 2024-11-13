@@ -1,27 +1,23 @@
-import os
 import cupy as cp
 import napari
-from compton import compton_forward
 from seqCoinc2ConesArray_ideal import seqCoin2Cones
+from imaging.ComptonCamera_tests.tools.compton import compton_forward
 
-# Same as reco.py but combining multiple root files
+# Script to reconstruct the source from root files with a sequenceCoincidence tree
 
 ##############################################################
 # Settings
 ##############################################################
-path = '../point_source/output/'
-E0 = 0.250  # MeV, incident gamma energy (adapt to energy_cut)
+path = '../point_source/output/camera_X0Y40Z48/'
+fname, E0 = path + 'CC_sequenceCoincidence.root', 0.250
 vsize = (256, 256, 256)
 vpitch = 1
-er = 100  # inverse of cosine error
-nSingles_max = 2  # maximum number of singles per coincidence, set to False to disable
-true_coinc = False  # filter true coincidences (i.e. avoid singles from different events)
+inv_cos_error = 100
 
 ##############################################################
 # Do Projection
 ##############################################################
-fnames = [path + sd + '/CC_sequenceCoincidence.root' for sd in os.listdir(path)]
-cp_array = cp.concatenate([seqCoin2Cones(fn, E0, vsize, vpitch, er, nSingles_max, true_coinc) for fn in fnames], axis=0)
+cp_array = seqCoin2Cones(fname, E0, vsize, vpitch, inv_cos_error, nSingles_max=2, filter_TrueCoinc=False)
 vol = cp.zeros(vsize, dtype=cp.float32)
 vol = compton_forward(vol, cp_array, volume_pitch=vpitch)
 

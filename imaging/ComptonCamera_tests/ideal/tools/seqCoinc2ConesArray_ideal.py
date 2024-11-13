@@ -1,4 +1,5 @@
 import uproot
+import cupy as cp
 
 # Create cupy array file with cones from sequenceCoincidence root file
 # ! WARNING ! For now, only works when adderComptPhotIdeal is used in the simulation

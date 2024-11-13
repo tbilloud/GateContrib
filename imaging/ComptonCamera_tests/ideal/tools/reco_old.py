@@ -4,7 +4,7 @@ import uproot
 import os
 compton_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "/home/billoud/PycharmProjects/COMPTON/mw_forward"))
 sys.path.append(compton_dir)
-from compton import compton_forward
+from imaging.ComptonCamera_tests.tools.compton import compton_forward
 import cupy as cp
 import awkward as ak
 import napari
@@ -14,7 +14,7 @@ import napari
 ##############################################################
 # path = '/home/billoud/PycharmProjects/GateContrib/imaging/ComptonCamera_CCMod_paper/output/seed1_time100/'
 # path = '/home/billoud/PycharmProjects/GateContrib/imaging/ComptonCamera_CCMod_paper/output/test_data/'
-path = '/home/billoud/PycharmProjects/GateContrib/imaging/ComptonCamera_tests/single_layer/output/'
+path = '/imaging/ComptonCamera_tests/ideal/single_layer/output/'
 #energy_cut = '(energy1+energyR>0.6) & (energy1+energyR<1.275)'  # MeV, see section 2.2.3 of the paper
 energy_cut = 'energy1>0'
 energy_cut = '(energy1>0) & (nSingles==2)'
