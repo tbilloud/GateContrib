@@ -1,0 +1,49 @@
+#======== World=================
+/gate/world/geometry/setXLength 1000 mm
+/gate/world/geometry/setYLength 1000 mm
+/gate/world/geometry/setZLength 1000 mm
+/gate/world/setMaterial         Vacuum
+
+#======Boundary Box =====================
+/gate/world/daughters/name                 BB
+/gate/world/daughters/insert               box
+/gate/BB/placement/setTranslation          0 0 490 mm
+/gate/BB/geometry/setXLength               100 mm
+/gate/BB/geometry/setYLength               100 mm
+/gate/BB/geometry/setZLength               20 mm
+/gate/BB/setMaterial                       Vacuum
+
+#==================== SCATTERER =========================
+/gate/BB/daughters/name                    scatterer
+/gate/BB/daughters/insert                  box
+/gate/scatterer/placement/setTranslation   0 0 -5 mm
+/gate/scatterer/geometry/setXLength        100 mm
+/gate/scatterer/geometry/setYLength        100 mm
+/gate/scatterer/geometry/setZLength        10 mm
+/gate/scatterer/setMaterial                Vacuum
+
+#================== ABSORBER =============================
+/gate/BB/daughters/name                    absorber
+/gate/BB/daughters/insert                  box
+/gate/absorber/placement/setTranslation    0 0 5 mm
+/gate/absorber/geometry/setXLength         100 mm
+/gate/absorber/geometry/setYLength         100 mm
+/gate/absorber/geometry/setZLength         10 mm
+/gate/absorber/setMaterial                 CdTe
+
+
+#================== SOURCE VOLUME =============================
+# This is a volume to embed the source, so that the source can be rotated
+/gate/world/daughters/name                    source_volume
+/gate/world/daughters/insert                  box
+/gate/source_volume/placement/setTranslation   0 0 0 mm
+/gate/source_volume/geometry/setXLength        250 mm
+/gate/source_volume/geometry/setYLength        400 mm
+/gate/source_volume/geometry/setZLength        250 mm
+/gate/source_volume/setMaterial                Vacuum
+/gate/source_volume/placement/setRotationAxis       1 0 0
+/gate/source_volume/placement/setRotationAngle      90 deg
+/gate/source_volume/vis/forceWireframe
+/gate/source_volume/vis/setColor red
+/gate/source_volume/vis/setVisible 1
+/gate/source_volume/vis/setDaughtersInvisible 0
