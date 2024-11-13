@@ -9,7 +9,7 @@ from seqCoinc2ConesArray_ideal import seqCoin2Cones
 ##############################################################
 # Settings
 ##############################################################
-path = '../point_source/output/'
+path = '../sourcePoint/output/'
 E0 = 0.250  # MeV, incident gamma energy (adapt to energy_cut)
 vsize = (256, 256, 256)
 vpitch = 1

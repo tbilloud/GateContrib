@@ -2,7 +2,7 @@
 /gate/source/VoxSource/attachTo source_volume
 /gate/source/VoxSource/reader/insert image
 /gate/source/VoxSource/imageReader/translator/insert linear
-/gate/source/VoxSource/imageReader/linearTranslator/setScale 1 Bq
+/gate/source/VoxSource/imageReader/linearTranslator/setScale 0.001 Bq
 /gate/source/VoxSource/imageReader/readFile mac/Defrise_200x200x200.h33
 /gate/source/VoxSource/imageReader/verbose 1
 /gate/source/VoxSource/gps/particle gamma

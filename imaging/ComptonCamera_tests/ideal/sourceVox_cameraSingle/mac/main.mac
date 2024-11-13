@@ -1,4 +1,4 @@
-/control/alias time 0.01
+/control/alias time 100
 /control/alias out output
 /control/alias seed 1
 

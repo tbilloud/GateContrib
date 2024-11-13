@@ -7,7 +7,7 @@ pandas.set_option('display.max_rows', 1000)
 
 # Script to print some info about root trees produced by CCMod actor
 # ! WARNING! comment out blocks if corresponding tree was not saved
-path = '../ideal/sourceVox/output/'
+path = '../ideal/sourceVox_cameraSingle/output/'
 nentries_printed = 3
 
 # Info about electron escape
