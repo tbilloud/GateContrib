@@ -3,13 +3,14 @@ import cupy as cp
 import napari
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
 from seqCoinc2ConesArray_ideal import seqCoin2Cones
+from pathlib import Path
 
 # Same as reco.py but combining multiple root files
 
 ##############################################################
 # Settings
 ##############################################################
-path = '../sourcePoint/output/'
+path = Path('../sourcePoint/output/')
 E0 = 0.250  # MeV, incident gamma energy (adapt to energy_cut)
 vsize = (256, 256, 256)
 vpitch = 1
@@ -20,7 +21,8 @@ true_coinc = False  # filter true coincidences (i.e. avoid singles from differen
 ##############################################################
 # Do Projection
 ##############################################################
-fnames = [path + sd + '/CC_sequenceCoincidence.root' for sd in os.listdir(path)]
+fnames = [sd / 'CC_sequenceCoincidence.root' for sd in path.iterdir() if sd.is_dir()]
+print(fnames)
 cp_array = cp.concatenate([seqCoin2Cones(fn, E0, vsize, vpitch, er, nSingles_max, true_coinc) for fn in fnames], axis=0)
 vol = cp.zeros(vsize, dtype=cp.float32)
 vol = compton_forward(vol, cp_array, volume_pitch=vpitch)
