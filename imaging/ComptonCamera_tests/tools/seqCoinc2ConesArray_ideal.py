@@ -1,11 +1,7 @@
 import uproot
-import numpy as np
 
 # Create cupy array file with cones from sequenceCoincidence root file
 # ! WARNING ! For now, only works when adderComptPhotIdeal is used in the simulation
-
-import uproot
-import cupy as cp
 
 def seqCoin2Cones(input_file_path, E0, vsize, vpitch, inv_cos_error, nSingles_max=False, filter_TrueCoinc=False):
 
