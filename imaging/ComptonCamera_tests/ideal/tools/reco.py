@@ -8,8 +8,8 @@ from imaging.ComptonCamera_tests.tools.compton import compton_forward
 ##############################################################
 # Settings
 ##############################################################
-path = '../point_source/output/camera_X0Y40Z48/'
-fname, E0 = path + 'CC_sequenceCoincidence.root', 0.250
+# fname, E0 = '../point_source/output/camera_X0Y40Z48/CC_sequenceCoincidence.root', 0.250
+fname, E0 = '../cameraSingle/output/CC_sequenceCoincidence.root', 0.250
 vsize = (256, 256, 256)
 vpitch = 1
 inv_cos_error = 100
