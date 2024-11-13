@@ -37,6 +37,9 @@ globalPosZ2 = []
 nSingles = []
 IsTrueCoinc = []
 
+# TODO: make this a function so that it can be reused in other scripts
+# TODO: does not work when pile up
+
 # Loop over the events and calculate the variables
 for i in range(len(energy_ini)):
     if i == 0 or (event_id[i] != event_id[i-1] or run_id[i] != run_id[i-1]):
