@@ -1,4 +1,4 @@
-/control/alias time 0.001
+/control/alias time 0.1
 /control/alias out output
 /control/alias seed 1
 
@@ -32,12 +32,10 @@
 # ============================
 /control/execute                     mac/source.mac
 
-
 # ============================
 # ==  VISUALIZATION         ==
 # ============================
-/control/execute                     mac/visu.mac
-
+#/control/execute                     mac/visu.mac
 
 # ============================
 # == OUTPUT                 ==

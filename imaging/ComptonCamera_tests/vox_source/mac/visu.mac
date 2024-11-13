@@ -2,7 +2,7 @@
 /vis/drawVolume
 /tracking/storeTrajectory     0
 /vis/scene/add/trajectories
-/vis/scene/endOfEventAction   accumulate
+/vis/scene/endOfEventAction   accumulate -1
 /vis/scene/add/axes            0 0 0 500 mm
 /vis/scene/add/text            10 0 0 cm  20 0 0   X
 /vis/scene/add/text            0 10 0 cm  20 0 0   Y

@@ -1,15 +1,8 @@
-#/gate/source/addSource mysource
-#/gate/source/mysource/gps/particle gamma
-#/gate/source/mysource/gps/energytype Mono
-#/gate/source/mysource/gps/monoenergy 250 keV
-#/gate/source/mysource/setActivity 847 kBq
-#/gate/source/mysource/gps/angtype iso
-#/gate/source/mysource/gps/centre 0.0 0.0 0.0 mm
-
 /gate/source/addSource VoxSource voxel
+/gate/source/VoxSource/attachTo source_volume
 /gate/source/VoxSource/reader/insert image
 /gate/source/VoxSource/imageReader/translator/insert linear
-/gate/source/VoxSource/imageReader/linearTranslator/setScale 0.03 Bq
+/gate/source/VoxSource/imageReader/linearTranslator/setScale 1 Bq
 /gate/source/VoxSource/imageReader/readFile mac/Defrise_200x200x200.h33
 /gate/source/VoxSource/imageReader/verbose 1
 /gate/source/VoxSource/gps/particle gamma
@@ -18,6 +11,7 @@
 /gate/source/VoxSource/gps/ang/maxtheta 180.0 deg
 /gate/source/VoxSource/gps/ang/minphi 0.0  deg
 /gate/source/VoxSource/gps/ang/maxphi 360.0 deg
+#/gate/source/VoxSource/gps/direction 0 1 0 mm # helps for visualization
 /gate/source/VoxSource/gps/energytype Mono
 /gate/source/VoxSource/gps/ene/mono 140.5 keV # For Tc-99m
 /gate/source/VoxSource/setIntensity 1
