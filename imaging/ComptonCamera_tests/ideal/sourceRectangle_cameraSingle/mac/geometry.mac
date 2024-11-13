@@ -22,7 +22,7 @@
 /gate/scatterer/geometry/setXLength        10 mm
 /gate/scatterer/geometry/setYLength        10 mm
 /gate/scatterer/geometry/setZLength        1 mm
-/gate/scatterer/setMaterial                CdTe
+/gate/scatterer/setMaterial                Vacuum
 
 #================== ABSORBER =============================
 /gate/BB/daughters/name                    absorber

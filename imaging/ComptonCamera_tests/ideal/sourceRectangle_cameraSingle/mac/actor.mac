@@ -38,7 +38,7 @@
 ####################### SORTER (2.1.4 section in paper) ##############################
 ######################################################################################
 /gate/digitizer/Coincidences/setWindow 50. ns
-/gate/digitizer/Coincidences/setAcceptancePolicy4CC keepIfMultipleVolumeNamesInvolved
+/gate/digitizer/Coincidences/setAcceptancePolicy4CC keepAll # keepIfMultipleVolumeNamesInvolved
 
 ######################################################################################
 ################ COINCIDENCE PROCESSING (2.1.5 section in paper) #####################
@@ -48,6 +48,6 @@
 /gate/digitizer/sequenceCoincidence/addInputName Coincidences
 /gate/digitizer/sequenceCoincidence/insert sequenceRecon
 /gate/digitizer/sequenceCoincidence/sequenceRecon/setSequencePolicy singlesTime # axialDist2Source
-/gate/digitizer/sequenceCoincidence/insert multiplesKiller
+# /gate/digitizer/sequenceCoincidence/insert multiplesKiller
 
 
