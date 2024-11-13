@@ -1,11 +1,12 @@
 /gate/source/addSource mysource
-/gate/source/mysource/gps/shape Rectangle
-/gate/source/mysource/gps/pos/halfx 10 mm
-/gate/source/mysource/gps/pos/halfy 50 mm
+/gate/source/mysource/gps/pos/type Plane
+/gate/source/mysource/gps/pos/shape Rectangle
+/gate/source/mysource/gps/pos/halfx 30 mm
+/gate/source/mysource/gps/pos/halfy 10 mm
 /gate/source/mysource/gps/particle gamma
 /gate/source/mysource/gps/energytype Mono
 /gate/source/mysource/gps/monoenergy 250 keV
-/gate/source/mysource/setActivity 1 kBq
+/gate/source/mysource/setActivity 1000 MBq
 /gate/source/mysource/gps/angtype iso
 /gate/source/mysource/gps/centre 0 0 0 mm
-/gate/source/mysource/gps/direction 0 0 1
+# /gate/source/mysource/gps/direction 0 0 1

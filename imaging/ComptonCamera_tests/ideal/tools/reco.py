@@ -10,10 +10,11 @@ from imaging.ComptonCamera_tests.tools.compton import compton_forward
 ##############################################################
 # fname, E0 = '../point_source/output/camera_X0Y40Z48/CC_sequenceCoincidence.root', 0.250
 # fname, E0 = '../cameraSingle/output/CC_sequenceCoincidence.root', 0.250
-fname, E0 = '../sourceVox_cameraSingle/output/CC_sequenceCoincidence.root', 0.1405
+# fname, E0 = '../sourceVox_cameraSingle/output/CC_sequenceCoincidence.root', 0.1405
+fname, E0 = '../sourceRectangle_cameraSingle/output/CC_sequenceCoincidence.root', 0.250
 
-vsize = (512, 512, 512)
-vpitch = 2
+vsize = (256, 256, 256)
+vpitch = 1
 inv_cos_error = 100
 
 ##############################################################
