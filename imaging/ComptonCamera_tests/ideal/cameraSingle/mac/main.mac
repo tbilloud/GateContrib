@@ -1,11 +1,11 @@
-/control/alias time 10
+/control/alias time 1
 /control/alias out output
 /control/alias seed 1
 
 # ===========================
 # == LOAD DATABASE         ==
 # ===========================
-/gate/geometry/setMaterialDatabase    ../data/GateMaterials.db
+/gate/geometry/setMaterialDatabase    ../../data/GateMaterials.db
 
 # ===========================
 # ==   GEOMETRY            ==
