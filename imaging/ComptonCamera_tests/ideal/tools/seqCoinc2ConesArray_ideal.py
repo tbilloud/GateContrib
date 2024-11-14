@@ -4,24 +4,26 @@ import cupy as cp
 # Create cupy array file with cones from sequenceCoincidence root file
 # ! WARNING ! For now, only works when adderComptPhotIdeal is used in the simulation
 # TODO: make this a function so that it can be reused in other scripts
-# TODO: does not work when pile up
+# TODO: test if this works with multiple runs
+# TODO: make it work for actors other than ideal
 
-def seqCoin2Cones(input_file_path, E0, vsize, vpitch, inv_cos_error, nSingles_max=False, filter_TrueCoinc=False):
+def seqCoin2Cones(input_file_path, E0, vsize, vpitch, inv_cos_error, nSingles_max=False, filter_TrueCoinc=False, nentries = None):
 
     # Open the input ROOT file and get the tree
     with uproot.open(input_file_path) as file:
         tree = file["sequenceCoincidence"]
         print('-'*100)
-        print(tree.num_entries, 'entries in tree sequenceCoincidence')
+        print(tree.num_entries, 'entries in tree sequenceCoincidence, reading', nentries if nentries else 'all')
 
         # Read the necessary branches
-        energy_ini = tree["energyIni"].array()
-        energy_fin = tree["energyFinal"].array()
-        global_pos_x = tree["globalPosX"].array()
-        global_pos_y = tree["globalPosY"].array()
-        global_pos_z = tree["globalPosZ"].array()
-        event_id = tree["eventID"].array()
-        run_id = tree["runID"].array()
+        energy_ini = tree["energyIni"].array(entry_stop=nentries)
+        energy_fin = tree["energyFinal"].array(entry_stop=nentries)
+        global_pos_x = tree["globalPosX"].array(entry_stop=nentries)
+        global_pos_y = tree["globalPosY"].array(entry_stop=nentries)
+        global_pos_z = tree["globalPosZ"].array(entry_stop=nentries)
+        event_id = tree["eventID"].array(entry_stop=nentries)
+        run_id = tree["runID"].array(entry_stop=nentries)
+        coinc_id = tree["coincID"].array(entry_stop=nentries)
 
     # Initialize lists to store the calculated variables
     energy1 = []
@@ -40,8 +42,10 @@ def seqCoin2Cones(input_file_path, E0, vsize, vpitch, inv_cos_error, nSingles_ma
     counter = 0
 
     # Loop over the events and calculate the variables
-    for i in range(len(energy_ini)):
-        if i == 0 or (event_id[i] != event_id[i-1] or run_id[i] != run_id[i-1]):
+    last_entry = nentries if nentries else tree.num_entries
+    print('last_entry', last_entry)
+    for i in range(last_entry):
+        if i == 0 or (coinc_id[i] != coinc_id[i-1] or run_id[i] != run_id[i-1]):
             energy1.append(energy_ini[i] - energy_fin[i])
             energyR.append(energy_fin[i])
             globalPosX1.append(global_pos_x[i])
@@ -59,9 +63,19 @@ def seqCoin2Cones(input_file_path, E0, vsize, vpitch, inv_cos_error, nSingles_ma
                 globalPosZ2.append(global_pos_z[i])
             counter += 1
 
-        if i == len(energy_ini) - 1 or (event_id[i] != event_id[i+1] or run_id[i] != run_id[i+1]):
+        if i == last_entry - 1 or (coinc_id[i] != coinc_id[i+1] or run_id[i] != run_id[i+1]):
             nSingles.append(counter)
             IsTrueCoinc.append(is_true_coinc)
+
+    # When nentries is used, the loop might stop right after appending the first element of the coincidence sequence,
+    # i.e. before position 2 of that coincidence is filled, resulting in globalPosXYZ2 to be shorter than other lists.
+    energy1 = energy1[:len(globalPosX2)]
+    energyR = energyR[:len(globalPosX2)]
+    globalPosX1 = globalPosX1[:len(globalPosX2)]
+    globalPosY1 = globalPosY1[:len(globalPosX2)]
+    globalPosZ1 = globalPosZ1[:len(globalPosX2)]
+    nSingles = nSingles[:len(globalPosX2)]
+    IsTrueCoinc = IsTrueCoinc[:len(globalPosX2)]
 
     # If filtering nSingles and IsTrueCoinc is needed
     print(len(energy1), len(globalPosX1), len(globalPosY1), len(globalPosZ1), len(globalPosX2), len(globalPosY2), len(globalPosZ2), len(nSingles), len(IsTrueCoinc))
