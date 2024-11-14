@@ -1,4 +1,3 @@
-import os
 import cupy as cp
 import napari
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
