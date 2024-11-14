@@ -17,12 +17,13 @@ vpitch = 1
 er = 100  # inverse of cosine error
 nSingles_max = 2  # maximum number of singles per coincidence, set to False to disable
 true_coinc = False  # filter true coincidences (i.e. avoid singles from different events)
+nentries = None
 
 ##############################################################
 # Do Projection
 ##############################################################
 fnames = [sd / 'CC_sequenceCoincidence.root' for sd in path.iterdir() if sd.is_dir()]
-cp_array = cp.concatenate([seqCoin2ConesArray(fn, E0, vsize, vpitch, er, nSingles_max, true_coinc) for fn in fnames], axis=0)
+cp_array = cp.concatenate([seqCoin2ConesArray(fn, E0, vsize, vpitch, er, nSingles_max, true_coinc, nentries) for fn in fnames], axis=0)
 vol = cp.zeros(vsize, dtype=cp.float32)
 vol = compton_forward(vol, cp_array, volume_pitch=vpitch)
 
