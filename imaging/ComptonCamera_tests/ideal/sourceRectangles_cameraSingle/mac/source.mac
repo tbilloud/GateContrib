@@ -1,0 +1,25 @@
+/gate/source/addSource rec1
+/gate/source/rec1/gps/pos/type Plane
+/gate/source/rec1/gps/pos/shape Rectangle
+/gate/source/rec1/gps/pos/halfx 3 mm
+/gate/source/rec1/gps/pos/halfy 1 mm
+/gate/source/rec1/gps/particle gamma
+/gate/source/rec1/gps/energytype Mono
+/gate/source/rec1/gps/monoenergy 250 keV
+/gate/source/rec1/setActivity 1 MBq
+/gate/source/rec1/gps/angtype iso
+/gate/source/rec1/gps/centre 0 5 -9 mm
+#/gate/source/rec1/gps/direction 0 0 1 # For visualization only !
+
+/gate/source/addSource rec2
+/gate/source/rec2/gps/pos/type Plane
+/gate/source/rec2/gps/pos/shape Rectangle
+/gate/source/rec2/gps/pos/halfx 6 mm
+/gate/source/rec2/gps/pos/halfy 2 mm
+/gate/source/rec2/gps/particle gamma
+/gate/source/rec2/gps/energytype Mono
+/gate/source/rec2/gps/monoenergy 250 keV
+/gate/source/rec2/setActivity 1 MBq
+/gate/source/rec2/gps/angtype iso
+/gate/source/rec2/gps/centre 0 -5 -9 mm
+##/gate/source/rec2/gps/direction 0 0 1 # For visualization only !

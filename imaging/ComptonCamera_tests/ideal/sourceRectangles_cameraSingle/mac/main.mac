@@ -1,0 +1,63 @@
+/control/alias time 100
+/control/alias out output
+/control/alias seed 1
+
+# ===========================
+# == LOAD DATABASE         ==
+# ===========================
+/gate/geometry/setMaterialDatabase    ../../data/GateMaterials.db
+
+# ===========================
+# ==   GEOMETRY            ==
+# ===========================
+/control/execute                     mac/geometry.mac
+
+# ===========================
+# ==  PHYSICS              ==
+# ===========================
+/gate/physics/addPhysicsList emstandard_opt4
+
+# =============================
+# == ACTORS                  ==
+# =============================
+/control/execute mac/actor.mac
+
+# ============================
+# == INITIALIZE             ==
+# ============================
+/gate/run/initialize
+
+# ============================
+# ==  VISUALIZATION         ==
+# ============================
+#/control/execute                     mac/visu.mac
+
+# ============================
+# == SOURCE                 ==
+# ============================
+/control/execute                     mac/source.mac
+
+# ============================
+# == OUTPUT                 ==
+# ============================
+/gate/application/noGlobalOutput # avoids output related to PET/SPECT systems
+
+#====================================================
+#  R A N D O M   E N G I N E  A N D  S E E D
+#====================================================
+/gate/random/setEngineName MersenneTwister
+/gate/random/setEngineSeed {seed} # 6781
+
+#=====================================================
+#   M E A S U R E M E N T   S E T T I N G S   
+#=====================================================
+/gate/application/setTimeSlice  {time} s
+/gate/application/setTimeStart   0.00   s
+/gate/application/setTimeStop    {time} s
+/gate/application/startDAQ
+
+exit
+
+
+
+
