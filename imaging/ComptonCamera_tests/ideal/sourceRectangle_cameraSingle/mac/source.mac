@@ -6,7 +6,7 @@
 /gate/source/mysource/gps/particle gamma
 /gate/source/mysource/gps/energytype Mono
 /gate/source/mysource/gps/monoenergy 250 keV
-/gate/source/mysource/setActivity 1000 MBq
+/gate/source/mysource/setActivity 1 MBq
 /gate/source/mysource/gps/angtype iso
 /gate/source/mysource/gps/centre 0 0 0 mm
 # /gate/source/mysource/gps/direction 0 0 1

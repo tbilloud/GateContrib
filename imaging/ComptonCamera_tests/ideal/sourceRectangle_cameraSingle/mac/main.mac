@@ -1,5 +1,5 @@
-/control/alias time 0.001
-/control/alias out output
+/control/alias time 1000
+/control/alias out output/1MBq_time1000
 /control/alias seed 1
 
 # ===========================
