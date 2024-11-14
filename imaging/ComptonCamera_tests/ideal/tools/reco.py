@@ -1,7 +1,7 @@
 import cupy as cp
 import napari
 from pathlib import Path
-from seqCoinc2ConesArray import seqCoin2ConesArray
+from seqCoinc2ConesArray import seqCoin2ConesArray as cones
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
 
 # Script to reconstruct the source from root files with a sequenceCoincidence tree
@@ -9,21 +9,22 @@ from imaging.ComptonCamera_tests.tools.compton import compton_forward
 ##############################################################
 # Settings
 ##############################################################
-fname, E0 = Path('../sourcePoint_cameraDouble/output/camera_X0Y40Z48/CC_sequenceCoincidence.root'), 0.250
-#fname, E0 = Path('../sourcePoint_cameraSingle/output/CC_sequenceCoincidence.root'), 0.250
-#fname, E0 = Path('../sourceVox_cameraSingle/output/1Bq_time100/CC_sequenceCoincidence.root'), 0.1405
-#fname, E0 = Path('../sourceRectangle_cameraSingle/output/1MBq_time1000/CC_sequenceCoincidence.root'), 0.250
+#fname, E0, world_z_mm = Path('../sourceRectangle_cameraSingle/output/1MBq_time1000'), 0.250, 200
+fname, E0_MeV, world_mm = Path('../sourceRectangles_cameraSingle/output'), 0.250, 20
 
-vsize = (256*2, 256*2, 256*2)
-vpitch = 4
-inv_cos_error = 100
+vsize = (256, 256, 256)
+vpitch = world_mm / vsize[2]
+er = 100  # inverse of cosine error
+nSingles_max = 2  # maximum number of singles per coincidence, set to False to disable
+true_coinc = False  # filter true coincidences (i.e. avoid singles from different events)
+nentries = None
 
 ##############################################################
 # Do Projection
 ##############################################################
-cp_array = seqCoin2ConesArray(fname, E0, vsize, vpitch, inv_cos_error, nSingles_max=False, filter_TrueCoinc=False, nentries=None)
+array = cones(fname / 'CC_sequenceCoincidence.root', E0_MeV, vsize, vpitch, er, nSingles_max, true_coinc, nentries)
 vol = cp.zeros(vsize, dtype=cp.float32)
-vol = compton_forward(vol, cp_array, volume_pitch=vpitch)
+vol = compton_forward(vol, array, volume_pitch=vpitch)
 
 ##############################################################
 # Display/Save results
