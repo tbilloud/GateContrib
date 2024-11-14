@@ -10,7 +10,6 @@ def seqCoin2ConesArray(input_file_path, E0, vsize, vpitch, inv_cos_error, nSingl
     energy1, energyR, globalPosX1, globalPosY1, globalPosZ1, globalPosX2, globalPosY2, globalPosZ2, nSingles, IsTrueCoinc = seqCoinc2Cones(input_file_path, nentries)
 
     # If filtering nSingles and IsTrueCoinc is needed
-    print(len(energy1), len(globalPosX1), len(globalPosY1), len(globalPosZ1), len(globalPosX2), len(globalPosY2), len(globalPosZ2), len(nSingles), len(IsTrueCoinc))
     cp_array = cp.stack([cp.array(energy1), cp.array(globalPosX1), cp.array(globalPosY1), cp.array(globalPosZ1), cp.array(globalPosX2), cp.array(globalPosY2), cp.array(globalPosZ2), cp.array(nSingles), cp.array(IsTrueCoinc)], axis=-1)
     print('values/counts in TBranch nSingles',cp.unique(cp.array(nSingles, dtype=cp.int32), return_counts=True))
     print('values/counts in TBranch IsTrueCoinc',cp.unique(cp.array(IsTrueCoinc, dtype=cp.int32), return_counts=True))
