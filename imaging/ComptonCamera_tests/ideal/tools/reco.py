@@ -1,7 +1,7 @@
 import cupy as cp
 import napari
 from pathlib import Path
-from seqCoinc2ConesArray_ideal import seqCoin2ConesArray
+from seqCoinc2ConesArray import seqCoin2ConesArray
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
 
 # Script to reconstruct the source from root files with a sequenceCoincidence tree
