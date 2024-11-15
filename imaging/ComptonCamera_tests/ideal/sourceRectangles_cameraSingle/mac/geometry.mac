@@ -7,7 +7,7 @@
 #======Boundary Box =====================
 /gate/world/daughters/name                 BB
 /gate/world/daughters/insert               box
-/gate/BB/placement/setTranslation          0 0 9 mm
+/gate/BB/placement/setTranslation          {posX} {posY} {posZ} mm # 0 0 9
 /gate/BB/geometry/setXLength               10 mm
 /gate/BB/geometry/setYLength               10 mm
 /gate/BB/geometry/setZLength               2 mm
