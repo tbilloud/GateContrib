@@ -132,9 +132,9 @@ def seqCoin2ConesArray(input_path, E0, vsize, vpitch, inv_cos_error, nSingles_ma
 
 
 def filter_conesArray(cp_array, filter_TrueCoinc, nSingles_max):
-    print('values/counts in TBranch nSingles', cp.unique(cp_array[:, 6].astype(cp.int32), return_counts=True))
-    print('values/counts in TBranch IsTrueCoinc', cp.unique(cp_array[:, 7].astype(cp.int32), return_counts=True))
     print(cp_array.shape[0], 'cones before filtering')
+    print('values/counts in TBranch nSingles', cp.unique(cp_array[:, 7].astype(cp.int32), return_counts=True))
+    print('values/counts in TBranch IsTrueCoinc', cp.unique(cp_array[:, 8].astype(cp.int32), return_counts=True))
     if nSingles_max:
         cp_array = cp_array[cp_array[:, 7] <= nSingles_max]
     if filter_TrueCoinc:
@@ -172,6 +172,7 @@ def conesGate2cones(E0, cp_array, inv_cos_error):
 def conesTTree2conesArray(input_file_path, E0_MeV, vsize, vpitch, er, nSingles_max=2, filter_TrueCoinc=False,
                           nentries=None):
     tree = uproot.open(input_file_path)['Cones']
+    print('Processing', input_file_path, 'with', tree.num_entries, 'entries')
     dict_branches = tree.arrays(library='np', entry_stop=nentries)
     del dict_branches['energyR']
 
