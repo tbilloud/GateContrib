@@ -7,7 +7,8 @@
 /vis/scene/endOfEventAction   accumulate -1
 /vis/scene/add/axes            0 0 0 10 mm
 
-/gate/scatterer/vis/setVisible 1
-/gate/scatterer/vis/setColor             green
+/gate/BB/vis/setVisible 0
+/gate/scatterer/vis/setVisible 0
+#/gate/scatterer/vis/setColor             green
 /gate/absorber/vis/setVisible 1
 /gate/absorber/vis/setColor             blue
