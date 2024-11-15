@@ -172,7 +172,7 @@ def conesGate2cones(E0, cp_array, inv_cos_error):
 def conesTTree2conesArray(input_file_path, E0_MeV, vsize, vpitch, er, nSingles_max=2, filter_TrueCoinc=False,
                           nentries=None):
     tree = uproot.open(input_file_path)['Cones']
-    dict_branches = tree.arrays(library='np')
+    dict_branches = tree.arrays(library='np', entry_stop=nentries)
     del dict_branches['energyR']
 
     cp_array = cp.stack([cp.array(dict_branches[key]) for key in dict_branches.keys()], axis=-1)
