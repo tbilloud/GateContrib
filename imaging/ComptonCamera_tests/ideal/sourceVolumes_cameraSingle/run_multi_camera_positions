@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Define the sets of posX and posY values
+posX_values=(0 10 20 0 0 -10 10)
+posY_values=(0 0 0 10 20 -10 10)
+
+# Define other parameters
+time=1
+posZ=9
+output_prefix="/media/billoud/Volume/CT/GATE/ideal/time${time}_camera"
+mac_file="mac/main.mac"
+seed=1
+
+# Start time
+start_time=$(date +%s)
+
+# Loop through the sets of posX and posY values
+for i in $(seq 0 $((${#posX_values[@]} - 1))); do
+  posX=${posX_values[$i]}
+  posY=${posY_values[$i]}
+
+  # Create the directory with parameter names and values
+  dir_name="${output_prefix}_posX${posX}_posY${posY}"
+  mkdir -p "$dir_name"
+
+  # Run the Gate command with the specified parameters in the background
+  Gate $mac_file -a [time,${time}][out,${dir_name}][posX,${posX}][posY,${posY}][posZ,${posZ}][seed,${seed}] &
+done
+
+# Wait for all background jobs to finish
+wait
+
+# End time
+end_time=$(date +%s)
+
+# Calculate and print the elapsed time
+elapsed_time=$((end_time - start_time))
+echo "Total time: $elapsed_time seconds"

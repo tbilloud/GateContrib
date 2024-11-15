@@ -9,7 +9,8 @@ from pathlib import Path
 ##############################################################
 # Settings
 ##############################################################
-path, E0_MeV, world_mm = Path('../sourceRectangles_cameraSingle/output/'), 0.250, 20
+# path, E0_MeV, world_mm = Path('../sourceRectangles_cameraSingle/output/'), 0.250, 20
+path, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/'), 0.250, 40
 vsize = (256, 256, 256)
 vpitch = world_mm / vsize[2]
 er = 100  # inverse of cosine error
@@ -21,11 +22,11 @@ nentries = None
 # Do Projection
 ##############################################################
 # ######## READING sequenceCoincidence.root files ####################
-# fnames = list(path.rglob('CC_sequenceCoincidence.root'))
-# cp_array = cp.concatenate([seqCoin2ConesArray(fn, E0_MeV, vsize, vpitch, er, nSingles_max, true_coinc, nentries) for fn in fnames], axis=0)
+fnames = list(path.rglob('CC_sequenceCoincidence.root'))
+cp_array = cp.concatenate([seqCoin2ConesArray(fn, E0_MeV, vsize, vpitch, er, nSingles_max, true_coinc, nentries) for fn in fnames], axis=0)
 # ######## READING CC_Cones.root files ####################
-fnames = list(path.rglob('CC_Cones.root'))
-cp_array = cp.concatenate([conesTTree2conesArray(fn, E0_MeV, vsize, vpitch, er, nSingles_max, true_coinc, nentries) for fn in fnames], axis=0)
+# fnames = list(path.rglob('CC_Cones.root'))
+# cp_array = cp.concatenate([conesTTree2conesArray(fn, E0_MeV, vsize, vpitch, er, nSingles_max, true_coinc, nentries) for fn in fnames], axis=0)
 
 vol = cp.zeros(vsize, dtype=cp.float32)
 vol = compton_forward(vol, cp_array, volume_pitch=vpitch)

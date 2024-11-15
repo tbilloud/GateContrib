@@ -1,25 +1,52 @@
-/gate/source/addSource rec1
-/gate/source/rec1/gps/pos/type Plane
-/gate/source/rec1/gps/pos/shape Rectangle
-/gate/source/rec1/gps/pos/halfx 3 mm
-/gate/source/rec1/gps/pos/halfy 1 mm
-/gate/source/rec1/gps/particle gamma
-/gate/source/rec1/gps/energytype Mono
-/gate/source/rec1/gps/monoenergy 250 keV
-/gate/source/rec1/setActivity 1 MBq
-/gate/source/rec1/gps/angtype iso
-/gate/source/rec1/gps/centre 0 5 -9 mm
-#/gate/source/rec1/gps/direction 0 0 1 # TODO !!! For visualization only !
+/gate/source/addSource sphere1
+/gate/source/sphere1/gps/pos/type Surface
+/gate/source/sphere1/gps/pos/shape Sphere
+/gate/source/sphere1/gps/pos/radius 3 mm
+/gate/source/sphere1/gps/particle gamma
+/gate/source/sphere1/gps/energytype Mono
+/gate/source/sphere1/gps/monoenergy 250 keV
+/gate/source/sphere1/setActivity 1 MBq
+/gate/source/sphere1/gps/angtype iso
+/gate/source/sphere1/gps/centre 5 5 -5 mm
 
-/gate/source/addSource rec2
-/gate/source/rec2/gps/pos/type Plane
-/gate/source/rec2/gps/pos/shape Rectangle
-/gate/source/rec2/gps/pos/halfx 6 mm
-/gate/source/rec2/gps/pos/halfy 2 mm
-/gate/source/rec2/gps/particle gamma
-/gate/source/rec2/gps/energytype Mono
-/gate/source/rec2/gps/monoenergy 250 keV
-/gate/source/rec2/setActivity 1 MBq
-/gate/source/rec2/gps/angtype iso
-/gate/source/rec2/gps/centre 0 -5 -9 mm
-#/gate/source/rec2/gps/direction 0 0 1 # TODO !!! For visualization only !
+/gate/source/addSource parallelepiped1
+/gate/source/parallelepiped1/gps/pos/type Surface
+/gate/source/parallelepiped1/gps/pos/shape Para
+/gate/source/parallelepiped1/gps/pos/halfx 3 mm
+/gate/source/parallelepiped1/gps/pos/halfy 3 mm
+/gate/source/parallelepiped1/gps/pos/halfz 3 mm
+/gate/source/parallelepiped1/gps/particle gamma
+/gate/source/parallelepiped1/gps/energytype Mono
+/gate/source/parallelepiped1/gps/monoenergy 250 keV
+/gate/source/parallelepiped1/setActivity 1 MBq
+/gate/source/parallelepiped1/gps/angtype iso
+/gate/source/parallelepiped1/gps/centre -5 5 -5 mm
+
+/gate/source/addSource sphere2
+/gate/source/sphere2/gps/pos/type Surface
+/gate/source/sphere2/gps/pos/shape Sphere
+/gate/source/sphere2/gps/pos/radius 1 mm
+/gate/source/sphere2/gps/particle gamma
+/gate/source/sphere2/gps/energytype Mono
+/gate/source/sphere2/gps/monoenergy 250 keV
+/gate/source/sphere2/setActivity 1 MBq
+/gate/source/sphere2/gps/angtype iso
+/gate/source/sphere2/gps/centre 5 -5 -5 mm
+
+/gate/source/addSource parallelepiped2
+/gate/source/parallelepiped2/gps/pos/type Surface
+/gate/source/parallelepiped2/gps/pos/shape Para
+/gate/source/parallelepiped2/gps/pos/halfx 1 mm
+/gate/source/parallelepiped2/gps/pos/halfy 1 mm
+/gate/source/parallelepiped2/gps/pos/halfz 1 mm
+/gate/source/parallelepiped2/gps/particle gamma
+/gate/source/parallelepiped2/gps/energytype Mono
+/gate/source/parallelepiped2/gps/monoenergy 250 keV
+/gate/source/parallelepiped2/setActivity 1 MBq
+/gate/source/parallelepiped2/gps/angtype iso
+/gate/source/parallelepiped2/gps/centre -5 -5 -5 mm
+
+#/gate/source/sphere1/gps/direction 0 0 1 # TODO !!! For visualization only !
+#/gate/source/parallelepiped1/gps/direction 0 0 1 # TODO !!! For visualization only !
+#/gate/source/sphere2/gps/direction 0 0 1 # TODO !!! For visualization only !
+#/gate/source/parallelepiped2/gps/direction 0 0 1 # TODO !!! For visualization only !

@@ -1,7 +1,7 @@
 #======== World=================
-/gate/world/geometry/setXLength 20 mm
-/gate/world/geometry/setYLength 20 mm
-/gate/world/geometry/setZLength 20 mm
+/gate/world/geometry/setXLength 40 mm
+/gate/world/geometry/setYLength 40 mm
+/gate/world/geometry/setZLength 40 mm
 /gate/world/setMaterial         Vacuum
 
 #======Boundary Box =====================

@@ -3,12 +3,12 @@
 # Gate mac/main.mac -a [time,1000][out,output/time1000_cameraX5Y0Z9][posX,5][posY,0][posZ,9][seed,1]
 # - If not:
 # Gate mac/main.mac
-/control/alias time 0.0001
-/control/alias out output
-/control/alias posX 0
-/control/alias posY 0
-/control/alias posZ 9
-/control/alias seed 1
+#/control/alias time 0.001
+#/control/alias out output
+#/control/alias posX 0
+#/control/alias posY 0
+#/control/alias posZ 9
+#/control/alias seed 1
 
 # ===========================
 # == LOAD DATABASE         ==
@@ -38,7 +38,7 @@
 # ============================
 # ==  VISUALIZATION         ==
 # ============================
-/control/execute                     mac/visu.mac
+#/control/execute                     mac/visu.mac
 
 # ============================
 # == SOURCE                 ==

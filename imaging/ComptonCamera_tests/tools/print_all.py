@@ -8,6 +8,7 @@ pandas.set_option('display.max_rows', 1000)
 # Script to print some info about root trees produced by CCMod actor
 # ! WARNING! comment out blocks if corresponding tree was not saved
 path = '../ideal/sourceRectangles_cameraSingle/output/time1000_cameraX5Y0Z9/'
+path = '/media/billoud/Volume/CT/GATE/ideal/time1_camera_posX0_posY0/'
 nentries_printed = 3
 
 # Info about electron escape
@@ -42,14 +43,14 @@ print(tree.num_entries, 'entries in tree sequenceCoincidence')
 df = tree.arrays(library='pd', entry_stop=nentries_printed)
 print(df)
 
-# PrintInfo about 'cones' => comment out if cone tree was not created (has to be done after simulation)
-tree = uproot.open(path + 'CC_Cones.root:Cones')
-print(tree.num_entries, 'entries in tree Cones')
-df = tree.arrays(library='pd', entry_stop=nentries_printed)
-print(df)
-# Set entry_stop to -1 if using the following
-print(len(df[df['nSingles'] == 1]),'entries with nSingles == 1')
-print(len(df[df['nSingles'] == 2]),'entries with nSingles == 2')
-print(len(df[df['nSingles'] == 3]),'entries with nSingles == 3')
-print(len(df[df['nSingles'] == 4]),'entries with nSingles == 4')
-print(len(df[df['nSingles'] == 5]),'entries with nSingles == 5')
+# # PrintInfo about 'cones' => comment out if cone tree was not created (has to be done after simulation)
+# tree = uproot.open(path + 'CC_Cones.root:Cones')
+# print(tree.num_entries, 'entries in tree Cones')
+# df = tree.arrays(library='pd', entry_stop=nentries_printed)
+# print(df)
+# # Set entry_stop to -1 if using the following
+# print(len(df[df['nSingles'] == 1]),'entries with nSingles == 1')
+# print(len(df[df['nSingles'] == 2]),'entries with nSingles == 2')
+# print(len(df[df['nSingles'] == 3]),'entries with nSingles == 3')
+# print(len(df[df['nSingles'] == 4]),'entries with nSingles == 4')
+# print(len(df[df['nSingles'] == 5]),'entries with nSingles == 5')
