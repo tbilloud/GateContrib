@@ -9,7 +9,7 @@
 /gate/source/rec1/setActivity 1 MBq
 /gate/source/rec1/gps/angtype iso
 /gate/source/rec1/gps/centre 0 5 -9 mm
-#/gate/source/rec1/gps/direction 0 0 1 # For visualization only !
+#/gate/source/rec1/gps/direction 0 0 1 # TODO !!! For visualization only !
 
 /gate/source/addSource rec2
 /gate/source/rec2/gps/pos/type Plane
@@ -22,4 +22,4 @@
 /gate/source/rec2/setActivity 1 MBq
 /gate/source/rec2/gps/angtype iso
 /gate/source/rec2/gps/centre 0 -5 -9 mm
-##/gate/source/rec2/gps/direction 0 0 1 # For visualization only !
+#/gate/source/rec2/gps/direction 0 0 1 # TODO !!! For visualization only !
