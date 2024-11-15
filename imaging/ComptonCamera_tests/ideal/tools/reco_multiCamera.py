@@ -1,7 +1,7 @@
 import cupy as cp
 import napari
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
-from seqCoinc2ConesArray import seqCoin2ConesArray, conesTTree2conesArray
+from imaging.ComptonCamera_tests.ideal.tools.seqCoinc2Cones import seqCoin2ConesArray, conesTTree2conesArray
 from pathlib import Path
 
 # Same as reco.py but combining multiple root files
