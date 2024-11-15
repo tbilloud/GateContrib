@@ -11,7 +11,7 @@ from imaging.ComptonCamera_tests.tools.compton import compton_forward
 ##############################################################
 # fname, E0, world_z_mm = Path('../sourceRectangle_cameraSingle/output/1MBq_time1000'), 0.250, 200
 # fname, E0_MeV, world_mm = Path('../sourceRectangles_cameraSingle/output'), 0.250, 20
-fname, E0_MeV, world_mm = Path('../sourceRectangles_cameraSingle/output/time100_cameraX0Y0Z9'), 0.250, 20
+fname, E0_MeV, world_mm = Path('../sourceRectangles_cameraSingle/output/time100_cameraX5Y0Z9'), 0.250, 20
 vsize = (256, 256, 256)
 vpitch = world_mm / vsize[2]
 er = 100  # inverse of cosine error
@@ -22,10 +22,10 @@ nentries = None
 ##############################################################
 # Do Projection
 ##############################################################
-# ######## READING sequenceCoincidence.root files ####################
-array = seqCoin2ConesArray(fname / 'CC_sequenceCoincidence.root', E0_MeV, vsize, vpitch, er, nSingles_max, true_coinc, nentries)
-# ######## READING CC_Cones.root files ####################
-# array = conesTTree2conesArray(fname / 'CC_Cones.root', E0_MeV, vsize, vpitch, er, nSingles_max, true_coinc, nentries)
+# ###### READING sequenceCoincidence.root files ##############
+# array = seqCoin2ConesArray(fname / 'CC_sequenceCoincidence.root', E0_MeV, vsize, vpitch, er, nSingles_max, true_coinc, nentries)
+# ###### READING CC_Cones.root files #########################
+array = conesTTree2conesArray(fname / 'CC_Cones.root', E0_MeV, vsize, vpitch, er, nSingles_max, true_coinc, nentries)
 
 vol = cp.zeros(vsize, dtype=cp.float32)
 vol = compton_forward(vol, array, volume_pitch=vpitch)
@@ -38,4 +38,5 @@ cp.save(fname.parent / "reconstruction.npy", vol)
 vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2, -vsize[2] // 2), colormap='gray_r', axis_labels=["y", "x", "z"])
 viewer = napari.view_image(vol, **vargs)
 viewer.axes.visible = True
+# TODO: add cuboid representing th detector (see napari's bounding box / annotation plugin?)
 napari.run()
