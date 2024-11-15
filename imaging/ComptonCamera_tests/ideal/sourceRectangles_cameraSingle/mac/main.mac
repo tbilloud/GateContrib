@@ -1,6 +1,12 @@
-/control/alias time 100
-/control/alias out output
-/control/alias seed 1
+# Usage:
+# - If following block commented:
+# Gate mac/main.mac -a [time,1000][out,output/time1000_cameraX5Y0Z9][posX,5][posY,0][posZ,9][seed,1]
+# - If not:
+# Gate mac/main.mac
+#/control/alias time 100
+#/control/alias out output
+#/control/alis pos
+#/control/alias seed 1
 
 # ===========================
 # == LOAD DATABASE         ==
