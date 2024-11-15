@@ -3,12 +3,13 @@ import uproot
 # Read sequenceCoincidence tree and return lists with parameters needed for cone reconstruction
 # TODO: test if this works with multiple runs
 # TODO: make it work for actors other than ideal
-
+# TODO: make it faster !
 def seqCoinc2Cones(input_file_path, nentries=None):
     # Open the input ROOT file and get the tree
     with uproot.open(input_file_path) as file:
         tree = file["sequenceCoincidence"]
         print('-'*100)
+        print('Processing',input_file_path)
         print(tree.num_entries, 'entries in tree sequenceCoincidence, reading', nentries if nentries else 'all')
 
         # Read the necessary branches
@@ -39,7 +40,6 @@ def seqCoinc2Cones(input_file_path, nentries=None):
 
     # Loop over the events and calculate the variables
     last_entry = nentries if nentries else tree.num_entries
-    print('last_entry', last_entry)
     for i in range(last_entry):
         if i == 0 or (coinc_id[i] != coinc_id[i-1] or run_id[i] != run_id[i-1]):
             energy1.append(energy_ini[i] - energy_fin[i])
@@ -73,4 +73,4 @@ def seqCoinc2Cones(input_file_path, nentries=None):
     nSingles = nSingles[:len(globalPosX2)]
     IsTrueCoinc = IsTrueCoinc[:len(globalPosX2)]
 
-    return energy1, energyR, globalPosX1, globalPosY1, globalPosZ1, globalPosX2, globalPosY2, globalPosZ2, nSingles, IsTrueCoinc
+    return [energy1, energyR, globalPosX1, globalPosY1, globalPosZ1, globalPosX2, globalPosY2, globalPosZ2, nSingles, IsTrueCoinc]

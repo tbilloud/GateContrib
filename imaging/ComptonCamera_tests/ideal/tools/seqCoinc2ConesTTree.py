@@ -12,23 +12,27 @@ from seqCoinc2Cones import seqCoinc2Cones
 # Define the input and output file paths
 input_file_path = "../sourcePoint_cameraSingle/output/CC_sequenceCoincidence.root"
 output_file_path = "../sourcePoint_cameraSingle/output/CC_Cones.root"
-nentries = None # None to read all entries
+nentries = None  # None to read all entries
 
-# Open the input ROOT file and get the tree
-energy1, energyR, globalPosX1, globalPosY1, globalPosZ1, globalPosX2, globalPosY2, globalPosZ2, nSingles, IsTrueCoinc = seqCoinc2Cones(
-    input_file_path, nentries=nentries)
+def seqCoinc2ConesTTree(input_file_path, output_file_path, nentries=None):
 
-# Write the calculated variables to the output ROOT file
-with uproot.recreate(output_file_path) as file:
-    file["Cones"] = {
-        "energy1": np.array(energy1),
-        "energyR": np.array(energyR),
-        "globalPosX1": np.array(globalPosX1),
-        "globalPosY1": np.array(globalPosY1),
-        "globalPosZ1": np.array(globalPosZ1),
-        "globalPosX2": np.array(globalPosX2),
-        "globalPosY2": np.array(globalPosY2),
-        "globalPosZ2": np.array(globalPosZ2),
-        "nSingles": np.array(nSingles),
-        "IsTrueCoinc": np.array(IsTrueCoinc)
-    }
+    # Open the input ROOT file and get the tree
+    print(f"Reading TTree 'sequenceCoincidence' from {input_file_path}")
+    energy1, energyR, globalPosX1, globalPosY1, globalPosZ1, globalPosX2, globalPosY2, globalPosZ2, nSingles, IsTrueCoinc = seqCoinc2Cones(
+        input_file_path, nentries=nentries)
+
+    # Write the calculated variables to the output ROOT file
+    print(f"Writing TTree 'Cones' to {output_file_path}")
+    with uproot.recreate(output_file_path) as file:
+        file["Cones"] = {
+            "energy1": np.array(energy1),
+            "energyR": np.array(energyR),
+            "globalPosX1": np.array(globalPosX1),
+            "globalPosY1": np.array(globalPosY1),
+            "globalPosZ1": np.array(globalPosZ1),
+            "globalPosX2": np.array(globalPosX2),
+            "globalPosY2": np.array(globalPosY2),
+            "globalPosZ2": np.array(globalPosZ2),
+            "nSingles": np.array(nSingles),
+            "IsTrueCoinc": np.array(IsTrueCoinc)
+        }
