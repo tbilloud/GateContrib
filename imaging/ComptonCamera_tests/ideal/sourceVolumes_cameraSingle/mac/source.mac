@@ -1,7 +1,8 @@
 # Type can be Surface or Volume
+/control/alias type Surface # Volume
 
 /gate/source/addSource sphere1
-/gate/source/sphere1/gps/pos/type Surface
+/gate/source/sphere1/gps/pos/type {type}
 /gate/source/sphere1/gps/pos/shape Sphere
 /gate/source/sphere1/gps/pos/radius 3 mm
 /gate/source/sphere1/gps/particle gamma
@@ -12,7 +13,7 @@
 /gate/source/sphere1/gps/centre 5 5 -5 mm
 
 /gate/source/addSource parallelepiped1
-/gate/source/parallelepiped1/gps/pos/type Surface
+/gate/source/parallelepiped1/gps/pos/type {type}
 /gate/source/parallelepiped1/gps/pos/shape Para
 /gate/source/parallelepiped1/gps/pos/halfx 3 mm
 /gate/source/parallelepiped1/gps/pos/halfy 3 mm
@@ -25,7 +26,7 @@
 /gate/source/parallelepiped1/gps/centre -5 5 -5 mm
 
 /gate/source/addSource sphere2
-/gate/source/sphere2/gps/pos/type Surface
+/gate/source/sphere2/gps/pos/type {type}
 /gate/source/sphere2/gps/pos/shape Sphere
 /gate/source/sphere2/gps/pos/radius 1 mm
 /gate/source/sphere2/gps/particle gamma
@@ -36,7 +37,7 @@
 /gate/source/sphere2/gps/centre 5 -5 -5 mm
 
 /gate/source/addSource parallelepiped2
-/gate/source/parallelepiped2/gps/pos/type Surface
+/gate/source/parallelepiped2/gps/pos/type {type}
 /gate/source/parallelepiped2/gps/pos/shape Para
 /gate/source/parallelepiped2/gps/pos/halfx 1 mm
 /gate/source/parallelepiped2/gps/pos/halfy 1 mm
