@@ -12,8 +12,6 @@
 /gate/BB/geometry/setYLength               10 mm
 /gate/BB/geometry/setZLength               2 mm
 /gate/BB/setMaterial                       Vacuum
-/gate/BB/vis/setVisible                    1
-/gate/BB/vis/setColor                      red
 
 #==================== SCATTERER =========================
 /gate/BB/daughters/name                    scatterer

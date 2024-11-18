@@ -1,14 +1,26 @@
-/vis/open                     OGLIQt
+# Script to visualize detector, and source trajectories or shape
+# Usage:
+# 1) In main.mac, uncomment /control/execute mac/visu.mac and reduce simulation time
+# 2) Gate --qt mac/main.mac
+# 3) To see source shape, type in the GUI console:
+# /gate/source/source_name/visualize 1000 yellow 1
+
+# Mandatory commands
+/vis/open                     OGL # OGLIQt
 /vis/drawVolume
+
+# Tune view point
 /vis/viewer/zoom 1.5
 /vis/viewer/set/viewpointThetaPhi -110 -30
-#/tracking/storeTrajectory     0
+
+# For particle trajectories
 /vis/scene/add/trajectories
 /vis/scene/endOfEventAction   accumulate -1
-/vis/scene/add/axes            0 0 0 10 mm
 
+# For individual items
+# /vis/scene/add/axes            0 0 0 10 mm
+/gate/world/vis/setVisible 0
 /gate/BB/vis/setVisible 0
 /gate/scatterer/vis/setVisible 0
-#/gate/scatterer/vis/setColor             green
 /gate/absorber/vis/setVisible 1
 /gate/absorber/vis/setColor             blue
