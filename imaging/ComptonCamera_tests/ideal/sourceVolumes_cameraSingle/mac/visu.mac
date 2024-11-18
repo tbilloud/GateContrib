@@ -24,3 +24,9 @@
 /gate/scatterer/vis/setVisible 0
 /gate/absorber/vis/setVisible 1
 /gate/absorber/vis/setColor             blue
+
+# To see source shapes only, copy-paste in Qt console:
+#/gate/source/sphere1/visualize 1000 yellow 1
+#/gate/source/sphere2/visualize 1000 yellow 1
+#/gate/source/parallelepiped1/visualize 1000 yellow 1
+#/gate/source/parallelepiped2/visualize 1000 yellow 1
