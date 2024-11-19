@@ -1,15 +1,22 @@
 #!/bin/bash
 
+# Script to run main.mac with multiple camera positions in parallel
+# Comment out first code block in main.mac and, from top folder, run:
+# source run_multi_camera_positions
+# TODO: make it work with zsh !
+
 # Define the sets of posX and posY values
 posX_values=(0 10 -10 0  0   -10 10)
 posY_values=(0 0  0   10 -10 -10 10)
 
 # Define other parameters
-time=2000
-posZ=9
-output_prefix="/media/billoud/Volume/CT/GATE/ideal/sourceVolumes/time${time}_camera"
-mac_file="mac/main.mac"
+time=0.1000 # 2000
+posZ=10
+energy_keV=140
+type=Volume
 seed=1
+output_prefix="/media/billoud/Volume/CT/GATE/ideal/sourceCube/${energy_keV}keV/time${time}_seed${time}_camera"
+mac_file="mac/main.mac"
 
 # Start time
 start_time=$(date +%s)
@@ -20,11 +27,11 @@ for i in $(seq 0 $((${#posX_values[@]} - 1))); do
   posY=${posY_values[$i]}
 
   # Create the directory with parameter names and values
-  dir_name="${output_prefix}_posX${posX}_posY${posY}"
+  dir_name="${output_prefix}X${posX}Y${posY}Z${posZ}"
   mkdir -p "$dir_name"
 
   # Run the Gate command with the specified parameters in the background
-  Gate $mac_file -a [time,${time}][out,${dir_name}][posX,${posX}][posY,${posY}][posZ,${posZ}][seed,${seed}] &
+  Gate $mac_file -a [time,${time}][out,${dir_name}][posX,${posX}][posY,${posY}][posZ,${posZ}][seed,${seed}][type,${type}][energy_keV,${energy_keV}] &
 done
 
 # Wait for all background jobs to finish
