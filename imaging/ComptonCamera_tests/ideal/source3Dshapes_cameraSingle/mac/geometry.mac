@@ -8,7 +8,7 @@
 /gate/world/daughters/name                 BB
 /gate/world/daughters/insert               box
 /gate/BB/placement/setTranslation          {posX} {posY} {posZ} mm # 0 0 9
-/gate/BB/geometry/setXLength               10 mm
+/gate/BB/geometry/setXLength               14 mm
 /gate/BB/geometry/setYLength               10 mm
 /gate/BB/geometry/setZLength               2 mm
 /gate/BB/setMaterial                       Vacuum
@@ -17,8 +17,8 @@
 /gate/BB/daughters/name                    scatterer
 /gate/BB/daughters/insert                  box
 /gate/scatterer/placement/setTranslation   0 0 -0.5 mm
-/gate/scatterer/geometry/setXLength        10 mm
-/gate/scatterer/geometry/setYLength        10 mm
+/gate/scatterer/geometry/setXLength        14 mm
+/gate/scatterer/geometry/setYLength        14 mm
 /gate/scatterer/geometry/setZLength        1 mm
 /gate/scatterer/setMaterial                Vacuum
 
@@ -26,7 +26,7 @@
 /gate/BB/daughters/name                    absorber
 /gate/BB/daughters/insert                  box
 /gate/absorber/placement/setTranslation    0 0 0.5 mm
-/gate/absorber/geometry/setXLength         10 mm
-/gate/absorber/geometry/setYLength         10 mm
+/gate/absorber/geometry/setXLength         14 mm
+/gate/absorber/geometry/setYLength         14 mm
 /gate/absorber/geometry/setZLength         1 mm
 /gate/absorber/setMaterial                 CdTe
