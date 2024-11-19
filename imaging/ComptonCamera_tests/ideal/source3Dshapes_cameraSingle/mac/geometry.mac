@@ -9,7 +9,7 @@
 /gate/world/daughters/insert               box
 /gate/BB/placement/setTranslation          {posX} {posY} {posZ} mm # 0 0 9
 /gate/BB/geometry/setXLength               14 mm
-/gate/BB/geometry/setYLength               10 mm
+/gate/BB/geometry/setYLength               14 mm
 /gate/BB/geometry/setZLength               2 mm
 /gate/BB/setMaterial                       Vacuum
 
