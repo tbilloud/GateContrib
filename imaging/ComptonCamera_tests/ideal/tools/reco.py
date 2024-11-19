@@ -40,9 +40,10 @@ vol = compton_forward(vol, cones, volume_pitch=vpitch)
 ##############################################################
 # Display/Save results
 ##############################################################
+vol /= vol.max()
 vol = vol.get()
 cp.save(fname.parent / "reconstruction.npy", vol)
-vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2, -vsize[2] // 2), colormap='gray_r', axis_labels=["y", "x", "z"])
+vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2, -vsize[2] // 2), axis_labels=["y", "x", "z"])
 viewer = napari.view_image(vol, **vargs)
 viewer.axes.visible = True
 # TODO: add cuboid representing th detector (see napari's bounding box / annotation plugin?)

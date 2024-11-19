@@ -13,7 +13,8 @@ from pathlib import Path
 # path, E0_MeV, world_mm = Path('../sourceRectangles_cameraSingle/output/'), 0.250, 20
 # path, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceSurfaces'), 0.250, 40
 # path, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceVolumes/140keV'), 0.1405, 40
-path, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceVolumes/140keV'), 0.140, 40
+# path, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceVolumes/140keV'), 0.140, 40
+path, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceCube/140keV'), 0.140, 40
 
 vsize = (256, 256, 256)
 vpitch = world_mm / vsize[2]
@@ -40,9 +41,10 @@ vol = compton_forward(vol, cones, volume_pitch=vpitch)
 # ##############################################################
 # # Display/Save results
 # ##############################################################
+vol /= vol.max()
 vol = vol.get()
 cp.save(fnames[0].parent.parent / "reconstruction.npy", vol)
-vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2, -vsize[2] // 2), colormap='gray_r', axis_labels=["y", "x", "z"])
+vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2, -vsize[2] // 2), axis_labels=["y", "x", "z"])
 viewer = napari.view_image(vol, **vargs)
 viewer.axes.visible = True
 napari.run()
