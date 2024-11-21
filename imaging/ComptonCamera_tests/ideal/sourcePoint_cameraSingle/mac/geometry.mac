@@ -4,23 +4,23 @@
 /gate/world/geometry/setZLength 200 mm
 /gate/world/setMaterial         Vacuum
 
+/control/alias sensor_side 14 mm
+
 #======Boundary Box =====================
 /gate/world/daughters/name                 BB
 /gate/world/daughters/insert               box
-/gate/BB/placement/setTranslation          0 0 48 mm
-/gate/BB/geometry/setXLength               10 mm
-/gate/BB/geometry/setYLength               10 mm
+/gate/BB/placement/setTranslation          0 0 10 mm
+/gate/BB/geometry/setXLength               {sensor_side}
+/gate/BB/geometry/setYLength               {sensor_side}
 /gate/BB/geometry/setZLength               2 mm
 /gate/BB/setMaterial                       Vacuum
-/gate/BB/vis/setVisible                    1
-/gate/BB/vis/setColor                      red
 
 #==================== SCATTERER =========================
 /gate/BB/daughters/name                    scatterer
 /gate/BB/daughters/insert                  box
 /gate/scatterer/placement/setTranslation   0 0 -0.5 mm
-/gate/scatterer/geometry/setXLength        10 mm
-/gate/scatterer/geometry/setYLength        10 mm
+/gate/scatterer/geometry/setXLength        {sensor_side}
+/gate/scatterer/geometry/setYLength        {sensor_side}
 /gate/scatterer/geometry/setZLength        1 mm
 /gate/scatterer/setMaterial                Vacuum
 
@@ -28,7 +28,7 @@
 /gate/BB/daughters/name                    absorber
 /gate/BB/daughters/insert                  box
 /gate/absorber/placement/setTranslation    0 0 0.5 mm
-/gate/absorber/geometry/setXLength         10 mm
-/gate/absorber/geometry/setYLength         10 mm
+/gate/absorber/geometry/setXLength         {sensor_side}
+/gate/absorber/geometry/setYLength         {sensor_side}
 /gate/absorber/geometry/setZLength         1 mm
 /gate/absorber/setMaterial                 CdTe
