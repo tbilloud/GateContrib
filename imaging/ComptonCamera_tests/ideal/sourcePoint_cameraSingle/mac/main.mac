@@ -1,4 +1,4 @@
-/control/alias time 1
+/control/alias time 0.01
 /control/alias out output
 /control/alias seed 1
 
@@ -15,7 +15,11 @@
 # ===========================
 # ==  PHYSICS              ==
 # ===========================
-/gate/physics/addPhysicsList emstandard_opt4
+/gate/physics/addPhysicsList emlivermore # emstandard_opt4
+#/gate/physics/Gamma/SetCutInRegion      absorber 0.001 mm
+#/gate/physics/Electron/SetCutInRegion   absorber 0.001 mm
+#/gate/physics/Positron/SetCutInRegion   absorber 0.001 mm
+/gate/physics/displayCuts
 
 # =============================
 # == ACTORS                  ==
