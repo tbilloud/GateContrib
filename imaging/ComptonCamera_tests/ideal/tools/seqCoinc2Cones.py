@@ -1,3 +1,5 @@
+import sys
+
 import cupy as cp
 import numpy as np
 import uproot
@@ -26,6 +28,8 @@ def seqCoinc2Cones(input_file_path, nentries=None):
         print('-' * 100)
         print('Processing', input_file_path)
         print(tree.num_entries, 'entries in tree sequenceCoincidence, reading', nentries if nentries else 'all')
+        if nentries and nentries > tree.num_entries:
+            sys.exit('Error: nentries is more than the number of entries in the tree')
 
         # Read the necessary branches
         energy_ini = tree["energyIni"].array(entry_stop=nentries)
