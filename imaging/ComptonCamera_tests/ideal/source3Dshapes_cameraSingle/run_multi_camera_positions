@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Script to run main.mac with multiple camera positions in parallel
-# Comment out first code block in main.mac and, from top folder, run:
-# source run_multi_camera_positions
-# TODO: make it work with zsh !
+# Comment out first code block in main.mac and, from top folder:
+# in bash: source run_multi_camera_positions.sh
+# in zsh: bash run_multi_camera_positions.sh
 
 # Define the sets of posX and posY values
 posX_values=(0 10 -10 0  0   -10 10)
@@ -15,7 +15,7 @@ posZ=10
 energy_keV=140
 type=Volume
 seed=1
-output_prefix="/media/billoud/Volume/CT/GATE/ideal/sourceCube/${energy_keV}keV/time${time}_seed${time}_camera"
+output_prefix="/media/billoud/Volume/CT/GATE/ideal/sourceCube/${energy_keV}keV/time${time}_seed${seed}_camera"
 mac_file="mac/main.mac"
 
 # Start time
