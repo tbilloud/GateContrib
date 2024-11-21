@@ -1,3 +1,5 @@
+import sys
+
 import cupy as cp
 import napari
 from pathlib import Path
@@ -16,7 +18,7 @@ from imaging.ComptonCamera_tests.tools.utils import remove_nans
 # fname, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceSurfaces/time2000_camera_posX10_posY10'), 0.250, 40
 # fname, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceVolumes/140keV/time200_camera_posX0_posY0'), 0.1405, 40
 # fname, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceVolumes/245keV/time200_camera_posX0_posY0'), 0.245, 40
-fname, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceCube/140keV/time200_camera_posX0_posY0'), 0.140, 40
+fname, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceCube/140keV/time1000/time1000_seed1_cameraX0Y0Z10'), 0.140, 40
 
 vsize = (256, 256, 256)
 vpitch = world_mm / vsize[2]
@@ -42,7 +44,7 @@ vol = compton_forward(vol, cones, volume_pitch=vpitch)
 ##############################################################
 vol /= vol.max()
 vol = vol.get()
-cp.save(fname.parent / "reconstruction.npy", vol)
+cp.save(fname / "reconstruction.npy", vol)
 vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2, -vsize[2] // 2), axis_labels=["y", "x", "z"])
 viewer = napari.view_image(vol, **vargs)
 viewer.axes.visible = True
