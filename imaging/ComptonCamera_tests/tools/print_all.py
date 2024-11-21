@@ -7,29 +7,29 @@ pandas.set_option('display.max_rows', 1000)
 
 # Script to print some info about root trees produced by CCMod actor
 # ! WARNING! comment out blocks if corresponding tree was not saved
-path = '../ideal/sourceRectangles_cameraSingle/output/time1000_cameraX5Y0Z9/'
-path = '/media/billoud/Volume/CT/GATE/ideal/time1_camera_posX0_posY0/'
-nentries_printed = 3
+path = '/home/billoud/PycharmProjects/GateContrib/imaging/ComptonCamera_tests/ideal/sourcePoint_cameraSingle/output/'
+#path = '/media/billoud/Volume/CT/GATE/ideal/time1_camera_posX0_posY0/'
+nentries_printed = 1
 
 # Info about electron escape
 # tree = uproot.open(path + 'CC_eventGlobalInfo.root:EventGlobalInfo')
 # print(tree.num_entries, 'entries in tree Hits')
 # df = tree.arrays(library='pd')
-# print(df[:nevent_printed])
+# print(df)
 
 # Info about 'hits'
-# tree = uproot.open(path + 'CC_Hits.root:Hits')
-# print(tree.num_entries, 'entries in tree Hits')
-# df = tree.arrays(library='pd')
-# print(df[df['eventID'] == 7043])
-# # print(df[:nevent_printed])
+tree = uproot.open(path + 'CC_Hits.root:Hits')
+print(tree.num_entries, 'entries in tree Hits')
+df = tree.arrays(library='pd', entry_stop=nentries_printed)
+#print(df[df['eventID'] == 7043])
+# print(df)
 
 # Info about 'singles'
 tree = uproot.open(path + 'CC_Singles.root:Singles')
 print(tree.num_entries, 'entries in tree Singles')
 df = tree.arrays(library='pd', entry_stop=nentries_printed)
 # print(df[df['eventID'] == 25745])
-# print(df[:nevent_printed])
+# print(df)
 
 # PrintInfo about 'coincidences'
 tree = uproot.open(path + 'CC_Coincidences.root:Coincidences')
