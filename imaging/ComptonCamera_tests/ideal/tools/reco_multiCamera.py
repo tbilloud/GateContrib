@@ -14,7 +14,7 @@ from pathlib import Path
 # path, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceSurfaces'), 0.250, 40
 # path, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceVolumes/140keV'), 0.1405, 40
 # path, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceVolumes/140keV'), 0.140, 40
-path, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceCube/140keV'), 0.140, 40
+path, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceCube/140keV/time1000'), 0.140, 40
 
 vsize = (256, 256, 256)
 vpitch = world_mm / vsize[2]
