@@ -35,9 +35,10 @@ cones = seqCoin2ConesArray(fname / 'CC_sequenceCoincidence.root', E0_MeV, vsize,
 # ######## RECONSTRUCT #######################################
 cones = remove_nans(cones)
 plane = list()
-for cone in cones:
+for i, cone in enumerate(cones):
     vol = cp.zeros(vsize, dtype=cp.float32)
-    print(cone)
+    print(i,cone)
+    # apex_x, y, z, normalized_direction_x, y, z, cosine_of_cone_half_angle, inverse_of_cosine_error
     vol = compton_forward(vol, cone, volume_pitch=vpitch)
     plane.append(vol[:, :, 0].get())
 
