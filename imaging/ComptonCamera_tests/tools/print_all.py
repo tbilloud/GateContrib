@@ -9,7 +9,7 @@ pandas.set_option('display.max_rows', 1000)
 # ! WARNING! comment out blocks if corresponding tree was not saved
 path = '/home/billoud/PycharmProjects/GateContrib/imaging/ComptonCamera_tests/ideal/sourcePoint_cameraSingle/output/'
 #path = '/media/billoud/Volume/CT/GATE/ideal/time1_camera_posX0_posY0/'
-nentries_printed = 1
+nentries_printed = -1
 
 # Info about electron escape
 tree = uproot.open(path + 'CC_eventGlobalInfo.root:EventGlobalInfo')
@@ -20,27 +20,29 @@ print(tree.num_entries, 'entries in tree EventGlobalInfo')
 # Info about 'hits'
 tree = uproot.open(path + 'CC_Hits.root:Hits')
 print(tree.num_entries, 'entries in tree Hits')
-# df = tree.arrays(library='pd', entry_stop=nentries_printed)
-# print(df[df['eventID'] == 7043])
-# print(df)
+df = tree.arrays(library='pd', entry_stop=nentries_printed)
+print(df[df['eventID'] == 6])
+#print(df)
 
 # Info about 'singles'
 tree = uproot.open(path + 'CC_Singles.root:Singles')
 print(tree.num_entries, 'entries in tree Singles')
-# df = tree.arrays(library='pd', entry_stop=nentries_printed)
-# print(df[df['eventID'] == 25745])
+df = tree.arrays(library='pd', entry_stop=nentries_printed)
+print(df[df['eventID'] == 6])
 # print(df)
 
 # PrintInfo about 'coincidences'
 tree = uproot.open(path + 'CC_Coincidences.root:Coincidences')
 print(tree.num_entries, 'entries in tree Coincidences')
-# df = tree.arrays(library='pd', entry_stop=nentries_printed)
+df = tree.arrays(library='pd', entry_stop=nentries_printed)
+print(df[df['eventID'] == 6])
 # print(df)
 
 # PrintInfo about 'coincidence sequences'
 tree = uproot.open(path + 'CC_sequenceCoincidence.root:sequenceCoincidence')
 print(tree.num_entries, 'entries in tree sequenceCoincidence')
-# df = tree.arrays(library='pd', entry_stop=nentries_printed)
+df = tree.arrays(library='pd', entry_stop=nentries_printed)
+print(df[df['eventID'] == 6])
 # print(df)
 
 # # PrintInfo about 'cones' => comment out if cone tree was not created (has to be done after simulation)

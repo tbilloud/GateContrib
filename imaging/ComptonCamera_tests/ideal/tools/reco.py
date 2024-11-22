@@ -19,14 +19,14 @@ from imaging.ComptonCamera_tests.tools.utils import remove_nans
 # fname, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceVolumes/140keV/time200_camera_posX0_posY0'), 0.1405, 40
 # fname, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceVolumes/245keV/time200_camera_posX0_posY0'), 0.245, 40
 # fname, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceCube/140keV/time1000/time1000_seed1_cameraX0Y0Z10'), 0.140, 40
-fname, E0_MeV, world_mm = Path('../sourcePoint_cameraSingle/output/livermore'), 0.100, 200
+fname, E0_MeV, world_mm = Path('../sourcePoint_cameraSingle/output'), 0.100, 200
 
 vsize = (256, 256, 256)
 vpitch = world_mm / vsize[2]
 er = 100  # inverse of cosine error
 nSingles_max = 2  # maximum number of singles per coincidence, set to False to disable
 true_coinc = True  # filter true coincidences (i.e. avoid singles from different events)
-nentries = 1000  # None to read all entries
+nentries = None  # None to read all entries
 
 ##############################################################
 # Do Projection
