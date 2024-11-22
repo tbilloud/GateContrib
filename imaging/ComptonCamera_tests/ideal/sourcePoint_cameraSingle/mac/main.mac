@@ -15,7 +15,7 @@
 # ===========================
 # ==  PHYSICS              ==
 # ===========================
-/gate/physics/addPhysicsList emlivermore # emstandard_opt4
+/gate/physics/addPhysicsList emlivermore # emlivermore, emstandard_opt4, emlivermore_polar
 #/gate/physics/Gamma/SetCutInRegion      absorber 0.001 mm
 #/gate/physics/Electron/SetCutInRegion   absorber 0.001 mm
 #/gate/physics/Positron/SetCutInRegion   absorber 0.001 mm
@@ -59,9 +59,6 @@
 /gate/application/setTimeStart   0.00   s
 /gate/application/setTimeStop    {time} s
 /gate/application/startDAQ
-
-exit
-
 
 
 
