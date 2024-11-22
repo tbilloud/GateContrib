@@ -84,6 +84,7 @@ def seqCoinc2Cones(input_file_path, nentries=None):
 
     # When nentries is used, the loop might stop right after appending the first element of the coincidence sequence,
     # i.e. before position 2 of that coincidence is filled, resulting in globalPosXYZ2 to be shorter than other lists.
+    # It is then necessary to remove the last element of the other lists to make them all the same length.
     energy1 = energy1[:len(globalPosX2)]
     energyR = energyR[:len(globalPosX2)]
     globalPosX1 = globalPosX1[:len(globalPosX2)]
