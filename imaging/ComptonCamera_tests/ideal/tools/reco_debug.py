@@ -16,7 +16,7 @@ from imaging.ComptonCamera_tests.tools.utils import remove_nans
 ##############################################################
 # Settings
 ##############################################################
-fname, E0_MeV, world_mm = Path('../sourcePoint_cameraSingle/output/livermore'), 0.100, 200
+fname, E0_MeV, world_mm = Path('../sourcePoint_cameraSingle/output'), 0.100, 200
 
 vsize = (256, 256, 256)
 vpitch = world_mm / vsize[2]
@@ -37,6 +37,7 @@ cones = remove_nans(cones)
 plane = list()
 for cone in cones:
     vol = cp.zeros(vsize, dtype=cp.float32)
+    print(cone)
     vol = compton_forward(vol, cone, volume_pitch=vpitch)
     plane.append(vol[:, :, 0].get())
 
