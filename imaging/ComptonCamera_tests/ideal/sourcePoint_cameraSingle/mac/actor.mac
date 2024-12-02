@@ -25,11 +25,10 @@
 # - The 3rd comprises those modules that filter the singles such as energy threshold modules.
 
 # CATEGORY 1: 'singles' creation (hit regrouping)
-/gate/digitizer/layers/insert adderComptPhotIdeal
-#/gate/digitizer/layers/insert/rejectEvtOtherProcesses 1 TODO: does not work, why?
+/gate/digitizer/layers/insert adderComptPhotIdeal # deposited energy has been validated using livermore physics list.
+# /gate/digitizer/layers/insert/rejectEvtOtherProcesses 1 TODO: does not work, why?
 #  The deposited energy value of each pulse corresponds to the sum of the deposited energy of the primary hit and all
-#  the secondary hits produced by it. The deposited energy has been validated using livermore physics list. Both
-#  versions the global module and its local counterpart have been developed.
+#  the secondary hits produced by it.
 
 # CATEGORY 2: 'singles' modification
 
