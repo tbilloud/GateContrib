@@ -9,7 +9,7 @@ pandas.set_option('display.max_rows', 1000)
 # ! WARNING! comment out blocks if corresponding tree was not saved
 path = '/home/billoud/PycharmProjects/GateContrib/imaging/ComptonCamera_tests/ideal/sourcePoint_cameraSingle/output/'
 #path = '/media/billoud/Volume/CT/GATE/ideal/time1_camera_posX0_posY0/'
-nentries_printed = -1
+nentries_printed = 10 # None to read all entries
 
 # Info about electron escape
 tree = uproot.open(path + 'CC_eventGlobalInfo.root:EventGlobalInfo')

@@ -6,11 +6,12 @@ pandas.set_option('display.width', 400)
 pandas.set_option('display.max_rows', 1000)
 
 path = '/home/billoud/PycharmProjects/GateContrib/imaging/ComptonCamera_tests/ideal/sourcePoint_cameraSingle/output/'
-nentries_printed = -1
+nentries_printed = None # None to read all entries
 
 tree = uproot.open(path + 'CC_Hits.root:Hits')
 print(tree.num_entries, 'entries in tree Hits')
 df = tree.arrays(library='pd', entry_stop=nentries_printed)
+print(df)
 df_compt = df[df['postStepProcess'] == 'compt']
 print(df_compt.shape[0], 'Compton interactions')
 
