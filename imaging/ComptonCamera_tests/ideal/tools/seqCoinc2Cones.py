@@ -28,6 +28,7 @@ def seqCoinc2Cones(input_file_path, nentries=None):
         print('-' * 100)
         print('Processing', input_file_path)
         print(tree.num_entries, 'entries in tree sequenceCoincidence, reading', nentries if nentries else 'all')
+        print('Number of cones might be lower than n_entries / 2 if there are coincidence groups with > than 2 singles')
         if nentries and nentries > tree.num_entries:
             sys.exit('Error: nentries is more than the number of entries in the tree')
 
