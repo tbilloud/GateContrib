@@ -15,10 +15,10 @@
 # ===========================
 # ==  PHYSICS              ==
 # ===========================
-/gate/physics/addPhysicsList emlivermore # emlivermore, emstandard_opt4, emlivermore_polar
-#/gate/physics/Gamma/SetCutInRegion      absorber 0.001 mm
-#/gate/physics/Electron/SetCutInRegion   absorber 0.001 mm
-#/gate/physics/Positron/SetCutInRegion   absorber 0.001 mm
+# emlivermore, emstandard_opt3 or emstandard_opt4 include doppler broadening, emstandard does not
+/gate/physics/addPhysicsList emstandard
+#/gate/physics/Gamma/SetCutInRegion      absorber 0.01 mm # default is 1 mm
+#/gate/physics/Electron/SetCutInRegion   absorber 0.01 mm # default is 1 mm
 /gate/physics/displayCuts
 
 # =============================
@@ -58,7 +58,7 @@
 #/gate/application/setTimeSlice  {time} s
 #/gate/application/setTimeStart   0.00   s
 #/gate/application/setTimeStop    {time} s
-/gate/application/setTotalNumberOfPrimaries 3
+/gate/application/setTotalNumberOfPrimaries 100000
 /gate/application/startDAQ
 
 

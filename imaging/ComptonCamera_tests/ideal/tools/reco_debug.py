@@ -16,14 +16,14 @@ from imaging.ComptonCamera_tests.tools.utils import remove_nans
 ##############################################################
 # Settings
 ##############################################################
-fname, E0_MeV, world_mm = Path('../sourcePoint_cameraSingle/output'), 0.100, 200
+fname, E0_MeV, world_mm = Path('../sourcePoint_cameraSingle/output'), 0.140, 200
 
 vsize = (256, 256, 256)
 vpitch = world_mm / vsize[2]
 er = 100  # inverse of cosine error
 nSingles_max = 2  # maximum number of singles per coincidence, set to False to disable
 true_coinc = True  # filter true coincidences (i.e. avoid singles from different events)
-nentries = None  # None to read all entries
+nentries = 100  # None to read all entries
 
 ##############################################################
 # Do Projection
@@ -37,7 +37,7 @@ cones = remove_nans(cones)
 plane = list()
 for i, cone in enumerate(cones):
     vol = cp.zeros(vsize, dtype=cp.float32)
-    print(i,cone)
+    # print(i,cone)
     # apex_x, y, z, normalized_direction_x, y, z, cosine_of_cone_half_angle, inverse_of_cosine_error
     vol = compton_forward(vol, cone, volume_pitch=vpitch)
     plane.append(vol[:, :, 0].get())

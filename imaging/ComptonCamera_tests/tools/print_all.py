@@ -21,29 +21,29 @@ print(tree.num_entries, 'entries in tree EventGlobalInfo')
 tree = uproot.open(path + 'CC_Hits.root:Hits')
 print(tree.num_entries, 'entries in tree Hits')
 df = tree.arrays(library='pd', entry_stop=nentries_printed)
-print(df[df['eventID'] == 6])
+#print(df[df['eventID'] == 6])
 #print(df)
 
 # Info about 'singles'
 tree = uproot.open(path + 'CC_Singles.root:Singles')
 print(tree.num_entries, 'entries in tree Singles')
 df = tree.arrays(library='pd', entry_stop=nentries_printed)
-print(df[df['eventID'] == 6])
+# print(df[df['eventID'] == 6])
 # print(df)
 
 # PrintInfo about 'coincidences'
 tree = uproot.open(path + 'CC_Coincidences.root:Coincidences')
 print(tree.num_entries, 'entries in tree Coincidences')
 df = tree.arrays(library='pd', entry_stop=nentries_printed)
-print(df[df['eventID'] == 6])
+# print(df[df['eventID'] == 6])
 # print(df)
 
 # PrintInfo about 'coincidence sequences'
 tree = uproot.open(path + 'CC_sequenceCoincidence.root:sequenceCoincidence')
 print(tree.num_entries, 'entries in tree sequenceCoincidence')
 df = tree.arrays(library='pd', entry_stop=nentries_printed)
-print(df[df['eventID'] == 6])
-# print(df)
+#print(df[df['eventID'] == 6])
+print(df)
 
 # # PrintInfo about 'cones' => comment out if cone tree was not created (has to be done after simulation)
 # tree = uproot.open(path + 'CC_Cones.root:Cones')
