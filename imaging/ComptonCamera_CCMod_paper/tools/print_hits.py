@@ -16,7 +16,7 @@ df = tree_hits.arrays(
     # 'eventID == 323',
     library='pd',
     entry_start=0,
-    entry_stop=10, # -1 for last entry
+    entry_stop=10, # None for all entries
 )
 print(df[:])
 
