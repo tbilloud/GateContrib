@@ -11,7 +11,14 @@ nentries_printed = None # None to read all entries
 tree = uproot.open(path + 'CC_Hits.root:Hits')
 print(tree.num_entries, 'entries in tree Hits')
 df = tree.arrays(library='pd', entry_stop=nentries_printed)
+
+df = df.drop(columns=['runID','sourcePosX', 'sourcePosY', 'sourcePosZ', 'sourceEnergy', 'sourcePDG', 'volumeID'])
+df = df.drop(columns=['localPosX', 'localPosY', 'localPosZ'])
+df = df.drop(columns=['layerName'])
+df = df.drop(columns=['trackLocalTime'])
+# print(df[df['eventID'] == 0])
 print(df)
+
 df_compt = df[df['postStepProcess'] == 'compt']
 print(df_compt.shape[0], 'Compton interactions')
 
