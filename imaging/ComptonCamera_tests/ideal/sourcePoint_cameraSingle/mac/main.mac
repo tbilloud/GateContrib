@@ -17,6 +17,7 @@
 # ===========================
 # emlivermore, emstandard_opt3 or emstandard_opt4 include doppler broadening, emstandard does not
 /gate/physics/addPhysicsList emstandard
+# TODO: possible to use livermore and switch off doppler broadening?
 #/gate/physics/Gamma/SetCutInRegion      absorber 0.01 mm # default is 1 mm
 #/gate/physics/Electron/SetCutInRegion   absorber 0.01 mm # default is 1 mm
 /gate/physics/displayCuts
