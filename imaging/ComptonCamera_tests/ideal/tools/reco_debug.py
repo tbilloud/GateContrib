@@ -1,11 +1,5 @@
-import sys
-
-import cupy as cp
 import napari
 from pathlib import Path
-
-import numpy as np
-
 from imaging.ComptonCamera_tests.ideal.tools.seqCoinc2Cones import *
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
 from imaging.ComptonCamera_tests.tools.utils import remove_nans
@@ -40,7 +34,8 @@ for i, cone in enumerate(cones):
     # print(i,cone)
     # apex_x, y, z, normalized_direction_x, y, z, cosine_of_cone_half_angle, inverse_of_cosine_error
     vol = compton_forward(vol, cone, volume_pitch=vpitch)
-    plane.append(vol[:, :, 0].get())
+    z_slice = vsize[2] // 2
+    plane.append(vol[:, :, vsize[2] // 2].get())
 
 # print(np.asarray(plane).shape), sys.exit()
 
