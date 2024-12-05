@@ -3,6 +3,7 @@ from pathlib import Path
 from imaging.ComptonCamera_tests.ideal.tools.seqCoinc2Cones import *
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
 from imaging.ComptonCamera_tests.tools.utils import remove_nans
+cp.set_printoptions(linewidth=200)
 
 # Script to check the precision of ideal simulation with point source
 # All cones should intersect at the source point
@@ -14,10 +15,11 @@ fname, E0_MeV, world_mm = Path('../sourcePoint_cameraSingle/output'), 0.140, 200
 
 vsize = (256, 256, 256)
 vpitch = world_mm / vsize[2]
-er = 100  # inverse of cosine error
-nSingles_max = 2  # maximum number of singles per coincidence, set to False to disable
-true_coinc = True  # filter true coincidences (i.e. avoid singles from different events)
-nentries = 100  # None to read all entries
+er = 200  # inverse of cosine error
+nSingles_max = False  # maximum number of singles per coincidence, False to disable
+true_coinc = False  # filter true coincidences (i.e. avoid singles from different events)
+nentries = 1000  # None to read all entries
+source_pos_z_slice_index = vsize[2] // 2
 
 ##############################################################
 # Do Projection
@@ -27,22 +29,24 @@ cones = seqCoin2ConesArray(fname / 'CC_sequenceCoincidence.root', E0_MeV, vsize,
 # ###### READING CC_Cones.root files #########################
 # cones = conesTTree2conesArray(fname / 'CC_Cones.root', E0_MeV, vsize, vpitch, er, nSingles_max, true_coinc, nentries)
 # ######## RECONSTRUCT #######################################
+print(len(cones), 'cones before removing nans')
 cones = remove_nans(cones)
-plane = list()
+print(len(cones), 'cones after removing nans')
+z_slice_stack = list()
 for i, cone in enumerate(cones):
     vol = cp.zeros(vsize, dtype=cp.float32)
-    # print(i,cone)
-    # apex_x, y, z, normalized_direction_x, y, z, cosine_of_cone_half_angle, inverse_of_cosine_error
-    vol = compton_forward(vol, cone, volume_pitch=vpitch)
-    z_slice = vsize[2] // 2
-    plane.append(vol[:, :, vsize[2] // 2].get())
-
-# print(np.asarray(plane).shape), sys.exit()
+    vol = compton_forward(volume=vol, cones=cone, volume_pitch=vpitch)
+    # TODO: i've seen cases where 'cones' variable name was impacting 'compton_forward'
+    z_slice = vol[:, :, source_pos_z_slice_index]
+    # z_slice = cp.nan_to_num(z_slice)
+    # z_slice[z_slice < 0] = 0
+    # z_slice /= z_slice.max()
+    z_slice_stack.append(z_slice.get())
 
 ##############################################################
 # Display/Save results
 ##############################################################
 vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2), axis_labels=["cone number", "x", "y"])
-viewer = napari.view_image(np.asarray(plane), **vargs)
+viewer = napari.view_image(np.asarray(z_slice_stack), **vargs)
 viewer.axes.visible = True
 napari.run()
