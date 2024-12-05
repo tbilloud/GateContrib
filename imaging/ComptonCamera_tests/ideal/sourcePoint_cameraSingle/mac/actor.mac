@@ -39,7 +39,11 @@
 ######################################################################################
 ####################### SORTER (2.1.4 section in paper) ##############################
 ######################################################################################
-/gate/digitizer/Coincidences/setWindow 50. ns
+# TODO: I had a case where there are valid coincident events in the Singles root tree but the Coincidences root tree is
+# TODO: empty. Just increasing the simulation time or number of primaries solved the problem... Looks like the
+# TODO: singles tree is not read until the end, the last few hundreds (~700) singles are not processed!
+# TODO: => this can be verified using /gate/application/setTotalNumberOfPrimaries 700
+/gate/digitizer/Coincidences/setWindow 50 ns
 /gate/digitizer/Coincidences/setAcceptancePolicy4CC keepAll
 
 ######################################################################################
