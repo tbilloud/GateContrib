@@ -8,7 +8,7 @@
 /vis/scene/add/hits # seems useless
 /vis/scene/add/eventID
 
-/vis/scene/endOfEventAction   accumulate
+/vis/scene/endOfEventAction   accumulate 10
 
 /vis/viewer/zoom 5
 /vis/viewer/set/viewpointThetaPhi -110 -30
@@ -20,7 +20,7 @@
 
 /gate/BB/vis/setVisible 0
 #/gate/BB/vis/setColor             green
-/gate/scatterer/vis/setVisible 0
-#/gate/scatterer/vis/setColor             green
+/gate/scatterer/vis/setVisible 1
+/gate/scatterer/vis/setColor             white
 /gate/absorber/vis/setVisible 1
 /gate/absorber/vis/setColor             blue
