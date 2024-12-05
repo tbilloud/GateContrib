@@ -19,7 +19,7 @@ er = 200  # inverse of cosine error
 nSingles_max = False  # maximum number of singles per coincidence, False to disable
 true_coinc = False  # filter true coincidences (i.e. avoid singles from different events)
 nentries = 1000  # None to read all entries
-source_pos_z_slice_index = vsize[2] // 2
+source_pos = [vsize[0] // 2,vsize[1] // 2,vsize[2] // 2] # in units of voxels in vol
 
 ##############################################################
 # Do Projection
@@ -33,15 +33,20 @@ print(len(cones), 'cones before removing nans')
 cones = remove_nans(cones)
 print(len(cones), 'cones after removing nans')
 z_slice_stack = list()
+n_bad_cones = 0
 for i, cone in enumerate(cones):
     vol = cp.zeros(vsize, dtype=cp.float32)
     vol = compton_forward(volume=vol, cones=cone, volume_pitch=vpitch)
     # TODO: i've seen cases where 'cones' variable name was impacting 'compton_forward'
-    z_slice = vol[:, :, source_pos_z_slice_index]
+    z_slice = vol[:, :, source_pos[2]]
     # z_slice = cp.nan_to_num(z_slice)
     # z_slice[z_slice < 0] = 0
     # z_slice /= z_slice.max()
     z_slice_stack.append(z_slice.get())
+    if z_slice[source_pos[0],source_pos[1]] == 0:
+        n_bad_cones += 1
+        print('bad cone at coincID', i, '(if no cone was filtered)')
+print(n_bad_cones, 'bad cones')
 
 ##############################################################
 # Display/Save results
