@@ -26,9 +26,7 @@
 
 # CATEGORY 1: 'singles' creation (hit regrouping)
 /gate/digitizer/layers/insert adderComptPhotIdeal # deposited energy has been validated using livermore physics list.
-# /gate/digitizer/layers/insert/rejectEvtOtherProcesses 1 TODO: does not work, why?
-#  The deposited energy value of each pulse corresponds to the sum of the deposited energy of the primary hit and all
-#  the secondary hits produced by it.
+/gate/digitizer/layers/adderComptPhotIdeal/rejectEvtOtherProcesses 1 # TODO: IMPORTANT (and error in Gate9.2 doc)
 
 # CATEGORY 2: 'singles' modification
 
