@@ -1,0 +1,7 @@
+This is a repository to test single layer Compton cameras a short distances from the source.
+
+I got started using the Compton camera example from GateContrib in GateContrib/imaging/ComptonCamera_TODO_GND (version of Oct. 2024, commit 13364d0e1757b864d1d3d887e9aae6228cf5ff96) and Gate 9.2.
+
+Starting from Gate 9.3 digitization changed and code would not work.
+
+I added several utility scripts in subdirectory 'tools'.
