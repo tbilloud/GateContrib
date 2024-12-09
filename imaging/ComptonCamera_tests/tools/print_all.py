@@ -11,7 +11,7 @@ pandas.set_option('display.float_format', lambda x: f'{x:.1f}')
 
 # Script to print some info about root trees produced by CCMod actor
 # ! WARNING! comment out blocks if corresponding tree was not saved
-path = '/imaging/ComptonCamera_tests/ideal/output/'
+path = '../ideal/output/'
 nentries_printed = 2  # None to read all entries
 
 # ELECTRON ESCAPES
@@ -26,7 +26,7 @@ print('\n =>', tree.num_entries, 'entries in tree EventGlobalInfo')
 # processName: The process by which the particle ended its path in the sensitive detector (e.g.: Transportation (“T”), Optical Absorption(“O”), Comptonscatter(”C”), PhotoElectric(“P”), RaleighScattering(“R”)). You might be interested in distinguishing between particles that are detected at the detector(“T”) and those that were absorbed(“O”). A particle that undergoes Comptonscatter(“C”) is counted as two hits when it splits up.
 tree = uproot.open(path + 'CC_Hits.root:Hits')
 print('\n =>', tree.num_entries, 'entries in tree Hits')
-hits = tree.arrays(library='pd', entry_stop=None)  # None to read all entries
+hits = tree.arrays(library='pd', entry_stop=nentries_printed)  # None to read all entries
 columns_to_remove = ['runID', 'time', 'sourcePDG', 'sourceEnergy', 'sourcePosX', 'sourcePosY', 'sourcePosZ', 'volumeID']
 columns_to_remove += ['posX', 'posY', 'posZ', 'localPosX', 'localPosY', 'localPosZ']
 columns_to_remove += ['nCrystalConv', 'nCrystalCompt', 'nCrystalRayl']
@@ -38,7 +38,7 @@ hits['stepLength'] = round(hits['stepLength'] * 1000, 2)  # convert to um
 hits['trackLength'] = round(hits['trackLength'] * 1000, 2)  # convert to um
 hits['trackLocalTime'] = round(hits['trackLocalTime'] * 1e15, 2)  # convert to fs
 # hits = hits[hits['eventID'] == 2]
-print(hits.to_string(index=False))
+#print(hits.to_string(index=False))
 # print(Series(hits['postStepProcess'].to_numpy()).value_counts(normalize=True) * 100,'\n')  # !! entry_stop = None  !!
 
 # SINGLES
@@ -56,7 +56,7 @@ print(coincidences)
 # COINCIDENCES SEQUENCES
 tree = uproot.open(path + 'CC_sequenceCoincidence.root:sequenceCoincidence')
 print('\n =>', tree.num_entries, 'entries in tree sequenceCoincidence')
-seqCoin = tree.arrays(library='pd', entry_stop=None)
+seqCoin = tree.arrays(library='pd', entry_stop=nentries_printed)
 print(len(seqCoin[seqCoin['nCrystalRayl'] > 0]), 'entries with nCrystalRayl > 0')  # !! entry_stop = None  !!
 # print(seqCoin)
 # print(seqCoin[seqCoin['coincID'] == 48])
