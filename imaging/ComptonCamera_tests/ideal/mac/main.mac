@@ -31,14 +31,15 @@
 #/process/em/auger false # this seems to disable Auger electron cascade
 
 # ##### Cuts  #####
-# - Default to 1 mm
-# - Above 0.01 mm, no eIoni, msc and eBrem hits
-# - For gammas in CdTe:
-#   - 1 mm corresponds to 40 keV
-#   - 0.1 mm corresponds to 10 keV => allows fluorescence
-/gate/physics/Gamma/SetCutInRegion      absorber 100 um
-/gate/physics/Electron/SetCutInRegion   absorber 100 um
-# /gate/physics/displayCuts
+# - Default to 1000 um
+# - Above ~10 um, no eIoni, msc, eBrem hits, and PIXE (fluorescence and Auger)
+# - Distance/energy correspondance for CdTe:
+#   - 1000 um <=> gamma 40 keV / e- 859 keV => no fluorescence
+#   - 100 um <=> gamma 10 keV / e- 171 keV => fluorescence
+#   - 0.1 um <=> gamma 1 keV / e- 1 keV => most realistic lower energy spectrum, below that no difference
+/gate/physics/Gamma/SetCutInRegion      absorber 0.1 um
+/gate/physics/Electron/SetCutInRegion   absorber 0.1 um
+/gate/physics/displayCuts
 
 # =============================
 # == VERBOSITY               ==
@@ -60,7 +61,7 @@
 # ============================
 # ==  VISUALIZATION         ==
 # ============================
-/control/execute                     mac/visu.mac
+#/control/execute                     mac/visu.mac
 
 # ============================
 # == SOURCE                 ==
