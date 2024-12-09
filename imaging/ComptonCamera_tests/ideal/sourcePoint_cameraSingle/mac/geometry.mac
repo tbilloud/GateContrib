@@ -31,4 +31,4 @@
 /gate/absorber/geometry/setXLength         {sensor_side}
 /gate/absorber/geometry/setYLength         {sensor_side}
 /gate/absorber/geometry/setZLength         1 mm
-/gate/absorber/setMaterial                 CdTe
+/gate/absorber/setMaterial                 CdTe # Silicon
