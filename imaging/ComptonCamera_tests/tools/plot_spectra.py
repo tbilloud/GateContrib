@@ -29,11 +29,10 @@ print(len(single_energies[single_energies < 0]), 'singles with negative energy')
 seqCoin = uproot.open(str(path / 'CC_sequenceCoincidence.root') + ':sequenceCoincidence')
 print(seqCoin.num_entries, 'entries in tree sequenceCoincidence')
 df = seqCoin.arrays(['coincID', 'energy'], '(layerName=="absorber_phys")', library='pd')
-df = df.groupby('coincID').sum()
-print(df)
-seqCoin_energies = 1000 * df['energy']
-print(len(seqCoin_energies[seqCoin_energies < 0]), 'seqCoin energies with negative energy')
 print('\n'.join([f'number of coincidences with {i} singles: {len(df.groupby("coincID").size()[df.groupby("coincID").size() == i])}{" (from different events/decays)" if i > 2 else ""}' for i in range(2, df.groupby("coincID").size().max() + 1)]))
+df = df.groupby('coincID').sum()
+# print(df)
+seqCoin_energies = 1000 * df['energy']
 
 
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(20, 10))
