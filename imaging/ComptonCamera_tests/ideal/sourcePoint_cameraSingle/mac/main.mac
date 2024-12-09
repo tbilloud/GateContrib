@@ -15,12 +15,37 @@
 # ===========================
 # ==  PHYSICS              ==
 # ===========================
-# emlivermore, emstandard_opt3 or emstandard_opt4 include doppler broadening, emstandard does not
-/gate/physics/addPhysicsList emstandard
-# TODO: possible to use livermore and switch off doppler broadening?
-#/gate/physics/Gamma/SetCutInRegion      absorber 0.01 mm # default is 1 mm
-#/gate/physics/Electron/SetCutInRegion   absorber 0.01 mm # default is 1 mm
+# Of interest to Compton camera simulations are the following processes:
+# - Compton scattering (Klein-Nishina equation, atomic electron at rest)
+# - Doppler broadening (atomic electron not at rest in Compton scattering)
+# - Photoelectric effect
+# - Rayleigh scattering (outside and inside the detector)
+# - Particle-induced X-ray emission (fluorescence and Auger), called PIXE in geant4 documentation
+# ##### Physics list #####
+# emlivermore, emstandard_opt3 or emstandard_opt4 include doppler broadening
+# emstandard, emstandard_opt1, emstandard_opt2 do not
+/gate/physics/addPhysicsList emlivermore
+# => Fluorescence from photons and electrons is activated by default in Option3, Option4, Livermore and Penelope physics constructors, while Auger production and PIXE are not.
+#/process/em/fluo false # this seems to have no effect
+#/process/em/auger false # this seems to disable Auger electron cascade
+
+# ##### Cuts  #####
+# - Default to 1 mm
+# - Above 0.01 mm, no eIoni, msc and eBrem hits
+# - For gammas in CdTe:
+#   - 1 mm corresponds to 40 keV
+#   - 0.1 mm corresponds to 10 keV => allows fluorescence
+/gate/physics/Gamma/SetCutInRegion      absorber 100 um
+/gate/physics/Electron/SetCutInRegion   absorber 100 um
 /gate/physics/displayCuts
+
+# =============================
+# == VERBOSITY               ==
+# =============================
+/process/em/verbose 0 # reduces the console output a lot !
+/vis/verbose errors # reduces the console output
+# TODO: line '### === G4UAtomicDeexcitation::InitialiseForNewRun()' appears twice (with full output)
+
 
 # =============================
 # == ACTORS                  ==
@@ -35,7 +60,7 @@
 # ============================
 # ==  VISUALIZATION         ==
 # ============================
-# /control/execute                     mac/visu.mac
+/control/execute                     mac/visu.mac
 
 # ============================
 # == SOURCE                 ==
@@ -54,13 +79,10 @@
 /gate/random/setEngineSeed {seed} # 6781
 
 #=====================================================
-#   M E A S U R E M E N T   S E T T I N G S   
+#   M E A S U R E M E N T   S E T T I N G S
 #=====================================================
 #/gate/application/setTimeSlice  {time} s
 #/gate/application/setTimeStart   0.00   s
 #/gate/application/setTimeStop    {time} s
-/gate/application/setTotalNumberOfPrimaries 100000
+/gate/application/setTotalNumberOfPrimaries 100
 /gate/application/startDAQ
-
-
-
