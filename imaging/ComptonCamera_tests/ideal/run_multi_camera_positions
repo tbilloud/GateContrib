@@ -13,7 +13,6 @@ posY_values=(0 0  0   10 -10 -10 10)
 time=0.1000 # 2000
 posZ=10
 energy_keV=140
-type=Volume
 seed=1
 output_prefix="/media/billoud/Volume/CT/GATE/ideal/sourceCube/${energy_keV}keV/time${time}_seed${seed}_camera"
 mac_file="mac/main.mac"
@@ -31,7 +30,7 @@ for i in $(seq 0 $((${#posX_values[@]} - 1))); do
   mkdir -p "$dir_name"
 
   # Run the Gate command with the specified parameters in the background
-  Gate $mac_file -a [time,${time}][out,${dir_name}][posX,${posX}][posY,${posY}][posZ,${posZ}][seed,${seed}][type,${type}][energy_keV,${energy_keV}] &
+  Gate $mac_file -a [time,${time}][out,${dir_name}][posX,${posX}][posY,${posY}][posZ,${posZ}][seed,${seed}][energy_keV,${energy_keV}] &
 done
 
 # Wait for all background jobs to finish

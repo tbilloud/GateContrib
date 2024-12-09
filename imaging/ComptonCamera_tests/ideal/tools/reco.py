@@ -19,7 +19,7 @@ from imaging.ComptonCamera_tests.tools.utils import remove_nans
 # fname, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceVolumes/140keV/time200_camera_posX0_posY0'), 0.1405, 40
 # fname, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceVolumes/245keV/time200_camera_posX0_posY0'), 0.245, 40
 # fname, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceCube/140keV/time1000/time1000_seed1_cameraX0Y0Z10'), 0.140, 40
-fname, E0_MeV, world_mm = Path('../sourcePoint_cameraSingle/output'), 0.140, 200
+fname, E0_MeV, world_mm = Path('../output'), 0.140, 200
 
 vsize = (256, 256, 256)
 vpitch = world_mm / vsize[2]

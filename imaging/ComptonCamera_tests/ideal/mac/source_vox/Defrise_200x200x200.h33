@@ -1,6 +1,6 @@
 !INTERFILE :=
 !data offset in bytes := 0
-!name of data file := mac/Defrise_200x200x200.i33
+!name of data file := mac/source_vox/Defrise_200x200x200.i33
 imagedata byte order := LITTLEENDIAN
 !matrix size [1] := 200
 !matrix size [2] := 200

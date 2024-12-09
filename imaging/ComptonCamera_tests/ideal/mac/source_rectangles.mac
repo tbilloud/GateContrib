@@ -5,7 +5,7 @@
 /gate/source/rec1/gps/pos/halfy 1 mm
 /gate/source/rec1/gps/particle gamma
 /gate/source/rec1/gps/ene/type Mono
-/gate/source/rec1/gps/ene/mono 250 keV
+/gate/source/rec1/gps/ene/mono {energy_keV} keV
 /gate/source/rec1/setActivity 1 MBq
 /gate/source/rec1/gps/ang/type iso
 /gate/source/rec1/gps/pos/centre 0 5 -9 mm
@@ -18,7 +18,7 @@
 /gate/source/rec2/gps/pos/halfy 2 mm
 /gate/source/rec2/gps/particle gamma
 /gate/source/rec2/gps/ene/type Mono
-/gate/source/rec2/gps/ene/mono 250 keV
+/gate/source/rec2/gps/ene/mono {energy_keV} keV
 /gate/source/rec2/setActivity 1 MBq
 /gate/source/rec2/gps/ang/type iso
 /gate/source/rec2/gps/pos/centre 0 -5 -9 mm

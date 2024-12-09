@@ -11,7 +11,7 @@ pandas.set_option('display.float_format', lambda x: f'{x:.1f}')
 
 # Script to print some info about root trees produced by CCMod actor
 # ! WARNING! comment out blocks if corresponding tree was not saved
-path = '/home/billoud/PycharmProjects/GateContrib/imaging/ComptonCamera_tests/ideal/sourcePoint_cameraSingle/output/'
+path = '/imaging/ComptonCamera_tests/ideal/output/'
 nentries_printed = 2  # None to read all entries
 
 # ELECTRON ESCAPES

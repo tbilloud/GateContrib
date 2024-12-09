@@ -19,7 +19,7 @@ cp.set_printoptions(linewidth=200)
 ##############################################################
 # Settings
 ##############################################################
-fname, E0_MeV, world_mm = Path('../sourcePoint_cameraSingle/output'), 0.140, 200
+fname, E0_MeV, world_mm = Path('../output'), 0.140, 200
 
 vsize = (256, 256, 256)
 vpitch = world_mm / vsize[2]

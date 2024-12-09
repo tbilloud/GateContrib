@@ -3,7 +3,7 @@
 /gate/source/mysource/gps/particle gamma
 /gate/source/mysource/gps/pos/centre 0 0 0 mm
 /gate/source/mysource/gps/ene/type Mono
-/gate/source/mysource/gps/ene/mono 140 keV
+/gate/source/mysource/gps/ene/mono {energy_keV} keV
 /gate/source/mysource/gps/ang/type iso
 /gate/source/mysource/gps/ang/maxtheta 30 deg
 /gate/source/mysource/gps/ang/rot1 0 1 0

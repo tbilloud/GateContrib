@@ -1,11 +1,12 @@
 /control/alias time 0.01
 /control/alias out output
 /control/alias seed 1
+/control/alias energy_keV 140
 
 # ===========================
 # == LOAD DATABASE         ==
 # ===========================
-/gate/geometry/setMaterialDatabase    ../../data/GateMaterials.db
+/gate/geometry/setMaterialDatabase    ../data/GateMaterials.db
 
 # ===========================
 # ==   GEOMETRY            ==
@@ -37,7 +38,7 @@
 #   - 0.1 mm corresponds to 10 keV => allows fluorescence
 /gate/physics/Gamma/SetCutInRegion      absorber 100 um
 /gate/physics/Electron/SetCutInRegion   absorber 100 um
-/gate/physics/displayCuts
+# /gate/physics/displayCuts
 
 # =============================
 # == VERBOSITY               ==
@@ -45,7 +46,6 @@
 /process/em/verbose 0 # reduces the console output a lot !
 /vis/verbose errors # reduces the console output
 # TODO: line '### === G4UAtomicDeexcitation::InitialiseForNewRun()' appears twice (with full output)
-
 
 # =============================
 # == ACTORS                  ==
@@ -65,7 +65,10 @@
 # ============================
 # == SOURCE                 ==
 # ============================
-/control/execute                     mac/source.mac
+/control/execute                     mac/source_point.mac
+#/control/execute                     mac/source_rectangles.mac
+#/control/execute                     mac/source_3Dshapes.mac
+#/control/execute                     mac/source_vox.mac
 
 # ============================
 # == OUTPUT                 ==
@@ -84,5 +87,5 @@
 #/gate/application/setTimeSlice  {time} s
 #/gate/application/setTimeStart   0.00   s
 #/gate/application/setTimeStop    {time} s
-/gate/application/setTotalNumberOfPrimaries 100
+/gate/application/setTotalNumberOfPrimaries 10000
 /gate/application/startDAQ

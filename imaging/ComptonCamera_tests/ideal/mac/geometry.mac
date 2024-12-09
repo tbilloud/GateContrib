@@ -32,3 +32,20 @@
 /gate/absorber/geometry/setYLength         {sensor_side}
 /gate/absorber/geometry/setZLength         1 mm
 /gate/absorber/setMaterial                 CdTe # Silicon
+
+# !!!!!! REMOVE THIS BLOCK IF NOT USING VOXELIZED SOURCE !!!!!!
+#================== SOURCE VOLUME =============================
+# This is a volume to embed the source, so that the source can be rotated
+#/gate/world/daughters/name                    source_volume
+#/gate/world/daughters/insert                  box
+#/gate/source_volume/placement/setTranslation   0 0 0 mm
+#/gate/source_volume/geometry/setXLength        250 mm
+#/gate/source_volume/geometry/setYLength        400 mm
+#/gate/source_volume/geometry/setZLength        250 mm
+#/gate/source_volume/setMaterial                Vacuum
+#/gate/source_volume/placement/setRotationAxis       1 0 0
+#/gate/source_volume/placement/setRotationAngle      90 deg
+#/gate/source_volume/vis/forceWireframe
+#/gate/source_volume/vis/setColor red
+#/gate/source_volume/vis/setVisible 1
+#/gate/source_volume/vis/setDaughtersInvisible 0

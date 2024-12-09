@@ -5,7 +5,7 @@ pandas.set_option('display.max_columns', 100)
 pandas.set_option('display.width', 400)
 pandas.set_option('display.max_rows', 1000)
 
-path = '/home/billoud/PycharmProjects/GateContrib/imaging/ComptonCamera_tests/ideal/sourcePoint_cameraSingle/output/'
+path = '/imaging/ComptonCamera_tests/ideal/output/'
 nentries_printed = None # None to read all entries
 
 tree = uproot.open(path + 'CC_Hits.root:Hits')

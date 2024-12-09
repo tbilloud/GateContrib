@@ -7,7 +7,7 @@
 /vis/modeling/trajectories/drawByParticleID-0/default/setStepPtsSize 10
 /vis/scene/add/eventID
 
-/vis/scene/endOfEventAction   accumulate 10
+/vis/scene/endOfEventAction   accumulate 100
 
 /vis/viewer/zoom 5
 /vis/viewer/set/viewpointThetaPhi -110 -30
