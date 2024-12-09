@@ -12,7 +12,7 @@ pandas.set_option('display.float_format', lambda x: f'{x:.1f}')
 # Script to print some info about root trees produced by CCMod actor
 # ! WARNING! comment out blocks if corresponding tree was not saved
 path = '../ideal/output/'
-nentries_printed = 2  # None to read all entries
+nentries_printed = 1000  # None to read all entries
 
 # ELECTRON ESCAPES
 tree = uproot.open(path + 'CC_eventGlobalInfo.root:EventGlobalInfo')
@@ -37,8 +37,8 @@ hits['energyFinal'] = round(hits['energyFinal'] * 1000, 2)  # convert to keV
 hits['stepLength'] = round(hits['stepLength'] * 1000, 2)  # convert to um
 hits['trackLength'] = round(hits['trackLength'] * 1000, 2)  # convert to um
 hits['trackLocalTime'] = round(hits['trackLocalTime'] * 1e15, 2)  # convert to fs
-# hits = hits[hits['eventID'] == 2]
-#print(hits.to_string(index=False))
+hits = hits[hits['eventID'].isin([11,33])]
+print(hits.to_string(index=False))
 # print(Series(hits['postStepProcess'].to_numpy()).value_counts(normalize=True) * 100,'\n')  # !! entry_stop = None  !!
 
 # SINGLES
