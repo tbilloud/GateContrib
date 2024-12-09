@@ -7,6 +7,14 @@ cp.set_printoptions(linewidth=200)
 
 # Script to check the precision of ideal simulation with point source
 # All cones should intersect at the source point
+# Possible reasons for bad cones:
+# - rayleigh scattering
+# - compton scattering with electron not at rest (doppler broadening)
+# - particle-induced X-ray emission (fluorescence, Auger)
+# - more than 2 coincident events (nSingles)
+# - electron/gamma escape
+# - time resolution (pile-up, singles with different eventID, true_coinc)
+# - energy/spatial resolution
 
 ##############################################################
 # Settings
@@ -49,7 +57,7 @@ for i, cone in enumerate(cones):
 print(n_bad_cones, 'bad cones')
 
 ##############################################################
-# Display/Save results
+# Display results
 ##############################################################
 vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2), axis_labels=["cone number", "x", "y"])
 viewer = napari.view_image(np.asarray(z_slice_stack), **vargs)
