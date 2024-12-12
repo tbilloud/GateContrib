@@ -25,20 +25,21 @@
 # ##### Physics list #####
 # emlivermore, emstandard_opt3 or emstandard_opt4 include doppler broadening
 # emstandard, emstandard_opt1, emstandard_opt2 do not
-/gate/physics/addPhysicsList emlivermore
+/gate/physics/addPhysicsList emlivermore # WARNING: NOT livermore !!!
 # => Fluorescence from photons and electrons is activated by default in Option3, Option4, Livermore and Penelope physics constructors, while Auger production and PIXE are not.
 #/process/em/fluo false # this seems to have no effect
 #/process/em/auger false # this seems to disable Auger electron cascade
 
 # ##### Cuts  #####
-# - Default to 1000 um
-# - Above ~10 um, no eIoni, msc, eBrem hits, and PIXE (fluorescence and Auger)
-# - Distance/energy correspondance for CdTe:
-#   - 1000 um <=> gamma 40 keV / e- 859 keV => no fluorescence
-#   - 100 um <=> gamma 10 keV / e- 171 keV => fluorescence
-#   - 0.1 um <=> gamma 1 keV / e- 1 keV => most realistic lower energy spectrum, below that no difference
-/gate/physics/Gamma/SetCutInRegion      absorber 0.1 um
-/gate/physics/Electron/SetCutInRegion   absorber 0.1 um
+# - For CdTe, distance <=> energy correspondence => aspect of Singles spectrum with adderComptPhotIdeal:
+#   - 1000 um <=> gamma 40 keV / e- 859 keV => default, no fluorescence
+#   - 100 um <=> gamma 10 keV / e- 171 keV => fluorescence, no fluorescence
+#   - 10 um <=> gamma 2.5 keV / e- 43 keV => fluorescence (K peaks mainly)
+#   - 1 um <=> gamma 1 keV / e- 2.6 keV => fluorescence (K + L peaks)
+#   - 0.1 um <=> gamma 1 keV / e- 1 keV => more low energy singles, below that no difference anymore
+# TODO: adderComptPhotIdeal does not record all singles when multiple fluorescence hits in same event
+/gate/physics/Gamma/SetCutInRegion      absorber 10 um
+/gate/physics/Electron/SetCutInRegion   absorber 10 um
 /gate/physics/displayCuts
 
 # =============================

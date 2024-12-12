@@ -25,8 +25,10 @@
 # - The 3rd comprises those modules that filter the singles such as energy threshold modules.
 
 # CATEGORY 1: 'singles' creation (hit regrouping)
-/gate/digitizer/layers/insert adderComptPhotIdeal # deposited energy has been validated using livermore physics list.
-#/gate/digitizer/layers/adderComptPhotIdeal/rejectEvtOtherProcesses 0 # TODO: IMPORTANT (and error in Gate9.2 doc)
+# WARNING: if fluorescence is enabled (cuts <100um), there's an issue with singles (see readme)
+/gate/digitizer/layers/insert adderComptPhotIdeal # WARNING: validated using livermore physics list.
+#/gate/digitizer/layers/adderComptPhotIdeal/rejectEvtOtherProcesses 1 # IMPORTANT (TODO: fix Gate9.2 doc, wrong command)
+#/gate/digitizer/layers/insert adder
 
 # CATEGORY 2: 'singles' modification
 
