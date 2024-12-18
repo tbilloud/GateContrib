@@ -2,10 +2,10 @@ import sys
 import uproot
 from pandas import Series
 import pandas
-# pandas.set_option('display.max_columns', 100)
-# pandas.set_option('display.width', 400)
-# pandas.set_option('display.max_rows', 1000)
-pandas.set_option('display.float_format', lambda x: f'{x:.1f}')
+pandas.set_option('display.max_columns', 100)
+pandas.set_option('display.width', 400)
+pandas.set_option('display.max_rows', 1000)
+pandas.set_option('display.float_format', lambda x: f'{x:.5f}')
 
 # Script to print some info about root trees produced by CCMod actor
 # ! WARNING! comment out blocks if corresponding tree was not saved
@@ -31,15 +31,15 @@ columns_to_remove += ['posX', 'posY', 'posZ', 'localPosX', 'localPosY', 'localPo
 columns_to_remove += ['nCrystalConv', 'nCrystalCompt', 'nCrystalRayl']
 columns_to_remove += ['trackLocalTime','stepLength','trackLength']
 hits = hits.drop(columns=columns_to_remove)
-hits['edep'] = round(hits['edep'] * 1000, 2)  # convert to keV
-hits['energyIniT'] = round(hits['energyIniT'] * 1000, 2)  # convert to keV
-hits['energyFinal'] = round(hits['energyFinal'] * 1000, 2)  # convert to keV
+hits['edep'] = hits['edep'] * 1000  # convert to keV
+hits['energyIniT'] = hits['energyIniT'] * 1000  # convert to keV
+hits['energyFinal'] = hits['energyFinal'] * 1000  # convert to keV
 # print(Series(hits['postStepProcess'].to_numpy()).value_counts(normalize=True) * 100,'\n')  # !! entry_stop = None  !!
 # print(Series(hits['layerName'].to_numpy()).value_counts(normalize=True) * 100,'\n')  # !! entry_stop = None  !!
 # print(hits.groupby('eventID')['edep'].sum())
 # hits = hits[hits['eventID'].isin([751,2027,2703])]
 #print(hits[hits['postStepProcess'] == 'compt'])
-print(hits.to_string(index=False))
+#print(hits.to_string(index=False))
 
 # SINGLES
 tree = uproot.open(path + 'CC_Singles.root:Singles')
@@ -49,16 +49,25 @@ columns_to_remove = ['runID', 'time', 'sourcePDG', 'sourceEnergy', 'sourcePosX',
 columns_to_remove += ['localPosX', 'localPosY', 'localPosZ']
 columns_to_remove += ['nCrystalConv', 'nCrystalCompt', 'nCrystalRayl']
 singles = singles.drop(columns=columns_to_remove)
-singles['energy'] = round(singles['energy'] * 1000, 2)  # convert to keV
-singles['energyIni'] = round(singles['energyIni'] * 1000, 2)  # convert to keV
-singles['energyFinal'] = round(singles['energyFinal'] * 1000, 2)  # convert to keV
+singles['energy'] = singles['energy'] * 1000 # convert to keV
+singles['energyIni'] = singles['energyIni'] * 1000  # convert to keV
+singles['energyFinal'] = singles['energyFinal'] * 1000  # convert to keV
 sgroup = singles.groupby("eventID").size()
 print('\n'.join([f'number of events with {i} singles: {len(sgroup[sgroup == i])}' for i in range(1, sgroup.max() + 1)]))
 # print(singles[singles['eventID'].isin(singles.groupby('eventID').filter(lambda x: len(x) == 3)['eventID'].unique())])
 # print(singles[singles['eventID'].isin([11,33])])
 # print(Series(singles['layerName'].to_numpy()).value_counts(normalize=True) * 100,'\n')  # !! entry_stop = None  !!
-print(singles.to_string(index=False))
+# print(singles.to_string(index=False))
 # sys.exit()
+
+# SINGLE + HITS SIDE BY SIDE
+dfc = pandas.concat([hits, singles.add_prefix('_')], axis=1)
+print('\n =>', len(dfc), 'entries in dataframe Singles + Hits')
+dfc['_eventID'] = dfc['_eventID'].fillna(-1).astype(int)
+print(dfc[dfc['eventID'].isin([0])].to_string(index=False))
+edep_sum = hits[hits['eventID'].isin([0])].groupby('trackID')['edep'].sum().reset_index()
+print(edep_sum)
+sys.exit()
 
 # COINCIDENCES
 tree = uproot.open(path + 'CC_Coincidences.root:Coincidences')
