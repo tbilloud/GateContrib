@@ -27,6 +27,7 @@
 # CATEGORY 1: 'singles' creation (hit regrouping)
 # WARNING: if fluorescence is enabled (cuts <100um), there's an issue with singles (see readme)
 /gate/digitizer/layers/insert adderComptPhotIdeal # WARNING: validated using livermore physics list.
+/gate/digitizer/layers/adderComptPhotIdeal/verbose 2
 #/gate/digitizer/layers/adderComptPhotIdeal/rejectEvtOtherProcesses 1 # IMPORTANT (TODO: fix Gate9.2 doc, wrong command)
 #/gate/digitizer/layers/insert adder
 
