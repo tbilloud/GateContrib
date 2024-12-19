@@ -13,6 +13,9 @@ To simulate perfect cones (e.g. to check their intersectoins with a point source
 - use adderComptPhotIdeal digitizer module
 - use emstandard physics list to disable doppler broadening
 - leave default cuts (1mm) to avoid fluorescence.
-TODO: adderComptPhotIdeal misses some singles inside events when fluorescence is enabled:
- => seem to occur when multiple fluorescence hits
- => sum(edep) of hits != sum(energy) of singles
+TODO: adderComptPhotIdeal misses some hits when using low cuts (~1 um):
+ => sum(edep) of hits != sum(energy) of corresponding single
+ => happens when there are multiple trackIDs in the same event
+ => at first I thought the problem was caused by the fact that every msc (multiple scattering) hit leads to a new
+  trackID, but this is not the case. Switching from emlivermore to emstandard removes msc hits and the problem persists.
+  Note that not only msc hits create new trackIDs, but also e.g. delta rays.
