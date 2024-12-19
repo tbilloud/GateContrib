@@ -16,17 +16,21 @@
 # ===========================
 # ==  PHYSICS              ==
 # ===========================
-# Of interest to Compton camera simulations are the following processes:
+# Of interest to Compton camera simulations are the following:
 # - Compton scattering (Klein-Nishina equation, atomic electron at rest)
 # - Doppler broadening (atomic electron not at rest in Compton scattering)
 # - Photoelectric effect
 # - Rayleigh scattering (outside and inside the detector)
 # - Particle-induced X-ray emission (fluorescence and Auger), called PIXE in geant4 documentation
-# ##### Physics list #####
+
+# ##### Physics lists #####
 # emlivermore, emstandard_opt3 or emstandard_opt4 include doppler broadening
 # emstandard, emstandard_opt1, emstandard_opt2 do not
 /gate/physics/addPhysicsList emlivermore # WARNING: NOT livermore !!!
 # => Fluorescence from photons and electrons is activated by default in Option3, Option4, Livermore and Penelope physics constructors, while Auger production and PIXE are not.
+
+# ##### Physics processes #####
+#/gate/physics/removeProcess msc e- # seems to not change anything
 #/process/em/fluo false # this seems to have no effect
 #/process/em/auger false # this seems to disable Auger electron cascade
 
@@ -53,6 +57,16 @@
 # == ACTORS                  ==
 # =============================
 /control/execute mac/actor.mac
+
+# =============================
+# == VERBOSITY               ==
+# =============================
+/gate/physics/displayCuts
+/process/em/verbose 0 # reduces the console output a lot
+/vis/verbose errors # reduces the console output a bit
+# TODO: line '### === G4UAtomicDeexcitation::InitialiseForNewRun()' appears twice (with full output)
+#/gate/digitizer/layers/adderComptPhotIdeal/verbose 2
+#/tracking/verbose 3
 
 # ============================
 # == INITIALIZE             ==
