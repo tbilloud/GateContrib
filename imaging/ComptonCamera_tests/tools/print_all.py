@@ -21,11 +21,11 @@ print('\n =>', tree.num_entries, 'entries in tree EventGlobalInfo')
 # HITS
 # stepLength[mm]: distance between two interactions of a particle (e.g.: distance between a gamma particle entering a sensitive volume and being scattered)
 # trackLength[mm]: total distance of one particle often including multiple steps. Can also be derived by the trackLocalTime.
-# processName: The process by which the particle ended its path in the sensitive detector (e.g.: Transportation (“T”), Optical Absorption(“O”), Comptonscatter(”C”), PhotoElectric(“P”), RaleighScattering(“R”)). You might be interested in distinguishing between particles that are detected at the detector(“T”) and those that were absorbed(“O”). A particle that undergoes Comptonscatter(“C”) is counted as two hits when it splits up.
+# processName: The process by which the (parent?) particle ended its path in the sensitive detector (e.g.: Transportation (“T”), Optical Absorption(“O”), Comptonscatter(”C”), PhotoElectric(“P”), RaleighScattering(“R”)). You might be interested in distinguishing between particles that are detected at the detector(“T”) and those that were absorbed(“O”). A particle that undergoes Comptonscatter(“C”) is counted as two hits when it splits up.
 # WARNING: A particle that undergoes Comptonscatter(“C”) is counted as two hits when it splits up.
 tree = uproot.open(path + 'CC_Hits.root:Hits')
 print('\n =>', tree.num_entries, 'entries in tree Hits')
-hits = tree.arrays(library='pd', entry_stop=200)  # None to read all entries
+hits = tree.arrays(library='pd', entry_stop=None)  # None to read all entries
 columns_to_remove = ['runID', 'time', 'sourcePDG', 'sourceEnergy', 'sourcePosX', 'sourcePosY', 'sourcePosZ', 'volumeID']
 columns_to_remove += ['posX', 'posY', 'posZ', 'localPosX', 'localPosY', 'localPosZ']
 columns_to_remove += ['nCrystalConv', 'nCrystalCompt', 'nCrystalRayl']
@@ -37,14 +37,15 @@ hits['energyFinal'] = hits['energyFinal'] * 1000  # convert to keV
 # print(Series(hits['postStepProcess'].to_numpy()).value_counts(normalize=True) * 100,'\n')  # !! entry_stop = None  !!
 # print(Series(hits['layerName'].to_numpy()).value_counts(normalize=True) * 100,'\n')  # !! entry_stop = None  !!
 # print(hits.groupby('eventID')['edep'].sum())
-# hits = hits[hits['eventID'].isin([751,2027,2703])]
-#print(hits[hits['postStepProcess'] == 'compt'])
-#print(hits.to_string(index=False))
+hits = hits[hits['eventID'].isin([88252])]
+# print(hits[hits['postStepProcess'] == 'compt'])
+# print(hits[hits['PDGEncoding'] == 22].to_string(index=False))
+# print(hits.to_string(index=False))
 
 # SINGLES
 tree = uproot.open(path + 'CC_Singles.root:Singles')
 print('\n =>', tree.num_entries, 'entries in tree Singles')
-singles = tree.arrays(library='pd', entry_stop=10)
+singles = tree.arrays(library='pd', entry_stop=None)
 columns_to_remove = ['runID', 'time', 'sourcePDG', 'sourceEnergy', 'sourcePosX', 'sourcePosY', 'sourcePosZ', 'volumeID']
 columns_to_remove += ['localPosX', 'localPosY', 'localPosZ']
 columns_to_remove += ['nCrystalConv', 'nCrystalCompt', 'nCrystalRayl']
@@ -55,7 +56,7 @@ singles['energyFinal'] = singles['energyFinal'] * 1000  # convert to keV
 sgroup = singles.groupby("eventID").size()
 print('\n'.join([f'number of events with {i} singles: {len(sgroup[sgroup == i])}' for i in range(1, sgroup.max() + 1)]))
 # print(singles[singles['eventID'].isin(singles.groupby('eventID').filter(lambda x: len(x) == 3)['eventID'].unique())])
-# print(singles[singles['eventID'].isin([11,33])])
+print(singles[singles['eventID'].isin([88252])])
 # print(Series(singles['layerName'].to_numpy()).value_counts(normalize=True) * 100,'\n')  # !! entry_stop = None  !!
 # print(singles.to_string(index=False))
 # sys.exit()
@@ -64,9 +65,8 @@ print('\n'.join([f'number of events with {i} singles: {len(sgroup[sgroup == i])}
 dfc = pandas.concat([hits, singles.add_prefix('_')], axis=1)
 print('\n =>', len(dfc), 'entries in dataframe Singles + Hits')
 dfc['_eventID'] = dfc['_eventID'].fillna(-1).astype(int)
-print(dfc[dfc['eventID'].isin([0])].to_string(index=False))
-edep_sum = hits[hits['eventID'].isin([0])].groupby('trackID')['edep'].sum().reset_index()
-print(edep_sum)
+print(dfc[dfc['eventID'].isin([88252])].to_string(index=False))
+# edep_sum = hits[hits['eventID'].isin([88252])].groupby('trackID')['edep'].sum().reset_index(), print(edep_sum)
 sys.exit()
 
 # COINCIDENCES
