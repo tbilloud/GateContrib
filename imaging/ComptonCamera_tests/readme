@@ -1,0 +1,6 @@
+This is a repository to test single layer Compton cameras a short distances from the source.
+
+Code to simulate compton cameras differs according to Gate version:
+- First module dedicated to compton cameras appeared in Gate 9.2 (see CCMod paper)
+- Gate 9.3 introduced a new way to handle digitizers
+- Gate 10 completely changed, scripts are now in python and compton camera actors have not been re-implemented (yet?)
