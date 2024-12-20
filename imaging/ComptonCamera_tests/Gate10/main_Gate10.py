@@ -1,3 +1,9 @@
+# TODO:
+#  - find out if it is possible to have hits labeled with fluorescence in output files
+#  - have qt visualisation work
+#  - write/use an actor that works as ComptonCameraActor in Gate 9.2 with the adderComptPhotIdeal digitizer
+#  - simulate Timepix3 with pixel matrix as gridDiscretization digitizer in Gate 9.2
+
 # Before running script, write in terminal:
 # export GLIBC_TUNABLES=glibc.rtld.optional_static_tls=2000000
 
@@ -58,7 +64,6 @@ hc.output_filename = 'CC_Gate10_Hits.root'
 hc.attributes = gate_core.GateDigiAttributeManager.GetInstance().GetAvailableDigiAttributeNames()  # all available
 hc.attributes = ['EventID', 'TrackID', 'ParentID', 'ParentParticleName', 'ParticleName', 'KineticEnergy',
                  'TotalEnergyDeposit', 'TrackCreatorProcess', 'ProcessDefinedStep']
-# print(hc.attributes), sys.exit()
 
 ## =============================
 ## == VERBOSITY               ==
@@ -70,7 +75,7 @@ sim.g4_verbose = False
 ## ============================
 sim.visu = True
 # sim.visu_verbose = True
-sim.visu_type = "qt" # default vrml
+# sim.visu_type = "qt" # default vrml
 # sim.visu_filename = 'testimage'
 
 ## ============================
@@ -110,6 +115,9 @@ hits = tree.arrays(library='pd', entry_stop=None)  # None to read all entries
 hits['TotalEnergyDeposit'] = hits['TotalEnergyDeposit'] * 1000  # keV
 hits['KineticEnergy'] = hits['KineticEnergy'] * 1000  # keV
 print(hits.to_string(index=False))
+if 'FluoType' in hits.columns:
+    print("\nFluorescence-related hits details:")
+    print(hits[hits['FluoType'] != 0].to_string(index=False))
 # print(hits[hits['ParticleName']=='gamma'].to_string(index=False))
 print(pandas.Series(hits['ProcessDefinedStep'].to_numpy()).value_counts(normalize=True) * 100,
       '\n')  # !! entry_stop = None  !!
