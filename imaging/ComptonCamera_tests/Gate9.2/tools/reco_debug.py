@@ -5,7 +5,7 @@ from imaging.ComptonCamera_tests.tools.compton import compton_forward
 from imaging.ComptonCamera_tests.tools.utils import remove_nans
 cp.set_printoptions(linewidth=200)
 
-# Script to check the precision of ideal simulation with point source
+# Script to check the precision of Gate9.2 simulation with point source
 # All cones should intersect at the source point
 # Possible reasons for bad cones:
 # - rayleigh scattering

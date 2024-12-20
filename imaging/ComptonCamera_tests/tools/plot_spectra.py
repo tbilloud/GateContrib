@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import uproot
 from pathlib import Path
 
-path = Path('../ideal/output')
+path = Path('../Gate9.2/output')
 #path = '../output/source_x30mm_time20/CC_Singles.root'
 emax_keV = 150
 
