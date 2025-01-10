@@ -37,10 +37,11 @@ hits['energyFinal'] = hits['energyFinal'] * 1000  # convert to keV
 # print(Series(hits['postStepProcess'].to_numpy()).value_counts(normalize=True) * 100,'\n')  # !! entry_stop = None  !!
 # print(Series(hits['layerName'].to_numpy()).value_counts(normalize=True) * 100,'\n')  # !! entry_stop = None  !!
 # print(hits.groupby('eventID')['edep'].sum())
-hits = hits[hits['eventID'].isin([88252])]
+# hits = hits[hits['eventID'].isin([88252])]
 # print(hits[hits['postStepProcess'] == 'compt'])
 # print(hits[hits['PDGEncoding'] == 22].to_string(index=False))
-# print(hits.to_string(index=False))
+print(hits.to_string(index=False))
+sys.exit()
 
 # SINGLES
 tree = uproot.open(path + 'CC_Singles.root:Singles')
