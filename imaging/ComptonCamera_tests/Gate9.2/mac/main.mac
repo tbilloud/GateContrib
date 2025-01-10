@@ -42,8 +42,8 @@
 #   - 1 um <=> gamma 1 keV / e- 2.6 keV => fluorescence (K + L peaks)
 #   - 0.1 um <=> gamma 1 keV / e- 1 keV => more low energy singles, below that no difference anymore
 # TODO: adderComptPhotIdeal does not record all singles when multiple fluorescence hits in same event
-/gate/physics/Gamma/SetCutInRegion      absorber 10 um
-/gate/physics/Electron/SetCutInRegion   absorber 10 um
+/gate/physics/Gamma/SetCutInRegion      sensor 0.1 um
+/gate/physics/Electron/SetCutInRegion   sensor 0.1 um
 /gate/physics/displayCuts
 
 # =============================
@@ -103,5 +103,5 @@
 #/gate/application/setTimeSlice  {time} s
 #/gate/application/setTimeStart   0.00   s
 #/gate/application/setTimeStop    {time} s
-/gate/application/setTotalNumberOfPrimaries 10000
+/gate/application/setTotalNumberOfPrimaries 3
 /gate/application/startDAQ
