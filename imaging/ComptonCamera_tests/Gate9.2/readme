@@ -4,16 +4,16 @@ Starting from Gate 9.3 digitization changed and code would not work.
 
 I added several utility scripts in subdirectory 'tools'.
 
-Doppler broadening => physics list emlivermore
-Fluorescence => cuts < 100 um
-
-To simulate perfect cones (e.g. to check their intersectoins with a point source):
+To simulate perfect cones (e.g. to check their intersections with a point source):
 - use adderComptPhotIdeal digitizer module
 - use emstandard physics list to disable doppler broadening
 - leave default cuts (1mm) to avoid fluorescence.
+
 TODO: adderComptPhotIdeal misses some hits when using low cuts (~1 um):
  => sum(edep) of hits != sum(energy) of corresponding single
  => happens when there are multiple trackIDs in the same event
  => at first I thought the problem was caused by the fact that every msc (multiple scattering) hit leads to a new
   trackID, but this is not the case. Switching from emlivermore to emstandard removes msc hits and the problem persists.
   Note that not only msc hits create new trackIDs, but also e.g. delta rays.
+=> note in Gate 9.4 doc: 'Note that the method applied to obtained the deposited energy (*energy attribute) is not
+ robust and may lead to incorrect values for other physics list (than emlivermore).'

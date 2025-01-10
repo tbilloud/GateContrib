@@ -4,3 +4,21 @@ Code to simulate compton cameras differs according to Gate version:
 - First module dedicated to compton cameras appeared in Gate 9.2 (see CCMod paper)
 - Gate 9.3 introduced a new way to handle digitizers
 - Gate 10 completely changed, scripts are now in python and compton camera actors have not been re-implemented (yet?)
+
+Doppler broadening => physics list emlivermore
+Fluorescence => cuts < 100 um
+
+Hit root files have different column names between Gate 9 and 10... Fluorescence events can be identified with:
+- Gate 10: a row with emission line energy in column 'TotalEnergyDeposit'.
+ EventID  TrackID  ParentID  ParentParticleName  ParticleName  KineticEnergy  TotalEnergyDeposit  TrackCreatorProcess  ProcessDefinedStep
+       8        1         0             unknown         gamma        140.000              11.107                 none                none
+  => There's only one row for both the parent X-ray and the subsequently emitted fluorescent X-ray... the only indication
+     that it was a photoelectric interaction is the TrackCreatorProcess of subsequent track ID.
+- Gate 9.2: a row with emission line energy in column 'edep'. It usually follows a row with a photoelectric event:
+ eventID  PDGEncoding  trackID  parentID     edep  energyFinal  energyIniT  postStepProcess  processName  layerName
+     316           22        1         0  0.12500      0.00000   140.00000             phot                absorber
+     316           22        3         1  1.40230      0.00000    10.94200             phot         phot   absorber
+NOTES:
+ * in both Gate 9.2 and 10, the emitted fluorescent X-ray does not seem to be transported at all...
+ * the example above used emlivermore with 0.1 um cuts and Germanium (K lines 9.89 keV and 10.98 keV). The difference
+   (11.107 vs 10.942 keV) might be due to different geant4 verions / physics lists?
