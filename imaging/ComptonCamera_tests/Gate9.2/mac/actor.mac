@@ -11,7 +11,7 @@
 /gate/actor/CC_digi_BB/saveCoincidencesTree             1
 /gate/actor/CC_digi_BB/saveCoincidenceChainsTree        1
 /gate/actor/CC_digi_BB/saveEventInfoTree                1
-/gate/actor/CC_digi_BB/absorberSDVolume                 absorber
+/gate/actor/CC_digi_BB/absorberSDVolume                 sensor
 /gate/actor/CC_digi_BB/scattererSDVolume                scatterer
 /gate/actor/CC_digi_BB/numberOfTotScatterers            1
 /gate/actor/CC_digi_BB/specifysourceParentID            0
