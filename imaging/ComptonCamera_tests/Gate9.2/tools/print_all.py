@@ -9,7 +9,7 @@ pandas.set_option('display.float_format', lambda x: f'{x:.5f}')
 
 # Script to print some info about root trees produced by CCMod actor
 # ! WARNING! comment out blocks if corresponding tree was not saved
-path = '../Gate9.2/output/'
+path = '../output/'
 
 # ELECTRON ESCAPES
 tree = uproot.open(path + 'CC_eventGlobalInfo.root:EventGlobalInfo')
