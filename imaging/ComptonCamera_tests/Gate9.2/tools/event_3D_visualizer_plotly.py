@@ -78,26 +78,24 @@ class MainWindow(QMainWindow):
         z = event_data['localPosZ']
         colors = event_data['PDGEncoding'].apply(lambda pdg: 'e-' if pdg == 11 else 'gamma')
 
+        # Change default range to have the same distance on all axes
         # Calculate ranges for each axis
         x_range = (x.min(), x.max())
         y_range = (y.min(), y.max())
         z_range = (z.min(), z.max())
-
         # Find the largest range among axes
         x_dist = x_range[1] - x_range[0]
         y_dist = y_range[1] - y_range[0]
         z_dist = z_range[1] - z_range[0]
-
         max_dist = max(x_dist, y_dist, z_dist)
-
         # Expand the ranges of smaller axes to match the largest range
+        extra = 50 # add a little extra range to avoid points at the extremity to be cut by the viewer
         x_center = (x_range[0] + x_range[1]) / 2
         y_center = (y_range[0] + y_range[1]) / 2
         z_center = (z_range[0] + z_range[1]) / 2
-
-        new_x_range = (x_center - max_dist / 2, x_center + max_dist / 2)
-        new_y_range = (y_center - max_dist / 2, y_center + max_dist / 2)
-        new_z_range = (z_center - max_dist / 2, z_center + max_dist / 2)
+        new_x_range = (x_center - max_dist / 2 - extra, x_center + max_dist / 2 + extra)
+        new_y_range = (y_center - max_dist / 2 - extra, y_center + max_dist / 2 + extra)
+        new_z_range = (z_center - max_dist / 2 - extra, z_center + max_dist / 2 + extra)
 
         # Create separate text annotations for points with PDGEncoding == 22
         text_labels = event_data['trackID'].where(event_data['PDGEncoding'] == 22, None)
