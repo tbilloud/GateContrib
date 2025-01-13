@@ -1,0 +1,3 @@
+run_multi_camera_positions is a shell script to run multiple simulations in parallel with different camera positions.
+
+It used to be in parent directory, not sure if it works form here.
