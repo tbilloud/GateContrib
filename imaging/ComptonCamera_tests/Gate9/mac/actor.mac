@@ -11,7 +11,7 @@
 /gate/actor/CC_digi_BB/saveCoincidencesTree             1
 /gate/actor/CC_digi_BB/saveCoincidenceChainsTree        1
 /gate/actor/CC_digi_BB/saveEventInfoTree                1
-/gate/actor/CC_digi_BB/absorberSDVolume                 sensor
+/gate/actor/CC_digi_BB/absorberSDVolume                 absorber
 /gate/actor/CC_digi_BB/scattererSDVolume                scatterer
 /gate/actor/CC_digi_BB/numberOfTotScatterers            1
 /gate/actor/CC_digi_BB/specifysourceParentID            0
@@ -26,9 +26,15 @@
 
 # CATEGORY 1: 'singles' creation (hit regrouping)
 # WARNING: if fluorescence is enabled (cuts <100um), there's an issue with singles (see readme)
-/gate/digitizer/layers/insert adderComptPhotIdeal # WARNING: validated using livermore physics list.
-#/gate/digitizer/layers/adderComptPhotIdeal/rejectEvtOtherProcesses 1 # IMPORTANT (TODO: fix Gate9.2 doc, wrong command)
-#/gate/digitizer/layers/insert adder
+# /gate/digitizer/layers/insert adderComptPhotIdeal # WARNING: validated using livermore physics list.
+##/gate/digitizer/layers/adderComptPhotIdeal/rejectEvtOtherProcesses 1 # IMPORTANT (TODO: fix Gate9 doc, wrong command)
+##/gate/digitizer/layers/insert adder
+/gate/digitizer/layers/insert gridDiscretization
+/gate/digitizer/layers/gridDiscretization/chooseNewVolume absorber
+/gate/digitizer/layers/gridDiscretization/absorber/setNumberStripsX 10
+/gate/digitizer/layers/gridDiscretization/absorber/setNumberStripsY 10
+/gate/digitizer/layers/gridDiscretization/absorber/setNumberStripsZ 0
+
 
 # CATEGORY 2: 'singles' modification
 
@@ -44,6 +50,7 @@
 # TODO: singles tree is not read until the end, the last few hundreds (~700) singles are not processed!
 # TODO: => this can be verified using /gate/application/setTotalNumberOfPrimaries 700
 /gate/digitizer/Coincidences/setWindow 50 ns
+# /gate/digitizer/Coincidences/setTriggerOnlyByAbsorber 1 # TODO seem to have no effect...
 /gate/digitizer/Coincidences/setAcceptancePolicy4CC keepAll
 
 ######################################################################################

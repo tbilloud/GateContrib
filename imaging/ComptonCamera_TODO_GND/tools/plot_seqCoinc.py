@@ -52,7 +52,7 @@ markers=['o','v','^','s','x','d','+','*','h']
 
 #path='/Users/etxebeste/gateworkdir/GateContrib/imaging/ComptonCamera/output/adder/'
 #path='/Users/etxebeste/gateworkdir/GateContrib/imaging/ComptonCamera/output/clustering/'
-path='/Users/etxebeste/gateworkdir/GateContrib/imaging/ComptonCamera/output/Gate9.2/'
+path='/Users/etxebeste/gateworkdir/GateContrib/imaging/ComptonCamera/output/Gate9/'
 
 
 #nameSeqCoin="CC_adder_sequenceCoincidence.root"

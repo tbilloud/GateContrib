@@ -1,4 +1,12 @@
-For this code I got started using the Compton camera example from GateContrib in GateContrib/imaging/ComptonCamera_TODO_GND (version of Oct. 2024, commit 13364d0e1757b864d1d3d887e9aae6228cf5ff96) and Gate 9.2.
+Compton camera simulations with Gate 9.2 inspired by GateContrib/imaging/ComptonCamera_TODO_GND (version of Oct. 2024, commit 13364d0e1757b864d1d3d887e9aae6228cf5ff96).
+
+Pros:
+- X-ray fluorescence is transported (not the case with Gate 10.0.1)
+
+Cons:
+- Problems with grid discretization module (gridDiscretization): does not work with single layer camera (Singles
+  are only produced in scatterer and coincidences are not produced at all...
+- Problems with ideal adder module (adderComptPhotIdeal): see below and in actor.mac
 
 Starting from Gate 9.3 digitization changed and code would not work.
 

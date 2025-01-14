@@ -22,16 +22,16 @@
 /gate/scatterer/geometry/setXLength        {sensor_side}
 /gate/scatterer/geometry/setYLength        {sensor_side}
 /gate/scatterer/geometry/setZLength        1 mm
-/gate/scatterer/setMaterial                Vacuum
+/gate/scatterer/setMaterial                Vacuum # Vacuum
 
-#================== SENSOR =============================
-/gate/BB/daughters/name                    sensor
+#================== ABSORBER =============================
+/gate/BB/daughters/name                    absorber
 /gate/BB/daughters/insert                  box
-/gate/sensor/placement/setTranslation    0 0 0.5 mm
-/gate/sensor/geometry/setXLength         {sensor_side}
-/gate/sensor/geometry/setYLength         {sensor_side}
-/gate/sensor/geometry/setZLength         1 mm
-/gate/sensor/setMaterial                 Tungsten # Silicon, CdTe, Tungsten
+/gate/absorber/placement/setTranslation    0 0 0.5 mm
+/gate/absorber/geometry/setXLength         {sensor_side}
+/gate/absorber/geometry/setYLength         {sensor_side}
+/gate/absorber/geometry/setZLength         1 mm
+/gate/absorber/setMaterial                 CdTe # CdTe # Silicon, CdTe, Tungsten
 
 # !!!!!! REMOVE THIS BLOCK IF NOT USING VOXELIZED SOURCE !!!!!!
 #================== SOURCE VOLUME =============================

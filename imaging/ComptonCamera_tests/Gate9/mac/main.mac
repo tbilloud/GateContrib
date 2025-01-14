@@ -1,3 +1,10 @@
+# TODO
+# use Ai assistant as I did for corresponding file in Gate10:
+# - READ HITS FILE AND ASK FOR A QT GUI DISPLAYING EVENT BY EVENT WITH MOUSE CLICKS
+# - THEN CHECK IF FLUORESCENCE X-RAY TRACKS EXIST OR NOT !!!
+# - THEN REVERT TO CdTe instead of Tungsten
+
+
 /control/alias time 0.01
 /control/alias out output
 /control/alias seed 1
@@ -42,9 +49,8 @@
 #   - 1 um <=> gamma 1 keV / e- 2.6 keV => fluorescence (K + L peaks)
 #   - 0.1 um <=> gamma 1 keV / e- 1 keV => more low energy singles, below that no difference anymore
 # TODO: adderComptPhotIdeal does not record all singles when multiple fluorescence hits in same event
-/gate/physics/Gamma/SetCutInRegion      sensor 0.1 um
-/gate/physics/Electron/SetCutInRegion   sensor 0.1 um
-/gate/physics/displayCuts
+/gate/physics/Gamma/SetCutInRegion      absorber 10 um
+/gate/physics/Electron/SetCutInRegion   absorber 10 um
 
 # =============================
 # == VERBOSITY               ==
@@ -61,7 +67,7 @@
 # =============================
 # == VERBOSITY               ==
 # =============================
-/gate/physics/displayCuts
+# /gate/physics/displayCuts
 /process/em/verbose 0 # reduces the console output a lot
 /vis/verbose errors # reduces the console output a bit
 # TODO: line '### === G4UAtomicDeexcitation::InitialiseForNewRun()' appears twice (with full output)
@@ -76,7 +82,7 @@
 # ============================
 # ==  VISUALIZATION         ==
 # ============================
-#/control/execute                     mac/visu.mac
+# /control/execute                     mac/visu.mac
 
 # ============================
 # == SOURCE                 ==
@@ -103,5 +109,5 @@
 #/gate/application/setTimeSlice  {time} s
 #/gate/application/setTimeStart   0.00   s
 #/gate/application/setTimeStop    {time} s
-/gate/application/setTotalNumberOfPrimaries 3
+/gate/application/setTotalNumberOfPrimaries 260
 /gate/application/startDAQ

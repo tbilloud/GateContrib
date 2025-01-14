@@ -10,7 +10,7 @@ pd.set_option('display.max_rows', 1000)
 # Script to plot doppler broadening
 # Slower than using sequenceCoincidence tree
 
-path = '/imaging/ComptonCamera_tests/Gate9.2/output/'
+path = '/imaging/ComptonCamera_tests/Gate9/output/'
 nentries_printed = 1000 # None to read all entries
 
 tree = uproot.open(path + 'CC_Hits.root:Hits')

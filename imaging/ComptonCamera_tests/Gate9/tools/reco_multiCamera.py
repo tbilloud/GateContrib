@@ -11,9 +11,9 @@ from pathlib import Path
 # Settings
 ##############################################################
 # path, E0_MeV, world_mm = Path('../sourceRectangles_cameraSingle/output/'), 0.250, 20
-# path, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/Gate9.2/sourceSurfaces'), 0.250, 40
-# path, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/Gate9.2/sourceVolumes/140keV'), 0.1405, 40
-# path, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/Gate9.2/sourceVolumes/140keV'), 0.140, 40
+# path, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/Gate9/sourceSurfaces'), 0.250, 40
+# path, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/Gate9/sourceVolumes/140keV'), 0.1405, 40
+# path, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/Gate9/sourceVolumes/140keV'), 0.140, 40
 path, E0_MeV, world_mm = Path('/media/billoud/Volume/CT/GATE/ideal/sourceCube/140keV/time1000'), 0.140, 40
 
 vsize = (256, 256, 256)

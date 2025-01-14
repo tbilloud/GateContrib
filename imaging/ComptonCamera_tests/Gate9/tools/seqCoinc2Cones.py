@@ -19,7 +19,7 @@ import uproot
 # Inspired by GateSequenceCoincidenceTreeReader.cc in Gate 9.2 source code #
 # Read sequenceCoincidence tree and return lists with parameters needed for cone reconstruction
 # TODO: test if this works with multiple runs
-# TODO: make it work for actors other than Gate9.2
+# TODO: make it work for actors other than Gate9
 # TODO: make it faster ! (few seconds for 100k cones for now)
 def seqCoinc2Cones(input_file_path, nentries=None):
     # Open the input ROOT file and get the tree

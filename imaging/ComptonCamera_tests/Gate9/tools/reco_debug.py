@@ -1,11 +1,11 @@
 import napari
 from pathlib import Path
-from imaging.ComptonCamera_tests.ideal.tools.seqCoinc2Cones import *
+from imaging.ComptonCamera_tests.Gate9.tools.seqCoinc2Cones import *
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
 from imaging.ComptonCamera_tests.tools.utils import remove_nans
 cp.set_printoptions(linewidth=200)
 
-# Script to check the precision of Gate9.2 simulation with point source
+# Script to check the precision of Gate9 simulation with point source
 # All cones should intersect at the source point
 # Possible reasons for bad cones:
 # - rayleigh scattering
@@ -26,7 +26,7 @@ vpitch = world_mm / vsize[2]
 er = 200  # inverse of cosine error
 nSingles_max = False  # maximum number of singles per coincidence, False to disable
 true_coinc = False  # filter true coincidences (i.e. avoid singles from different events)
-nentries = 1000  # None to read all entries
+nentries = None  # None to read all entries
 source_pos = [vsize[0] // 2,vsize[1] // 2,vsize[2] // 2] # in units of voxels in vol
 
 ##############################################################
