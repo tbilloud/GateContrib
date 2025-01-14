@@ -109,7 +109,16 @@ class MainWindow(QMainWindow):
             text=text_labels  # Adds annotations for specific points
         )
 
-        fig.update_traces(marker=dict(size=5))
+        # Update marker sizes and opacities
+        fig.for_each_trace(
+            lambda trace: trace.update(
+                marker=dict(
+                    size=7 if trace.name == 'gamma' else 5,  # Larger marker size for gamma
+                    opacity=0.5 if trace.name == 'e-' else 1  # Transparency for e-
+                )
+            )
+        )
+
         fig.update_layout(
             legend_title_text="",
             scene=dict(
@@ -142,12 +151,11 @@ class MainWindow(QMainWindow):
         # Create the Plotly figure
         fig = self.create_plotly_figure(event_data)
 
-        # Save the figure as an HTML file
-        plot_file_path = os.path.abspath("./plot.html")
-        fig.write_html(plot_file_path)
+        # Get the figure as an HTML string
+        plot_html = self.create_plotly_figure(event_data).to_html(include_plotlyjs='cdn')
 
-        # Load the HTML file in QWebEngineView
-        self.web_view.setUrl(QUrl.fromLocalFile(plot_file_path))
+        # Load the HTML string in QWebEngineView
+        self.web_view.setHtml(plot_html)
 
     def update_event_table(self):
         """Displays rows corresponding to the current event in a table widget."""
