@@ -2,6 +2,7 @@ Compton camera simulations with Gate 9.2 inspired by GateContrib/imaging/Compton
 
 Pros:
 - X-ray fluorescence is transported (not the case with Gate 10.0.1)
+- dedicated modules for compton cameras and pixel detectors (not the case with Gate 10.0.1)
 
 Cons:
 - Problems with grid discretization module (gridDiscretization): does not work with single layer camera (Singles
