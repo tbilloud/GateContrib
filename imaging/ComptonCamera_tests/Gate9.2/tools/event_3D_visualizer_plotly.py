@@ -145,13 +145,11 @@ class MainWindow(QMainWindow):
         # Create the Plotly figure
         fig = self.create_plotly_figure(event_data)
 
-        # Save the figure as an HTML file
-        plot_file_path = os.path.abspath("plot.html")  # Create an absolute file path
-        fig.write_html(plot_file_path)
+        # Get the figure as an HTML string
+        plot_html = self.create_plotly_figure(event_data).to_html(include_plotlyjs='cdn')
 
-        # Load the HTML file in QWebEngineView using QUrl
-        self.web_view.setUrl(QUrl.fromLocalFile(plot_file_path))
-
+        # Load the HTML string in QWebEngineView
+        self.web_view.setHtml(plot_html)
     def update_event_table(self):
         """Displays rows corresponding to the current event in a table widget."""
         self.table_display.clear()
