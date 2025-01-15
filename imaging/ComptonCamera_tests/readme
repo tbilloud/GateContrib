@@ -1,12 +1,18 @@
-This is a repository to test single layer Compton cameras a short distances from the source.
+This is a repository to test single layer Compton cameras with pixel detector such as Timepix3
 
 Code to simulate compton cameras differs according to Gate version:
 - First module dedicated to compton cameras appeared in Gate 9.2 (see CCMod paper)
 - Gate 9.3 introduced a new way to handle digitizers
 - Gate 10 completely changed, scripts are now in python and compton camera actors have not been re-implemented (yet?)
 
-Doppler broadening => physics list emlivermore
-Fluorescence => cuts < 100 um
+Bad cones can originate from:
+- Doppler broadening => physics list emlivermore
+- X-ray fluorescence => cuts < 100 um
+- Limited detector resolution in:
+  - energy (threshold and ToT fluctuations)
+  - position (pixel segmentation, charge sharing, etc)
+  - time (pile-up in coincident events)
+- ???
 
 Hit root files have different column names between Gate 9 and 10... Fluorescence events can be identified with:
 - Gate 10: a gamma row with emission line energy in column 'TotalEnergyDeposit'.
