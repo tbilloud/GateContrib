@@ -1,10 +1,13 @@
 import pandas
 import uproot
+import SimpleITK as sitk
+import matplotlib.pyplot as plt
+from pandas import Series
 
 pandas.set_option('display.max_columns', 100)
 pandas.set_option('display.width', 400)
 pandas.set_option('display.max_rows', 100)
-pandas.set_option('display.float_format', lambda x: f'{x:.3f}')
+pandas.set_option('display.float_format', lambda x: f'{x:.9f}')
 
 # List of all possible attributes for Hits:
 # ['Direction', 'EventDirection', 'EventID', 'EventKineticEnergy', 'EventPosition', 'GlobalTime', 'HitUniqueVolumeID',
@@ -26,9 +29,9 @@ def analyse_hits(sim):
     hits.loc[:, hits.columns.str.contains('Position')] *= 1000  # convert to um
     print(hits.to_string(index=False))
     # print(hits.groupby('EventID').first().to_string(index=False))
-    # print(hits[hits['ParticleName'] == 'gamma'].to_string(index=False))
-    print(hits['TotalEnergyDeposit'].sum())
-    print(hits[hits['TrackID']==2]['TotalEnergyDeposit'].sum())
+    print(hits[hits['ParticleName'] == 'gamma'].to_string(index=False))
+    # print(hits['TotalEnergyDeposit'].sum())
+    # print(hits[hits['TrackID']==2]['TotalEnergyDeposit'].sum())
 
 def analyse_singles(sim):
     sc = sim.actor_manager.get_actor("Singles")
@@ -37,4 +40,19 @@ def analyse_singles(sim):
     singles = tree_singles.arrays(library='pd', entry_stop=None)  # None to read all entries
     singles.loc[:, singles.columns.str.contains('Energy')] *= 1000  # convert to keV
     singles.loc[:, singles.columns.str.contains('Position')] *= 1000  # convert to um
-    print(singles)
+    # print(singles.to_string(index=False))
+    print(Series(singles['PreStepUniqueVolumeID'].to_numpy()).value_counts(normalize=True) * 100,'\n')  # !! entry_stop = None  !!
+
+def plot_DigitizerProjectionActor(sim):
+
+    proj = sim.actor_manager.get_actor("Projection")
+
+    # Load the .mhd file
+    file_path = sim.output_dir + '/' + proj.output_filename  # Replace with the actual path to your .mhd file
+    image = sitk.ReadImage(file_path)
+
+    # Convert to a NumPy array for plotting
+    image_array = sitk.GetArrayFromImage(image)
+    plt.imshow(image_array[0, :, :], cmap='gray', vmax=2)
+    plt.colorbar()
+    plt.show()
