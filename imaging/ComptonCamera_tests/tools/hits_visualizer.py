@@ -221,8 +221,8 @@ class MainWindow(QMainWindow):
 
 def main():
     # Read the ROOT file into a DataFrame
-    # tree = uproot.open("../Gate10/output/CC_Gate10_Hits.root:Hits")
-    tree = uproot.open("../Gate9/output/CC_Hits.root:Hits")
+    tree = uproot.open("../Gate10/output/CC_Hits.root:Hits")
+    # tree = uproot.open("../Gate9/output/CC_Hits.root:Hits")
     df = tree.arrays(library="pd")
 
     # Detect Gate version
