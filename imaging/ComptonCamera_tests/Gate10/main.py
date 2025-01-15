@@ -25,19 +25,16 @@ sim.volume_manager.add_material_database('../data/GateMaterials.db')
 sim.world.material = "Vacuum"
 sim.world.size = [0.2 * mm, 0.2 * mm, 2 * mm]
 sensor = sim.add_volume("Box", "sensor")
-sensor_side = 110 * um
-pixel_pitch = 55 * um
-sensor.size = [sensor_side, sensor_side, 1 * mm]
+side, pitch = 110 * um, 55 * um
+sensor.size = [side, side, 1 * mm]
 sensor.translation = [0 * mm, 0 * mm, 0.5 * mm]
 sensor.material = "Vacuum"
 pixel = sim.add_volume("Box", "pixel")
 pixel.mother = sensor.name
-pixel.size = [pixel_pitch, pixel_pitch, 1 * mm]
+pixel.size = [pitch, pitch, 1 * mm]
 pixel.material = "Tungsten"
 pixel.color = [1, 1, 0, 1]
-size = [int(sensor_side/pixel_pitch), int(sensor_side/pixel_pitch), 1]
-tr = [pixel_pitch, pixel_pitch, 0]
-pixel.translation = gate.geometry.utility.get_grid_repetition(size, tr)
+pixel.translation = gate.geometry.utility.get_grid_repetition([int(side / pitch)] * 2 + [1],  [pitch, pitch, 0])
 
 ## ===========================
 ## ==  PHYSICS              ==
@@ -76,7 +73,7 @@ sim.g4_verbose = False
 ## ============================
 ## ==  VISUALIZATION         ==
 ## ============================
-# sim.visu = True # defaults to vrml, qt seems to not work on ubuntu yet
+sim.visu = True # defaults to vrml, qt seems to not work on ubuntu yet
 
 ## ============================
 ## == SOURCE                 ==
@@ -104,7 +101,6 @@ sim.run()
 ##   ANALYSIS
 ##=====================================================
 from imaging.ComptonCamera_tests.Gate10.tools import analysis
-
 analysis.analyse_hits(sim)
 analysis.analyse_singles(sim)
 # TODO: running hits_visualizer.py here does not work...
