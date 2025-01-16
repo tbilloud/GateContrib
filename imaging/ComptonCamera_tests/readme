@@ -14,17 +14,14 @@ Bad cones can originate from:
   - time (pile-up in coincident events)
 - ???
 
-Hit root files have different column names between Gate 9 and 10... Fluorescence events can be identified with:
-- Gate 10: a gamma row with emission line energy in column 'TotalEnergyDeposit'.
+Hit root files have different column names between Gate 9 and 10...
+
+X-ray fluorescence events can be identified with (using livermore physics list with production cuts below ~10 keV):
+- Gate 10: a gamma row with emission line energy in column 'KineticEnergy'.
  EventID  TrackID  ParentID  ParentParticleName  ParticleName  KineticEnergy  TotalEnergyDeposit  TrackCreatorProcess  ProcessDefinedStep
-       8        1         0             unknown         gamma        140.000              11.107                 none                none
-  => There's only one row for both the parent X-ray and the subsequently emitted fluorescent X-ray... the only indication
-     that it was a photoelectric interaction is the TrackCreatorProcess of subsequent track ID.
+       4        1         0             unknown         gamma  100.000000000         0.674450000                 none      Transportation
+       4        3         1               gamma         gamma   59.483000000         0.756460000                 phot                none
 - Gate 9.2: a gamma row (PDGEncoding = 22) with emission line energy in column 'energyIniT'. It usually follows a row with a photoelectric event:
  eventID  PDGEncoding  trackID  parentID     edep  energyFinal  energyIniT  postStepProcess  processName  layerName
      316           22        1         0  0.12500      0.00000   140.00000             phot                absorber
      316           22        3         1  1.40230      0.00000    10.94200             phot         phot   absorber
-NOTES:
- * in Gate 10, the emitted fluorescent X-ray does not seem to be transported at all...
- * the example above used emlivermore with 0.1 um cuts and Germanium (K lines 9.89 keV and 10.98 keV). The difference
-   (11.107 vs 10.942 keV) might be due to different geant4 verions / physics lists?
