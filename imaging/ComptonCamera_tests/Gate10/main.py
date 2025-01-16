@@ -1,11 +1,6 @@
-# TODO:
-#  - find out if it is possible to have hits labeled with fluorescence in output files
-#  - have qt visualisation work (developer guide -> Currently, QT visualisation is not working on all architectures.)
-#  - write/use an actor that works as ComptonCameraActor in Gate 9.2 with the adderComptPhotIdeal digitizer
-#  - simulate Timepix3 with pixel matrix as gridDiscretization digitizer in Gate 9.2
-
 import opengate as gate
-from imaging.ComptonCamera_tests.Gate10.tools.analysis import plot_DigitizerProjectionActor
+import imaging.ComptonCamera_tests.Gate10.tools.analysis_basics as analysis_basics
+import imaging.ComptonCamera_tests.Gate10.tools.analysis_cones as analysis_cones
 
 sim = gate.Simulation()
 sim.output_dir = "output"
@@ -24,7 +19,7 @@ sim.volume_manager.add_material_database('../data/GateMaterials.db')
 # ===========================
 # ==   GEOMETRY            ==
 # ===========================
-npix = 3
+npix = 10
 pitch, thickness = 55 * um, 1 * mm
 sim.world.material = "Vacuum"
 sim.world.size = [npix * pitch, npix * pitch, thickness * 2]
@@ -35,7 +30,7 @@ sensor.material = "Vacuum"
 pixel = sim.add_volume("Box", "pixel")
 pixel.mother = sensor.name
 pixel.size = [pitch, pitch, thickness]
-pixel.material = "CdTe"
+pixel.material = "CdTe" # Tungsten CdTe
 pixel.color = [0, 0, 0, 0]  # see trajectories better
 pixel.translation = gate.geometry.utility.get_grid_repetition([int(npix * pitch / pitch)] * 2 + [1], [pitch, pitch, 0])
 
@@ -89,9 +84,9 @@ sim.g4_verbose = False
 ## ============================
 source = sim.add_source("GenericSource", "source_point")
 source.particle = "gamma"
-source.energy.mono = 50 * keV
-# source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
-source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
+source.energy.mono = 140 * keV
+source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
+# source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
 source.position.translation = [0 * mm, 0 * mm, -thickness / 2]
 
 ##====================================================
@@ -103,15 +98,15 @@ sim.random_seed = 1
 ##=====================================================
 ##   M E A S U R E M E N T
 ##=====================================================
-source.n = 1000
+# source.n = 20
+source.activity = 100 * gate.g4_units.Bq # for sorting coincidences with GlobalTime
 sim.run()
 
 ##=====================================================
 ##   ANALYSIS
 ##=====================================================
-from imaging.ComptonCamera_tests.Gate10.tools import analysis
-
-# analysis.analyse_hits(sim)
-analysis.analyse_singles(sim)
-plot_DigitizerProjectionActor(sim)
+# analysis_basics.analyse_hits(sim.output_dir + '/' + hc.output_filename)
+# analysis.analyse_singles(sim.output_dir + '/' + sc.output_filename)
+# plot_DigitizerProjectionActor(sim)
 # TODO: running hits_visualizer.py here does not work...
+analysis_cones.singles2cones_withDepth_byEventID(sim.output_dir + '/' + sc.output_filename)
