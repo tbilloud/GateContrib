@@ -33,9 +33,10 @@ def analyse_hits(file_path):
     # print(hits.to_string(index=False))
     # print(hits.groupby('EventID').first().to_string(index=False))
     # print(hits[hits['ParticleName'] == 'gamma'].to_string(index=False))
-    print(hits[hits['TrackCreatorProcess'] == 'compt'].to_string(index=False))
+    # print(hits[hits['TrackCreatorProcess'] == 'compt'].to_string(index=False))
     # print(hits['TotalEnergyDeposit'].sum())
     # print(hits[hits['TrackID']==2]['TotalEnergyDeposit'].sum())
+    return hits
 
 # List of available attributes for Singles:
 #  EventID  TrackID  ParentID  ParentParticleName  ParticleName  KineticEnergy  TotalEnergyDeposit  TrackCreatorProcess
@@ -48,9 +49,9 @@ def analyse_singles(file_path):
     singles.loc[:, singles.columns.str.contains('Energy')] *= 1000  # convert to keV
     singles.loc[:, singles.columns.str.contains('Position')] *= 1000  # convert to um
     # print(singles.to_string(index=False))
-    print(singles[singles['TrackCreatorProcess'] == 'compt'].to_string(index=False))
+    # print(singles[singles['TrackCreatorProcess'] == 'compt'].to_string(index=False))
     # print(Series(singles['PreStepUniqueVolumeID'].to_numpy()).value_counts(normalize=True) * 100,'\n')  # !! entry_stop = None  !!
-    singles = singles.loc[:, ~singles.columns.str.contains('Position', case=False)]
+    # singles = singles.loc[:, ~singles.columns.str.contains('Position', case=False)]
     return singles
 
 def plot_DigitizerProjectionActor(sim):
