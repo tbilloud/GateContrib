@@ -6,13 +6,18 @@ Code to simulate compton cameras differs according to Gate version:
 - Gate 10 completely changed, scripts are now in python and compton camera actors have not been re-implemented (yet?)
 
 Bad cones can originate from:
+- primary gamma interacted in air before interacting in sensor
 - Doppler broadening => physics list emlivermore
 - X-ray fluorescence => cuts < 100 um
 - Limited detector resolution in:
   - energy (threshold and ToT fluctuations)
   - position (pixel segmentation, charge sharing, etc)
   - time (pile-up in coincident events)
-- ???
+- Escape photons
+- Escape electrons (compton recoil electron or photo-electron track leaving sensor)
+- More than one compton scattering
+- Compton scattering was not from incident particle but from fluorescent X-ray
+- Compton and photo-elec interactions in the same pixel
 
 Hit root files have different column names between Gate 9 and 10...
 
