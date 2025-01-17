@@ -98,8 +98,8 @@ sim.random_seed = 1
 ##=====================================================
 ##   M E A S U R E M E N T
 ##=====================================================
-# source.n = 20
-source.activity = 100 * gate.g4_units.Bq # for sorting coincidences with GlobalTime
+source.n = 10000
+# source.activity = 10 * gate.g4_units.Bq # for sorting coincidences with GlobalTime
 sim.run()
 
 ##=====================================================
@@ -109,4 +109,6 @@ sim.run()
 # analysis.analyse_singles(sim.output_dir + '/' + sc.output_filename)
 # plot_DigitizerProjectionActor(sim)
 # TODO: running hits_visualizer.py here does not work...
-analysis_cones.singles2cones_withDepth_byEventID(sim.output_dir + '/' + sc.output_filename)
+analysis_cones.extract_ideal_hits(sim.output_dir + '/' + hc.output_filename)
+# analysis_cones.hits2cones_withDepth_byEventID(sim.output_dir + '/' + hc.output_filename)
+# analysis_cones.singles2cones_withDepth_byEventID(sim.output_dir + '/' + sc.output_filename)
