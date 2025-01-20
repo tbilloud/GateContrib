@@ -36,6 +36,7 @@ def analyse_hits(file_path):
     # print(hits[hits['TrackCreatorProcess'] == 'compt'].to_string(index=False))
     # print(hits['TotalEnergyDeposit'].sum())
     # print(hits[hits['TrackID']==2]['TotalEnergyDeposit'].sum())
+    # print(hits.groupby('EventID').first())
     return hits
 
 # List of available attributes for Singles:
