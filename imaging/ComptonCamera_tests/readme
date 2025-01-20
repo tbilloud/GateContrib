@@ -6,22 +6,53 @@ Code to simulate compton cameras differs according to Gate version:
 - Gate 10 completely changed, scripts are now in python and compton camera actors have not been re-implemented (yet?)
 
 Bad cones can originate from:
-- primary gamma interacted in air before interacting in sensor
-- Doppler broadening => physics list emlivermore
-- X-ray fluorescence => cuts < 100 um
+- primary gamma interacted in air before sensor
+- Doppler broadening (use physics list emlivermore)
+- X-ray fluorescence (use cuts < 100 um)
+- Rayleigh sctattering (see note below)
 - Limited detector resolution in:
   - energy (threshold and ToT fluctuations)
   - position (pixel segmentation, charge sharing, etc)
   - time (pile-up in coincident events)
-- Escape photons
+- Escape photons (photon leaving sensor after compton interaction)
 - Escape electrons (compton recoil electron or photo-electron track leaving sensor)
 - More than one compton scattering
 - Compton scattering was not from incident particle but from fluorescent X-ray
 - Compton and photo-elec interactions in the same pixel
 
-Hit root files have different column names between Gate 9 and 10...
+##=====================================================
+##   ANALYSING HIT ROOT FILES
+##=====================================================
 
-X-ray fluorescence events can be identified with (using livermore physics list with production cuts below ~10 keV):
+WARNING:
+- number of hits in each track is less than its number of gean4 steps: the 1st 'initStep' and steps with zero energy
+  deposition (e.g. Transportation at volume boundaries) are not saved.
+  Check this using `sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1`
+- the ProcessDefinedStep is the pre-step process, and the post-step process is not saved: thus the last process in each
+  track is unknown. This is problematic for investigating gammas (see below).
+
+Investigating photo-electric interactions:
+Because post-step processes are not saved, photo-electric events are not labeled if the emitted e- is not tracked.
+This happens when cuts are higher than the e- range, i.e. by default for X-rays below ~100 keV.
+To identify them, two solutions:
+ - reduce cuts and look at the 'TrackCreatorProcess' of e- particles whose 'ParentParticleName' is a gamma.
+ - assume that any gamma whose KineticEnergy == TotalEnergyDeposit is a photo-electric event.
+
+Investigating compton scattering:
+Gammas that interact via Compton and do not escape the sensor can be identified by ProcessDefinedStep == compt. They
+come in a track where the 2nd hit has ProcessDefinedStep == compt.
+They can be followed by other compton interactions.
+TODO: There are cases where the 1st hit of the 1st track has ProcessDefinedStep == compt... looks like in these cases
+the initial transportation step at the boundary is skipped...
+
+Investigating Rayleigh scattering (note from Gate 10 doc):
+Note that, like in Gate, every hit with zero deposited energy is ignored. If you need them, you should probably use a
+PhaseSpaceActor. Several tests using DigitizerHitsCollectionActor are proposed: test025, test028, test035, etc.
+
+Investigating fluorescence:
+As opposed to compton, photoelec or rayleigh scattering, there's no fluorescence process in Geant4, and thus in Gate.
+Hit root files have different column names between Gate 9 and 10... Fluorescence events can be identified with (using
+livermore physics list with production cuts below ~10 keV):
 - Gate 10: a gamma row with emission line energy in column 'KineticEnergy'.
  EventID  TrackID  ParentID  ParentParticleName  ParticleName  KineticEnergy  TotalEnergyDeposit  TrackCreatorProcess  ProcessDefinedStep
        4        1         0             unknown         gamma  100.000000000         0.674450000                 none      Transportation
@@ -30,3 +61,31 @@ X-ray fluorescence events can be identified with (using livermore physics list w
  eventID  PDGEncoding  trackID  parentID     edep  energyFinal  energyIniT  postStepProcess  processName  layerName
      316           22        1         0  0.12500      0.00000   140.00000             phot                absorber
      316           22        3         1  1.40230      0.00000    10.94200             phot         phot   absorber
+
+Investigating escape photons:
+In Gate 10, Compton scattering hits can be identified with two types of rows, where either:
+- ProcessDefinedStep = compt
+- TrackCreatorProcess = compt in which case the parent track had a ProcessDefinedStep = Transportation
+TODO: investigate 2nd type !
+
+Investigating ideal cones:
+A compton interaction followed by a photo-elec interaction without escape (i.e. sum(TotalEnergyDeposit) = source energy)
+- With high cuts (photo-electron not tracked):
+ EventID  TrackID  ParentID  ParentParticleName  ParticleName  KineticEnergy  TotalEnergyDeposit  TrackCreatorProcess  ProcessDefinedStep
+       0        1         0             unknown         gamma    0.140000000         0.003190000                 none      Transportation
+       0        1         0             unknown         gamma    0.136813473         0.136810000                 none               compt
+That corresponds to geant4 steps:
+*********************************************************************************************************
+* G4Track Information:   Particle = gamma,   Track ID = 1,   Parent ID = 0
+*********************************************************************************************************
+Step#    X(mm)    Y(mm)    Z(mm) KinE(MeV)  dE(MeV) StepLeng TrackLeng  NextVolume ProcName
+    0        0        0     -500      0.14        0        0         0       world initStep
+    1        0        0        0      0.14        0      500       500      sensor Transportation
+    2        0        0    0.493     0.137  0.00319    0.493       500      sensor compt
+    3    0.256    0.218     1.26         0    0.137    0.834       501      sensor phot
+- With low cuts (photo-electron tracked):
+ EventID  TrackID  ParentID  ParentParticleName  ParticleName  KineticEnergy  TotalEnergyDeposit  TrackCreatorProcess  ProcessDefinedStep
+    9758        1         0             unknown         gamma    0.140000000         0.006420000                 none      Transportation
+    9758        1         0             unknown         gamma    0.133577283         0.026720000                 none               compt
+    9758        2         1               gamma            e-    0.106862283         0.106860000                 phot                none
+TODO: is time resolution of Timepix3 enough if photo-electric interaction occur in same/coincident pixel?
