@@ -39,12 +39,19 @@ sensor.material = "CdTe"
 ## ===========================
 # fluo = True
 # doppler = True
+
 # if doppler:
 #     sim.physics_manager.physics_list_name = 'G4EmLivermorePhysics'  # FTFP_BERT_LIV, G4EmStandardPhysics, G4EmLivermorePhysics, G4EmStandardPhysics_option4
+
 # if fluo:
 #     sim.physics_manager.global_production_cuts.all = 0.1 * um
 #     sim.physics_manager.em_parameters.update(
 #         {'fluo': fluo, 'auger': fluo, 'auger_cascade': fluo, 'pixe': fluo, 'deexcitation_ignore_cut': fluo})
+# TODO can't this be simplified with just:
+# sim.physics_manager.em_parameters.update({'fluo': fluo, 'auger': fluo, 'auger_cascade': fluo, 'pixe': fluo, 'deexcitation_ignore_cut': fluo})
+# => if fluo = True  -> cuts will be ignored and fluo will occur, no?
+# => if fluo = False -> then no fluo, no matter the physics list, no?
+# TODO what about impact of physics list?
 
 ## =============================
 ## == ACTORS                  ==
@@ -52,30 +59,35 @@ sensor.material = "CdTe"
 # HITS
 hc = sim.add_actor('DigitizerHitsCollectionActor', 'Hits')
 hc.attached_to = sensor.name
-hc.authorize_repeated_volumes = True # required according to doc, but seems useless
+hc.authorize_repeated_volumes = True  # required according to doc, but seems useless
 hc.output_filename = 'CC_Hits.root'
 hc.attributes = ['EventID', 'TrackID', 'ParentID', 'ParentParticleName', 'ParticleName', 'KineticEnergy',
                  'TotalEnergyDeposit', 'TrackCreatorProcess', 'ProcessDefinedStep',
                  # 'PreKineticEnergy', 'PostKineticEnergy', # KineticEnergy == PreKineticEnergy
-                 'PrePosition', 'EventPosition',
-                 'PreStepUniqueVolumeID', 'PostPosition', 'GlobalTime'  # for DigitizerAdderActor
+                 'Position',
+                 'PrePosition', 'PostPosition',
+                 'PreDirection', 'PostDirection',
+                 # 'EventPosition',
+                 # 'PreStepUniqueVolumeID', 'PostPosition', 'GlobalTime'  # for DigitizerAdderActor
+                 'StepLength',
+                 'Direction'
                  ]
-# SINGLES
-sc = sim.add_actor("DigitizerAdderActor", "Singles")
-sc.input_digi_collection = "Hits"
-sc.policy = "EnergyWeightedCentroidPosition"
-sc.output_filename = 'CC_Singles.root'  # if hc.output_filename, there will be two branches in the file
-# TIMEPIX FRAME (HIT COUNT)
-proj = sim.add_actor("DigitizerProjectionActor", "Projection")
-proj.input_digi_collections = ["Singles"]
-proj.spacing = [pitch, pitch]  # Set pixel spacing in mm
-proj.size = [npix, npix]  # Image size in pixels (128x128)
-proj.output_filename = 'projection.mhd'
+# # SINGLES
+# sc = sim.add_actor("DigitizerAdderActor", "Singles")
+# sc.input_digi_collection = "Hits"
+# sc.policy = "EnergyWeightedCentroidPosition"
+# sc.output_filename = 'CC_Singles.root'  # if hc.output_filename, there will be two branches in the file
+# # TIMEPIX FRAME (HIT COUNT)
+# proj = sim.add_actor("DigitizerProjectionActor", "Projection")
+# proj.input_digi_collections = ["Singles"]
+# proj.spacing = [pitch, pitch]  # Set pixel spacing in mm
+# proj.size = [npix, npix]  # Image size in pixels (128x128)
+# proj.output_filename = 'projection.mhd'
 
 ## =============================
 ## == VERBOSITY               ==
 ## =============================
-# sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1
+sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1
 
 ## ============================
 ## ==  VISUALIZATION         ==
@@ -101,7 +113,7 @@ sim.random_seed = 1
 ##=====================================================
 ##   M E A S U R E M E N T
 ##=====================================================
-source.n = 30
+source.n = 10
 # source.activity = 10 * gate.g4_units.Bq # for sorting coincidences with GlobalTime
 sim.run()
 
@@ -111,7 +123,15 @@ sim.run()
 # analysis_basics.analyse_hits(sim.output_dir + '/' + hc.output_filename)
 # analysis.analyse_singles(sim.output_dir + '/' + sc.output_filename)
 # plot_DigitizerProjectionActor(sim)
-# TODO: running hits_visualizer.py here does not work...
 # analysis_cones.extract_ideal_hits(sim.output_dir + '/' + hc.output_filename)
-analysis_cones.hits2cones_withDepth_byEventID(sim.output_dir + '/' + hc.output_filename, source.energy.mono)
-# analysis_cones.singles2cones_withDepth_byEventID(sim.output_dir + '/' + sc.output_filename)
+cones = analysis_cones.hits2cones_withDepth_byEventID(sim.output_dir + '/' + hc.output_filename, source.energy.mono)
+
+# TODO: Qt-dependent functions do not work here... i.e:
+# import imaging.ComptonCamera_tests.tools.hits_visualizer as hits_visualizer
+# hits_visualizer.main()
+# OR
+# import imaging.ComptonCamera_tests.tools.reco_debug as reco_debug
+# vsize = (256, 256, 256)
+# vpitch = sim.world.size[2] / vsize[2]
+# source_pos = [vsize[0] // 2,vsize[1] // 2,vsize[2] // 2] # in units of voxels in vol TODO: use source.position.translation (right now source must be in world center)
+# reco_debug.reco(cones, vsize, pitch, source_pos)

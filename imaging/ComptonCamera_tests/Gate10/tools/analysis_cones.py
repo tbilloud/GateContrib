@@ -1,5 +1,6 @@
 # Utility functions to analyse output files
 # Can be used in the main simulation script after sim.run() or offline (i.e. reading root files without simulation)
+# Calling E1 the energy deposited in the Compton scattering, as in CCMod paper
 
 import sys
 import pandas
@@ -16,27 +17,28 @@ pandas.set_option('display.max_rows', 1000)
 pandas.set_option('display.float_format', lambda x: f'{x:.9f}')
 
 
-def extract_ideal_hits(file_path, source_energy_MeV):
+def extract_ideal_hits_byEventID(file_path, source_energy_MeV):
     hits = uproot.open(file_path)['Hits'].arrays(library='pd', entry_stop=None)  # None to read all entries
-
+    # print(hits)
     print(f"{hits['EventID'].nunique()} events interacted in the sensor")
 
     grouped = hits.groupby('EventID')
 
     # Filter events with at least one compton interaction
+    # TODO: in the 1st track? (to avoid gammas coming from e.g. compton interaction in air or surrounding volumes)
     filtered_event_ids = [eventid for eventid, group in grouped if 'compt' in group['ProcessDefinedStep'].tolist()]
     filtered_df = hits[hits['EventID'].isin(filtered_event_ids)]
     print(f"{filtered_df['EventID'].nunique()} events with at least one compton interaction")
     # print(filtered_df.to_string(index=False))
 
-    # Filter events with exactly one compton interaction
-    compt_hits = hits[hits['ProcessDefinedStep'] == 'compt']
-    compton_counts = compt_hits.groupby('EventID').size()
-    for i in range(1, compton_counts.max() + 1):
-        print(f"{(compton_counts == i).sum()} events with exactly {i} compton interaction{'s' if i > 1 else ''}")
-    single_compton_event_ids = compton_counts[compton_counts == 1].index
-    filtered_df = filtered_df[filtered_df['EventID'].isin(single_compton_event_ids)]
-    # print(filtered_df.to_string(index=False))
+    # # Filter events with exactly one compton interaction
+    # compt_hits = hits[hits['ProcessDefinedStep'] == 'compt']
+    # compton_counts = compt_hits.groupby('EventID').size()
+    # for i in range(1, compton_counts.max() + 1):
+    #     print(f"{(compton_counts == i).sum()} events with exactly {i} compton interaction{'s' if i > 1 else ''}")
+    # single_compton_event_ids = compton_counts[compton_counts == 1].index
+    # filtered_df = filtered_df[filtered_df['EventID'].isin(single_compton_event_ids)]
+    # # print(filtered_df.to_string(index=False))
 
     # Filter events where sum of energy deposits matches source energy
     energy_deposit_sums = filtered_df.groupby('EventID')['TotalEnergyDeposit'].sum()
@@ -48,23 +50,39 @@ def extract_ideal_hits(file_path, source_energy_MeV):
     return filtered_df
 
 
-def hits2cones_withDepth_byEventID(file_path, source_energy_MeV):
-    ideal_hits = extract_ideal_hits(file_path=file_path, source_energy_MeV=source_energy_MeV)
-    print(ideal_hits.to_string(index=False))
+def hits2cones_withDepth_byEventID(file_path, source_energy_MeV, nentries = None):
+    # ideal_hits = extract_ideal_hits_byEventID(file_path=file_path, source_energy_MeV=source_energy_MeV)
+    # print(ideal_hits.to_string(index=False))
 
-    # TODO
-    # deal with tracks where recoil was tracked and those where it was not
+    # TODO deal with different cases:
+    # 1) track starting with Transportation: recoil e- was not tracked, E1 is in TotalEnergyDeposit of 1st row
+    # 2) track starting with compt: recoil e- was tracked
+    #  EventID  TrackID  ParentID  ParentParticleName  ParticleName  KineticEnergy  TotalEnergyDeposit  TrackCreatorProcess  ProcessDefinedStep
+    #        3        1         0             unknown         gamma    0.215230284         0.215230284                 none               compt
+    #        3        2         1               gamma            e-    0.784769716         0.229902759                compt                none
+    #        3        2         1               gamma            e-    0.471311071         0.471311071                compt               eBrem
+    #        3        3         2                  e-         gamma    0.083555886         0.083555886                eBrem                none
 
-    cones = cp.array([])
-    return cones
+    hits = uproot.open(file_path)['Hits'].arrays(library='pd', entry_stop=nentries)  # None to read all entries
+    grouped = hits.groupby('EventID')
+    cones = []
+    for eventid, group in grouped:
+        if group['TotalEnergyDeposit'].sum() == source_energy_MeV:
+            first_row = group.iloc[0]
+            second_row = group.iloc[1]
+            first_process = first_row['ProcessDefinedStep']
+            if first_process == 'compt':
+                print(eventid, 'recoil e- was tracked')
+            elif first_process == 'Transportation':
+                print(eventid, 'recoil e- was not tracked')
+                apex = [second_row['PostPosition_X'], second_row['PostPosition_Y'], second_row['PostPosition_Z']]
+                normalized_direction = [first_row['PostDirection_X'], first_row['PostDirection_Y'], first_row['PostDirection_Z']]
+                cosT = 1 - (0.511 * first_row['TotalEnergyDeposit']) / (source_energy_MeV * (source_energy_MeV - first_row['TotalEnergyDeposit']))
+                print(apex+normalized_direction+[cosT])
+                cones.append(apex+normalized_direction+[cosT])
+            else:
+                print('*' * 100)
 
-
-def singles2cones_withDepth_byEventID(file_path):
-    singles = analysis_basics.analyse_singles(file_path=file_path)
-    print(singles)
-    singles_grouped = singles.groupby('EventID')
-    print(singles_grouped.size())
-    cones = cp.array([])
     return cones
 
 
