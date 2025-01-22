@@ -1,11 +1,7 @@
 import sys
-
 import cupy as cp
 import numpy as np
 import uproot
-
-from imaging.ComptonCamera_tests.tools.utils import coordinateOrigin2arrayCenter
-
 
 # Function to create cones from sequenceCoincidence root files, as would be done by GateDigit_seqCoinc2Cones
 # Not only CC_Cones.tree can be created, but also numpy arrays and in different formats
@@ -124,8 +120,7 @@ def seqCoinc2ConesTTree(input_file_path, output_file_path, nentries=None):
 
 
 # Create cupy array file with cones from sequenceCoincidence root file
-def seqCoin2ConesArray(input_path, E0, vsize, vpitch, inv_cos_error, nSingles_max=False, filter_TrueCoinc=False,
-                       nentries=None):
+def seqCoin2ConesArray(input_path, E0, inv_cos_error, nSingles_max=False, filter_TrueCoinc=False, nentries=None):
     cp_array = cp.stack([cp.array(list) for list in seqCoinc2Cones(input_path, nentries)], axis=-1)
     # energy1, energyR, globalPosX1, globalPosY1, globalPosZ1, globalPosX2, globalPosY2, globalPosZ2, nSingles, IsTrueCoinc
     cp_array = cp_array[:, [0, 2, 3, 4, 5, 6, 7, 8, 9]]  # TODO: this removes energyR, will have to be added back
@@ -133,8 +128,6 @@ def seqCoin2ConesArray(input_path, E0, vsize, vpitch, inv_cos_error, nSingles_ma
     cp_array = filter_conesArray(cp_array, filter_TrueCoinc, nSingles_max)
 
     cp_array = conesGate2cones(E0, cp_array, inv_cos_error)
-
-    cp_array = coordinateOrigin2arrayCenter(cp_array, vpitch, vsize)
 
     return cp_array
 
@@ -170,8 +163,7 @@ def conesGate2cones(E0, cp_array, inv_cos_error):
     return cp_array
 
 
-def conesTTree2conesArray(input_file_path, E0_MeV, vsize, vpitch, er, nSingles_max=2, filter_TrueCoinc=False,
-                          nentries=None):
+def conesTTree2conesArray(input_file_path, E0_MeV, er, nSingles_max=2, filter_TrueCoinc=False, nentries=None):
     tree = uproot.open(input_file_path)['Cones']
     print('Processing', input_file_path, 'with', tree.num_entries, 'entries')
     dict_branches = tree.arrays(library='np', entry_stop=nentries)
@@ -182,7 +174,5 @@ def conesTTree2conesArray(input_file_path, E0_MeV, vsize, vpitch, er, nSingles_m
     cp_array = filter_conesArray(cp_array, filter_TrueCoinc, nSingles_max)
 
     cp_array = conesGate2cones(E0_MeV, cp_array, er)
-
-    cp_array = coordinateOrigin2arrayCenter(cp_array, vpitch, vsize)
 
     return cp_array

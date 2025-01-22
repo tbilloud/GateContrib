@@ -3,9 +3,9 @@ import sys
 import cupy as cp
 import napari
 from pathlib import Path
-from imaging.ComptonCamera_tests.ideal.tools.seqCoinc2Cones import *
+from imaging.ComptonCamera_tests.Gate9.tools.seqCoinc2Cones import *
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
-from imaging.ComptonCamera_tests.tools.utils import remove_nans
+from imaging.ComptonCamera_tests.tools.utils import remove_nans, coordinateOrigin2arrayCenter
 
 # Script to reconstruct the source from root files with a sequenceCoincidence tree
 
@@ -31,12 +31,15 @@ nentries = None  # None to read all entries
 ##############################################################
 # Do Projection
 ##############################################################
+
 # ###### READING sequenceCoincidence.root files ##############
 cones = seqCoin2ConesArray(fname / 'CC_sequenceCoincidence.root', E0_MeV, vsize, vpitch, er, nSingles_max, true_coinc, nentries)
 # ###### READING CC_Cones.root files #########################
 # cones = conesTTree2conesArray(fname / 'CC_Cones.root', E0_MeV, vsize, vpitch, er, nSingles_max, true_coinc, nentries)
+
 # ######## RECONSTRUCT #######################################
 cones = remove_nans(cones)
+cones = coordinateOrigin2arrayCenter(cones, vpitch, vsize)
 vol = cp.zeros(vsize, dtype=cp.float32)
 vol = compton_forward(vol, cones, volume_pitch=vpitch)
 

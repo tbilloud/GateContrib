@@ -2,7 +2,7 @@ import napari
 from pathlib import Path
 from imaging.ComptonCamera_tests.Gate9.tools.seqCoinc2Cones import *
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
-from imaging.ComptonCamera_tests.tools.utils import remove_nans
+from imaging.ComptonCamera_tests.tools.utils import remove_nans, coordinateOrigin2arrayCenter
 cp.set_printoptions(linewidth=200)
 
 # Script to check the precision of Gate9 simulation with point source
@@ -33,13 +33,14 @@ source_pos = [vsize[0] // 2,vsize[1] // 2,vsize[2] // 2] # in units of voxels in
 # Do Projection
 ##############################################################
 # ###### READING sequenceCoincidence.root files ##############
-cones = seqCoin2ConesArray(fname / 'CC_sequenceCoincidence.root', E0_MeV, vsize, vpitch, er, nSingles_max, true_coinc, nentries)
+cones = seqCoin2ConesArray(fname / 'CC_sequenceCoincidence.root', E0_MeV, er, nSingles_max, true_coinc, nentries)
 # ###### READING CC_Cones.root files #########################
 # cones = conesTTree2conesArray(fname / 'CC_Cones.root', E0_MeV, vsize, vpitch, er, nSingles_max, true_coinc, nentries)
 # ######## RECONSTRUCT #######################################
 print(len(cones), 'cones before removing nans')
 cones = remove_nans(cones)
 print(len(cones), 'cones after removing nans')
+cones = coordinateOrigin2arrayCenter(cones, vpitch, vsize)
 z_slice_stack = list()
 n_bad_cones = 0
 for i, cone in enumerate(cones):
