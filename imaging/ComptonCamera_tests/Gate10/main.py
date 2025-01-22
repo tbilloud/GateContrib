@@ -68,7 +68,7 @@ hc.output_filename = 'CC_Hits.root'
 hc.attributes = ['EventID', 'TrackID', 'ParentID', 'ParentParticleName', 'ParticleName', 'KineticEnergy',
                  'TotalEnergyDeposit', 'TrackCreatorProcess', 'ProcessDefinedStep',
                  # 'PreKineticEnergy', 'PostKineticEnergy', # KineticEnergy == PreKineticEnergy
-                 'Position',
+                 # 'Position',
                  'PrePosition', 'PostPosition',
                  'PreDirection', 'PostDirection',
                  # 'EventPosition',
@@ -91,7 +91,7 @@ hc.attributes = ['EventID', 'TrackID', 'ParentID', 'ParentParticleName', 'Partic
 ## =============================
 ## == VERBOSITY               ==
 ## =============================
-# sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1
+sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1
 
 ## ============================
 ## ==  VISUALIZATION         ==
@@ -112,12 +112,12 @@ source.position.translation = [0 * mm, 0 * mm, -thickness / 2]
 ##  R A N D O M   E N G I N E  A N D  S E E D
 ##====================================================
 sim.random_engine = "MersenneTwister"
-sim.random_seed = 1
+sim.random_seed = 4
 
 ##=====================================================
 ##   M E A S U R E M E N T
 ##=====================================================
-source.n = 100
+source.n = 4
 # source.activity = 10 * gate.g4_units.Bq # for sorting coincidences with GlobalTime
 sim.run()
 
@@ -131,19 +131,14 @@ sim.run()
 
 # Cones
 # analysis_cones.extract_ideal_hits(sim.output_dir + '/' + hc.output_filename)
-c = analysis_cones.hits2cones_withDepth_byEventID(sim.output_dir + '/' + hc.output_filename, source.energy.mono)
+c = analysis_cones.hits2cones_withDepth_byEventID(sim.output_dir + '/' + hc.output_filename, source.energy.mono,
+                                                  store_info=True)
 print('number of cones:', c.shape[0])
 print('number of cones with a nan value:', cp.isnan(c).any(axis=1).sum())
 s = point_source_cone_validation(c, sim.world.size[2], source.position.translation)
 plt.imshow(cp.sum(cp.array(s).get(), axis=0), cmap='gray')
 plt.show()
 
-# TODO: Qt-dependent functions do not work here... i.e:
+# TODO: Qt-dependent functions (hit visualizer, reco) do not work here... i.e:
 # import imaging.ComptonCamera_tests.tools.hits_visualizer as hits_visualizer
 # hits_visualizer.main()
-# OR
-# import imaging.ComptonCamera_tests.tools.reco_debug as reco_debug
-# vsize = (256, 256, 256)
-# vpitch = sim.world.size[2] / vsize[2]
-# source_pos = [vsize[0] // 2,vsize[1] // 2,vsize[2] // 2] # in units of voxels in vol TODO: use source.position.translation (right now source must be in world center)
-# reco_debug.reco(cones, vsize, pitch, source_pos)

@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import napari
 from pathlib import Path
 from imaging.ComptonCamera_tests.Gate9.tools.seqCoinc2Cones import *
@@ -6,6 +7,7 @@ from imaging.ComptonCamera_tests.tools.compton import compton_forward
 from imaging.ComptonCamera_tests.tools.utils import remove_nans, coordinateOrigin2arrayCenter
 
 cp.set_printoptions(linewidth=200)
+
 
 # Script to check the precision of Gate9 or Gate10 simulations with a point source
 # Can be run as a standalone script or (WIP) as a function in a Gate10 script
@@ -22,37 +24,40 @@ cp.set_printoptions(linewidth=200)
 
 # Units should be the same in cones_array, vpitch and source_pos
 def point_source_cone_validation(cones_array, world_z, source_pos):
-
     # Volume size and pitch
     vsize = (256, 256, 256)
     vpitch = world_z / vsize[2]
-    print(vpitch)
     vol_init = cp.zeros(vsize, dtype=cp.float32)
 
     # Source position must be in units of voxels in vol
     source_pos_in_voxels = [int(source_pos[i] / vpitch) + (vsize[i] // 2) for i in range(3)]
 
     # Coordinate system
+    # remove last column
+    cones_array, EventID = cones_array[:, :-1], cones_array[:, -1]
     cones_array = coordinateOrigin2arrayCenter(cones_array, vpitch, vsize)
 
     # ######## RECONSTRUCT CONE BY CONE #######################################
     z_slice_stack = list()
     n_bad_cones = 0
-    for i, cone in enumerate(cones_array):
+    # for i, cone in enumerate(cones_array):
+    for cone,event in zip(cones_array,EventID):
         vol = compton_forward(volume=vol_init, cones=cone, volume_pitch=vpitch)
         z_slice = vol[:, :, source_pos_in_voxels[2]]
         z_slice_stack.append(z_slice.get())
-        if z_slice[source_pos_in_voxels[0],source_pos_in_voxels[1]] == 0:
+        if z_slice[source_pos_in_voxels[0], source_pos_in_voxels[1]] == 0:
+            # TODO sometime cone is bad but z_slice is not 0
             n_bad_cones += 1
 
         # ##############################################################
         # # Display stack with matplotlib (one by one)
         # ##############################################################
         plt.imshow(z_slice.get(), cmap='gray')
+        plt.scatter(source_pos_in_voxels[0], source_pos_in_voxels[1], c='r', s=10)
+        plt.scatter(vsize[0]//2,vsize[1]//2, c='b', s=10)
+        plt.title(f'EventID: {int(event)}')
         plt.colorbar()
         plt.show()
-    plt.imshow(np.sum(np.array(z_slice_stack), axis=0), cmap='gray')
-    plt.show()
 
     print(n_bad_cones, 'bad cones')
 
@@ -67,7 +72,6 @@ def point_source_cone_validation(cones_array, world_z, source_pos):
 
 
 if __name__ == "__main__":
-
     # ###### READING Gate9.2 sequenceCoincidence.root files ##############
     # fname, E0_MeV, world_z, source_pos = Path('../Gate9/output'), 0.140, 200, [0, 0, 0]
     # nSingles_max = False  # maximum number of singles per coincidence, False to disable
