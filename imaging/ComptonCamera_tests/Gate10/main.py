@@ -1,6 +1,10 @@
+import sys
+import cupy as cp
+import matplotlib.pyplot as plt
 import opengate as gate
 import imaging.ComptonCamera_tests.Gate10.tools.analysis_basics as analysis_basics
 import imaging.ComptonCamera_tests.Gate10.tools.analysis_cones as analysis_cones
+from imaging.ComptonCamera_tests.tools.point_source_validation import point_source_cone_validation
 
 sim = gate.Simulation()
 sim.output_dir = "output"
@@ -20,7 +24,7 @@ sim.volume_manager.add_material_database('../data/GateMaterials.db')
 # ==   GEOMETRY            ==
 # ===========================
 npix = 1000
-pitch, thickness = 55 * um, 1000 * mm
+pitch, thickness = 55 * um, 100 * mm
 sim.world.material = "Vacuum"
 sim.world.size = [npix * pitch, npix * pitch, thickness * 2]
 sensor = sim.add_volume("Box", "sensor")
@@ -87,12 +91,12 @@ hc.attributes = ['EventID', 'TrackID', 'ParentID', 'ParentParticleName', 'Partic
 ## =============================
 ## == VERBOSITY               ==
 ## =============================
-sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1
+# sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1
 
 ## ============================
 ## ==  VISUALIZATION         ==
 ## ============================
-# sim.visu = True  # defaults to vrml, qt seems to not work on ubuntu yet
+sim.visu = True  # defaults to vrml, qt seems to not work on ubuntu yet
 
 ## ============================
 ## == SOURCE                 ==
@@ -100,8 +104,8 @@ sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1
 source = sim.add_source("GenericSource", "source_point")
 source.particle = "gamma"
 source.energy.mono = 1000 * keV
-# source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
-source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
+source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
+# source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
 source.position.translation = [0 * mm, 0 * mm, -thickness / 2]
 
 ##====================================================
@@ -120,11 +124,19 @@ sim.run()
 ##=====================================================
 ##   ANALYSIS
 ##=====================================================
+# Basics
 # analysis_basics.analyse_hits(sim.output_dir + '/' + hc.output_filename)
 # analysis.analyse_singles(sim.output_dir + '/' + sc.output_filename)
 # plot_DigitizerProjectionActor(sim)
+
+# Cones
 # analysis_cones.extract_ideal_hits(sim.output_dir + '/' + hc.output_filename)
-cones = analysis_cones.hits2cones_withDepth_byEventID(sim.output_dir + '/' + hc.output_filename, source.energy.mono)
+c = analysis_cones.hits2cones_withDepth_byEventID(sim.output_dir + '/' + hc.output_filename, source.energy.mono)
+print('number of cones:', c.shape[0])
+print('number of cones with a nan value:', cp.isnan(c).any(axis=1).sum())
+s = point_source_cone_validation(c, sim.world.size[2], source.position.translation)
+plt.imshow(cp.sum(cp.array(s).get(), axis=0), cmap='gray')
+plt.show()
 
 # TODO: Qt-dependent functions do not work here... i.e:
 # import imaging.ComptonCamera_tests.tools.hits_visualizer as hits_visualizer

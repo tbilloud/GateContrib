@@ -57,32 +57,25 @@ def hits2cones_withDepth_byEventID(file_path, source_energy_MeV, nentries = None
     # TODO deal with different cases:
     # 1) track starting with Transportation: recoil e- was not tracked, E1 is in TotalEnergyDeposit of 1st row
     # 2) track starting with compt: recoil e- was tracked
-    #  EventID  TrackID  ParentID  ParentParticleName  ParticleName  KineticEnergy  TotalEnergyDeposit  TrackCreatorProcess  ProcessDefinedStep
-    #        3        1         0             unknown         gamma    0.215230284         0.215230284                 none               compt
-    #        3        2         1               gamma            e-    0.784769716         0.229902759                compt                none
-    #        3        2         1               gamma            e-    0.471311071         0.471311071                compt               eBrem
-    #        3        3         2                  e-         gamma    0.083555886         0.083555886                eBrem                none
-
     hits = uproot.open(file_path)['Hits'].arrays(library='pd', entry_stop=nentries)  # None to read all entries
     grouped = hits.groupby('EventID')
     cones = []
     for eventid, group in grouped:
         if group['TotalEnergyDeposit'].sum() == source_energy_MeV:
             first_row = group.iloc[0]
-            second_row = group.iloc[1]
             first_process = first_row['ProcessDefinedStep']
             if first_process == 'compt':
                 print(eventid, 'recoil e- was tracked')
             elif first_process == 'Transportation':
                 print(eventid, 'recoil e- was not tracked')
-                apex = [second_row['PostPosition_X'], second_row['PostPosition_Y'], second_row['PostPosition_Z']]
-                normalized_direction = [first_row['PostDirection_X'], first_row['PostDirection_Y'], first_row['PostDirection_Z']]
+                apex = [first_row['PostPosition_X'], first_row['PostPosition_Y'], first_row['PostPosition_Z']]
+                normalized_direction = [-first_row['PostDirection_X'], -first_row['PostDirection_Y'], -first_row['PostDirection_Z']]
                 cosT = 1 - (0.511 * first_row['TotalEnergyDeposit']) / (source_energy_MeV * (source_energy_MeV - first_row['TotalEnergyDeposit']))
-                print(apex+normalized_direction+[cosT])
-                cones.append(apex+normalized_direction+[cosT])
+                cones.append(apex+normalized_direction+[cosT]+[200])
             else:
                 print('*' * 100)
 
+    cones = cp.array(cones)
     return cones
 
 
