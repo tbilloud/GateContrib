@@ -4,6 +4,8 @@ import cupy as cp
 import numpy as np
 import uproot
 
+from imaging.ComptonCamera_tests.tools.utils import coordinateOrigin2arrayCenter
+
 
 # Function to create cones from sequenceCoincidence root files, as would be done by GateDigit_seqCoinc2Cones
 # Not only CC_Cones.tree can be created, but also numpy arrays and in different formats
@@ -146,13 +148,6 @@ def filter_conesArray(cp_array, filter_TrueCoinc, nSingles_max):
     if filter_TrueCoinc:
         cp_array = cp_array[cp_array[:, 8] == 1]
     print(cp_array.shape[0], 'cones after filtering')
-    return cp_array
-
-
-def coordinateOrigin2arrayCenter(cp_array, vpitch, vsize):
-    cp_array[:, 0] = cp_array[:, 0] + vpitch * vsize[0] / 2
-    cp_array[:, 1] = cp_array[:, 1] + vpitch * vsize[1] / 2
-    cp_array[:, 2] = cp_array[:, 2] + vpitch * vsize[2] / 2
     return cp_array
 
 
