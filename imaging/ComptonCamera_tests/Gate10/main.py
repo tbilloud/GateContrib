@@ -117,7 +117,7 @@ sim.random_seed = 1
 ##=====================================================
 ##   M E A S U R E M E N T
 ##=====================================================
-source.n = 10
+source.n = 100
 # source.activity = 10 * gate.g4_units.Bq # for sorting coincidences with GlobalTime
 sim.run()
 

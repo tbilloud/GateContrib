@@ -26,6 +26,7 @@ def point_source_cone_validation(cones_array, world_z, source_pos):
     # Volume size and pitch
     vsize = (256, 256, 256)
     vpitch = world_z / vsize[2]
+    print(vpitch)
     vol_init = cp.zeros(vsize, dtype=cp.float32)
 
     # Source position must be in units of voxels in vol
@@ -82,7 +83,7 @@ if __name__ == "__main__":
     # cones_array = conesTTree2conesArray(fname / 'CC_Cones.root', E0_MeV, er, nSingles_max, true_coinc, nentries)
 
     # ###### READING Gate10 hit root files ##############
-    fname, E0_MeV, world_z, source_pos = Path('../Gate10/output'), 1.0, 2000, [0, 0, -500]
+    fname, E0_MeV, world_z, source_pos = Path('../Gate10/output'), 1.0, 200, [0, 0, -50]
     cones_array = hits2cones_withDepth_byEventID(fname / 'CC_Hits.root', E0_MeV)
 
     # ###### Preprocessing #########
