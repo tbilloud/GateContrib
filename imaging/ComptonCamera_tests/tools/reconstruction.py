@@ -1,46 +1,29 @@
-import napari
+from napari import view_image, run
 from pathlib import Path
-from imaging.ComptonCamera_tests.Gate9.tools.seqCoinc2Cones import *
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import *
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
 from imaging.ComptonCamera_tests.tools.utils import remove_nans, coordinateOrigin2arrayCenter
 
-cp.set_printoptions(linewidth=200)
 
 # Script to reconstruct 3D image from cones
 
 # Units should be the same in cones_array and vpitch
-def reconstruct(cones_array, vsize, vpitch):
-
-    # Coordinate system
-    print(cones_array)
+def reconstruct(cones_array, vsize, vpitch, save=False,napari=False):
     cones_array = coordinateOrigin2arrayCenter(cones_array, vpitch, vsize)
+    vol = compton_forward(volume=cp.zeros(vsize, dtype=cp.float32), cones=cones_array, volume_pitch=vpitch)
+    vol = (vol / vol.max()).get()
 
-    vol_init = cp.zeros(vsize, dtype=cp.float32)
-    vol = compton_forward(volume=vol_init, cones=cones_array, volume_pitch=vpitch)
-
-    vol /= vol.max()
-    vol = vol.get()
-    cp.save(fname / "reconstruction.npy", vol)
-    vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2, -vsize[2] // 2), axis_labels=["y", "x", "z"],
-                 colormap='gray_r')
-    viewer = napari.view_image(vol, **vargs)
-    viewer.axes.visible = True
-    # TODO: add cuboid representing th detector (see napari's bounding box / annotation plugin?)
-    napari.run()
-
-    # ##############################################################
-    # # Display results
-    # ##############################################################
-    # vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2), axis_labels=["cone number", "x", "y"])
-    # viewer = napari.view_image(np.asarray(z_slice_stack), **vargs)
-    # viewer.axes.visible = True
-    # napari.run()
+    if save:
+        cp.save(fname / "reconstruction.npy", vol)
+    if napari:
+        # TODO: add cuboid representing th detector (see napari's bounding box / annotation plugin?)
+        viewer = view_image(vol, translate=tuple(-v // 2 for v in vsize), axis_labels=['y', 'x', 'z'], colormap='gray_r')
+        viewer.axes.visible = True
+        run()
     return vol
 
 
 if __name__ == "__main__":
-
     # ###### READING Gate9.2 sequenceCoincidence.root files ##############
     # fname, E0_MeV = Path('../Gate9/output'), 0.140
     # nSingles_max = False  # maximum number of singles per coincidence, False to disable
@@ -65,8 +48,4 @@ if __name__ == "__main__":
     # cones_array = remove_nans(cones_array)
     # print(len(cones_array), 'cones after removing nans')
 
-    # Volume size and pitch
-    vsize = (256, 256, 256)
-    vpitch = 7.8125
-    
-    reconstruct(cones_array, vsize, vpitch)
+    reconstruct(cones_array, (256, 256, 256), 0.78125)
