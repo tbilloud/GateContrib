@@ -56,31 +56,33 @@ def hits2cones_withDepth_byEventID(file_path, source_energy_MeV, nentries = None
     # TODO Deal with different cases
     # TODO For now I only care about compton interactions from primary gamma (i.e. TrackID == 1) with full energy
     #  deposited in sensor
-    # 1) track starting with Transportation:
-    #   a) recoil e- was not tracked, E1 is in TotalEnergyDeposit of 1st row
-    # 2) track starting with compt: recoil e- was tracked
+    # 1) if 1st track starts with Transportation, recoil e- was not tracked
+    #   a) 2nd hit in 1st track is compt, E1 is in TotalEnergyDeposit of 1st row
+    #   b) 2nd hit in 1st track is none, TODO ???
+    # 2) if 1st track starts with compt, recoil e- was tracked
     hits = uproot.open(file_path)['Hits'].arrays(library='pd', entry_stop=nentries)  # None to read all entries
     print(hits.to_string(index=False))
     grouped = hits.groupby('EventID')
     cones = []
     for eventid, group in grouped:
-        if group['TotalEnergyDeposit'].sum() == source_energy_MeV:
-            first_row = group.iloc[0]
-            first_process = first_row['ProcessDefinedStep']
-            first_trackID = first_row['TrackID']
-            if first_process == 'compt' and first_trackID == 1:
-                print(eventid, 'recoil e- was tracked')
-            elif first_process == 'Transportation' and first_trackID == 1:
+        first_row = group.iloc[0]
+        if first_row['TrackID'] == 1:
+            if group['TotalEnergyDeposit'].sum() == source_energy_MeV:
+                first_process = first_row['ProcessDefinedStep']
+                if first_process == 'compt':
+                    print(eventid, 'recoil e- was tracked')
+                elif first_process == 'Transportation':
 
-                print(eventid, 'recoil e- was not tracked')
-                apex = [first_row['PostPosition_X'], first_row['PostPosition_Y'], first_row['PostPosition_Z']]
-                normalized_direction = [-first_row['PostDirection_X'], -first_row['PostDirection_Y'], -first_row['PostDirection_Z']]
-                cosT = 1 - (0.511 * first_row['TotalEnergyDeposit']) / (source_energy_MeV * (source_energy_MeV - first_row['TotalEnergyDeposit']))
-                cone = apex + normalized_direction + [cosT] + [200]
-                cones.append(cone + [eventid] if store_info else cone)
-            else:
-                print('*' * 100)
-
+                    print(eventid, 'recoil e- was not tracked')
+                    apex = [first_row['PostPosition_X'], first_row['PostPosition_Y'], first_row['PostPosition_Z']]
+                    normalized_direction = [-first_row['PostDirection_X'], -first_row['PostDirection_Y'], -first_row['PostDirection_Z']]
+                    cosT = 1 - (0.511 * first_row['TotalEnergyDeposit']) / (source_energy_MeV * (source_energy_MeV - first_row['TotalEnergyDeposit']))
+                    cone = apex + normalized_direction + [cosT] + [200]
+                    cones.append(cone + [eventid] if store_info else cone)
+                else:
+                    print('*' * 100)
+        else:
+            print('event not from gamma source')
     cones = cp.array(cones)
     return cones
 
