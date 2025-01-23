@@ -2,6 +2,8 @@ import sys
 import cupy as cp
 import matplotlib.pyplot as plt
 import opengate as gate
+import opengate_core
+
 import imaging.ComptonCamera_tests.Gate10.tools.analysis_basics as analysis_basics
 import imaging.ComptonCamera_tests.Gate10.tools.analysis_cones as analysis_cones
 from imaging.ComptonCamera_tests.tools.point_source_validation import point_source_cone_validation
@@ -23,34 +25,36 @@ sim.volume_manager.add_material_database('../data/GateMaterials.db')
 # ===========================
 # ==   GEOMETRY            ==
 # ===========================
-npix = 1000
+npix = 20
 pitch, thickness = 55 * um, 100 * mm
 sim.world.material = "Vacuum"
-sim.world.size = [npix * pitch, npix * pitch, thickness * 2]
+margin = 10 * mm # avoids segmentation fault
+sim.world.size = [npix * pitch + margin, npix * pitch + margin, thickness * 2 + margin]
 sensor = sim.add_volume("Box", "sensor")
 sensor.size = [npix * pitch, npix * pitch, thickness]
 sensor.translation = [0 * mm, 0 * mm, thickness / 2]
+# sensor.rotation = R.from_euler('z', 45, degrees=True).as_matrix()
 sensor.material = "CdTe"
 # pixel = sim.add_volume("Box", "pixel")
 # pixel.mother = sensor.name
 # pixel.size = [pitch, pitch, thickness]
 # pixel.material = "CdTe" # Tungsten CdTe
-# pixel.color = [0, 0, 0, 0]  # see trajectories better
+# # pixel.color = [0, 0, 0, 0]  # see trajectories better
 # pixel.translation = gate.geometry.utility.get_grid_repetition([int(npix * pitch / pitch)] * 2 + [1], [pitch, pitch, 0])
 
 ## ===========================
 ## ==  PHYSICS              ==
 ## ===========================
-# fluo = True
-# doppler = True
+fluo = False
+doppler = False
 
-# if doppler:
-#     sim.physics_manager.physics_list_name = 'G4EmLivermorePhysics'  # FTFP_BERT_LIV, G4EmStandardPhysics, G4EmLivermorePhysics, G4EmStandardPhysics_option4
+if doppler:
+    sim.physics_manager.physics_list_name = 'G4EmLivermorePhysics'  # FTFP_BERT_LIV, G4EmStandardPhysics, G4EmLivermorePhysics, G4EmStandardPhysics_option4
 
-# if fluo:
-#     sim.physics_manager.global_production_cuts.all = 0.1 * um
-#     sim.physics_manager.em_parameters.update(
-#         {'fluo': fluo, 'auger': fluo, 'auger_cascade': fluo, 'pixe': fluo, 'deexcitation_ignore_cut': fluo})
+if fluo:
+    sim.physics_manager.global_production_cuts.all = 0.1 * um
+    sim.physics_manager.em_parameters.update(
+        {'fluo': fluo, 'auger': fluo, 'auger_cascade': fluo, 'pixe': fluo, 'deexcitation_ignore_cut': fluo})
 # TODO can't this be simplified with just:
 # sim.physics_manager.em_parameters.update({'fluo': fluo, 'auger': fluo, 'auger_cascade': fluo, 'pixe': fluo, 'deexcitation_ignore_cut': fluo})
 # => if fluo = True  -> cuts will be ignored and fluo will occur, no?
@@ -63,19 +67,9 @@ sensor.material = "CdTe"
 # HITS
 hc = sim.add_actor('DigitizerHitsCollectionActor', 'Hits')
 hc.attached_to = sensor.name
-hc.authorize_repeated_volumes = True  # required according to doc, but seems useless
+# hc.authorize_repeated_volumes = True  # required according to doc, but seems useless
 hc.output_filename = 'CC_Hits.root'
-hc.attributes = ['EventID', 'TrackID', 'ParentID', 'ParentParticleName', 'ParticleName', 'KineticEnergy',
-                 'TotalEnergyDeposit', 'TrackCreatorProcess', 'ProcessDefinedStep',
-                 # 'PreKineticEnergy', 'PostKineticEnergy', # KineticEnergy == PreKineticEnergy
-                 # 'Position',
-                 'PrePosition', 'PostPosition',
-                 'PreDirection', 'PostDirection',
-                 # 'EventPosition',
-                 # 'PreStepUniqueVolumeID', 'PostPosition', 'GlobalTime'  # for DigitizerAdderActor
-                 'StepLength',
-                 'Direction'
-                 ]
+hc.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvailableDigiAttributeNames()
 # # SINGLES
 # sc = sim.add_actor("DigitizerAdderActor", "Singles")
 # sc.input_digi_collection = "Hits"
@@ -91,12 +85,12 @@ hc.attributes = ['EventID', 'TrackID', 'ParentID', 'ParentParticleName', 'Partic
 ## =============================
 ## == VERBOSITY               ==
 ## =============================
-sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1
+# sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # not working if visualization
 
 ## ============================
 ## ==  VISUALIZATION         ==
 ## ============================
-sim.visu = True  # defaults to vrml, qt seems to not work on ubuntu yet
+# sim.visu = True  # defaults to vrml, qt seems to not work on ubuntu yet
 
 ## ============================
 ## == SOURCE                 ==
@@ -104,21 +98,21 @@ sim.visu = True  # defaults to vrml, qt seems to not work on ubuntu yet
 source = sim.add_source("GenericSource", "source_point")
 source.particle = "gamma"
 source.energy.mono = 1000 * keV
-source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
-# source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
+# source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
+source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
 source.position.translation = [0 * mm, 0 * mm, -thickness / 2]
 
 ##====================================================
 ##  R A N D O M   E N G I N E  A N D  S E E D
 ##====================================================
 sim.random_engine = "MersenneTwister"
-sim.random_seed = 4
+sim.random_seed = 5
 
 ##=====================================================
 ##   M E A S U R E M E N T
 ##=====================================================
-source.n = 4
-# source.activity = 10 * gate.g4_units.Bq # for sorting coincidences with GlobalTime
+source.n = 10000
+# source.activity = 1000 * gate.g4_units.Bq # for sorting coincidences with GlobalTime
 sim.run()
 
 ##=====================================================
@@ -130,9 +124,10 @@ sim.run()
 # plot_DigitizerProjectionActor(sim)
 
 # Cones
-# analysis_cones.extract_ideal_hits(sim.output_dir + '/' + hc.output_filename)
 c = analysis_cones.hits2cones_withDepth_byEventID(sim.output_dir + '/' + hc.output_filename, source.energy.mono,
                                                   store_info=True)
+if not c.shape[0]:
+    sys.exit('No cones')
 print('number of cones:', c.shape[0])
 print('number of cones with a nan value:', cp.isnan(c).any(axis=1).sum())
 s = point_source_cone_validation(c, sim.world.size[2], source.position.translation)

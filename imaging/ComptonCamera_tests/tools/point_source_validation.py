@@ -24,6 +24,7 @@ cp.set_printoptions(linewidth=200)
 
 # Units should be the same in cones_array, vpitch and source_pos
 def point_source_cone_validation(cones_array, world_z, source_pos):
+
     # Volume size and pitch
     vsize = (256, 256, 256)
     vpitch = world_z / vsize[2]

@@ -11,7 +11,7 @@ from pandas import Series
 pandas.set_option('display.max_columns', 100)
 pandas.set_option('display.width', 400)
 pandas.set_option('display.max_rows', 1000)
-pandas.set_option('display.float_format', lambda x: f'{x:.9f}')
+pandas.set_option('display.float_format', lambda x: f'{x:.9f}')  # G4 steps are logged with f'{x:.3}'
 
 # List of all possible attributes for Hits:
 # ['Direction', 'EventDirection', 'EventID', 'EventKineticEnergy', 'EventPosition', 'GlobalTime', 'HitUniqueVolumeID',
