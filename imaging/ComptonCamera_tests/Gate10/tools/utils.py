@@ -9,6 +9,19 @@ def print_hits_inG4format(hits_df):
 
 # Prints only few relevant columns from hits tree
 # Make sure that columns were present in simulation settings
-def print_hits_simple(hits_df):
+def print_hits_short(hits_df):
     print(hits_df[['EventID', 'TrackID', 'ParticleName', 'ParentID', 'ParentParticleName', 'KineticEnergy',
-                   'TotalEnergyDeposit', 'ProcessDefinedStep','TrackCreatorProcess']].to_string(index=False))
+                   'TotalEnergyDeposit', 'ProcessDefinedStep', 'TrackCreatorProcess']].to_string(index=False))
+
+def print_hits_long(hits_df):
+    print(hits_df[['EventID', 'TrackID', 'ParticleName', 'ParentID', 'ParentParticleName', 'KineticEnergy',
+                   'TotalEnergyDeposit', 'ProcessDefinedStep', 'TrackCreatorProcess', 'PrePosition_X', 'PrePosition_Y',
+                   'PrePosition_Z', 'PostPosition_X', 'PostPosition_Y', 'PostPosition_Z']].to_string(index=False))
+
+# Prints directional info from hits tree
+# Make sure that columns were present in simulation settings
+def print_hits_direction(hits_df):
+    print(hits_df[['EventID', 'TrackID', 'ParticleName', 'ProcessDefinedStep',
+                   'PrePosition_X', 'PrePosition_Y', 'PrePosition_Z', 'PostPosition_X', 'PostPosition_Y', 'PostPosition_Z',
+                   'PreDirection_X','PreDirection_Y', 'PreDirection_Z', 'PostDirection_X', 'PostDirection_Y',
+                   'PostDirection_Z']].to_string(index=False))
