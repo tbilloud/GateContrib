@@ -3,23 +3,27 @@ from pathlib import Path
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import *
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
 from imaging.ComptonCamera_tests.tools.utils import remove_nans, coordinateOrigin2arrayCenter
+from imaging.ComptonCamera_tests.tools.display_reconstruction import display_reconstruction
 
 
 # Script to reconstruct 3D image from cones
 
 # Units should be the same in cones_array and vpitch
-def reconstruct(cones_array, vsize, vpitch, save=False,napari=False):
+def reconstruct(cones_array, vsize, vpitch, output=False, napari=False):
+    # Format cones array
+    cones_array, EventID = cones_array[:, 1:], cones_array[:, 0]
+
+    # Transfer coordinate system
     cones_array = coordinateOrigin2arrayCenter(cones_array, vpitch, vsize)
+
     vol = compton_forward(volume=cp.zeros(vsize, dtype=cp.float32), cones=cones_array, volume_pitch=vpitch)
     vol = (vol / vol.max()).get()
 
-    if save:
-        cp.save(fname / "reconstruction.npy", vol)
+    if output:
+        cp.save(output, vol)
     if napari:
-        # TODO: add cuboid representing th detector (see napari's bounding box / annotation plugin?)
-        viewer = view_image(vol, translate=tuple(-v // 2 for v in vsize), axis_labels=['y', 'x', 'z'], colormap='gray_r')
-        viewer.axes.visible = True
-        run()
+        display_reconstruction(vol, vsize)
+
     return vol
 
 
@@ -40,7 +44,7 @@ if __name__ == "__main__":
 
     # ###### READING Gate10 hit root files ##############
     fname, E0_MeV = Path('../Gate10/output'), 1.0
-    cones_array = hits2cones_withDepth_byEventID(fname / 'CC_Hits.root', E0_MeV)
+    cones_array = hits2cones_byEventID(fname / 'CC_Hits.root', E0_MeV)
 
     # ###### Preprocessing #########
     print('number of cones with a nan value:', cp.isnan(cones_array).any(axis=1).sum())

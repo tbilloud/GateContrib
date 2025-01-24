@@ -33,9 +33,10 @@ def point_source_cone_validation(cones_array, world_z, source_pos, plot = False)
     # Source position must be in units of voxels in vol
     source_pos_in_voxels = [int(source_pos[i] / vpitch) + (vsize[i] // 2) for i in range(3)]
 
-    # Coordinate system
-    # remove last column
+    # Format cones array
     cones_array, EventID = cones_array[:, 1:], cones_array[:, 0]
+
+    # Coordinate system
     cones_array = coordinateOrigin2arrayCenter(cones_array, vpitch, vsize)
 
     # ######## RECONSTRUCT CONE BY CONE #######################################
@@ -90,7 +91,7 @@ if __name__ == "__main__":
 
     # ###### READING Gate10 hit root files ##############
     fname, E0_MeV, world_z, source_pos = Path('../Gate10/output'), 1.0, 200, [0, 0, -50]
-    cones_array = hits2cones_withDepth_byEventID(fname / 'CC_Hits.root', E0_MeV)
+    cones_array = hits2cones_byEventID(fname / 'CC_Hits.root', E0_MeV)
 
     # ###### Preprocessing #########
     # print('number of cones with a nan value:', cp.isnan(cones_array).any(axis=1).sum())

@@ -7,6 +7,7 @@ import opengate_core
 import imaging.ComptonCamera_tests.Gate10.tools.analysis_basics as analysis_basics
 import imaging.ComptonCamera_tests.Gate10.tools.analysis_cones as analysis_cones
 from imaging.ComptonCamera_tests.tools.point_source_validation import point_source_cone_validation
+from imaging.ComptonCamera_tests.tools.reconstruction import reconstruct
 
 sim = gate.Simulation()
 sim.output_dir = "output"
@@ -52,7 +53,7 @@ if doppler:
     sim.physics_manager.physics_list_name = 'G4EmLivermorePhysics'  # FTFP_BERT_LIV, G4EmStandardPhysics, G4EmLivermorePhysics, G4EmStandardPhysics_option4
 
 if fluo:
-    sim.physics_manager.global_production_cuts.all = 0.1 * um
+    sim.physics_manager.global_production_cuts.all = 1 * um
     sim.physics_manager.em_parameters.update(
         {'fluo': fluo, 'auger': fluo, 'auger_cascade': fluo, 'pixe': fluo, 'deexcitation_ignore_cut': fluo})
 # TODO can't this be simplified with just:
@@ -85,12 +86,12 @@ hc.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvailabl
 ## =============================
 ## == VERBOSITY               ==
 ## =============================
-sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # not working if visualization
+# sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # not working if visualization
 
 ## ============================
 ## ==  VISUALIZATION         ==
 ## ============================
-sim.visu = True  # defaults to vrml, qt seems to not work on ubuntu yet
+# sim.visu = True  # defaults to vrml, qt seems to not work on ubuntu yet
 
 ## ============================
 ## == SOURCE                 ==
@@ -111,7 +112,7 @@ sim.random_seed = 5
 ##=====================================================
 ##   M E A S U R E M E N T
 ##=====================================================
-source.n = 1000
+source.n = 10000
 # source.activity = 1000 * gate.g4_units.Bq # for sorting coincidences with GlobalTime
 sim.run()
 
@@ -124,14 +125,16 @@ sim.run()
 # plot_DigitizerProjectionActor(sim)
 
 # Cones
-c = analysis_cones.hits2cones_withDepth_byEventID(sim.output_dir + '/' + hc.output_filename, source.energy.mono)
+c = analysis_cones.hits2cones_byEventID(sim.output_dir + '/' + hc.output_filename, source.energy.mono)
 if not c.shape[0]:
     sys.exit('No cones')
 print('number of cones:', c.shape[0])
 print('number of cones with a nan value:', cp.isnan(c).any(axis=1).sum())
-s = point_source_cone_validation(c, sim.world.size[2], source.position.translation, plot=False)
-plt.imshow(cp.sum(cp.array(s).get(), axis=0), cmap='gray')
-plt.show()
+# s = point_source_cone_validation(c, sim.world.size[2], source.position.translation, plot=False)
+# plt.imshow(cp.sum(cp.array(s).get(), axis=0), cmap='gray')
+# plt.show()
+opath = "output/reconstruction.npy"
+reconstruct(c, (256, 256, 256), sim.world.size[2]/256, output=opath, napari=False)
 
 # TODO: Qt-dependent functions (hit visualizer, reco) do not work here... i.e:
 # import imaging.ComptonCamera_tests.tools.hits_visualizer as hits_visualizer

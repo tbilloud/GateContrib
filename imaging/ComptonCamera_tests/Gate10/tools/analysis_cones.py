@@ -19,7 +19,7 @@ pandas.set_option('display.float_format', lambda x: f'{x:.3}')  # G4 steps are l
 
 
 # TODO: I need one version writing array for direct reco and one with extra simu info for validation?
-def hits2cones_withDepth_byEventID(file_path, source_MeV, nentries=None, store_info=False):
+def hits2cones_byEventID(file_path, source_MeV, nentries=None, store_info=False):
     if not os.path.isfile(file_path):
         sys.exit(f"File {file_path} does not exist, probably no hit produced...")
     hits = uproot.open(file_path)['Hits'].arrays(library='pd', entry_stop=nentries)  # None to read all entries
@@ -33,7 +33,7 @@ def hits2cones_withDepth_byEventID(file_path, source_MeV, nentries=None, store_i
     # TODO: deal with
     #   doppler
     #   PIXE/fluo
-    n_events_secondary, n_events_escape_primary_without_recoil, n_events_photoelectric, n_events_recoil_tracked, n_events_recoil_not_tracked = 0, 0, 0, 0, 0
+    n_events_secondary, n_events_escape, n_events_photoelectric, n_events_recoil_tracked, n_events_recoil_not_tracked = 0, 0, 0, 0, 0
     for eventid, group in grouped:
         row1 = group.iloc[0]
         # Sensor received primary gamma
@@ -41,6 +41,7 @@ def hits2cones_withDepth_byEventID(file_path, source_MeV, nentries=None, store_i
             # All primary energy was deposited
             # else: subcases differs! e.g. photon escapes after Compton and recoil e- tracked => photon track not stored
             if group['TotalEnergyDeposit'].sum() == source_MeV:
+                # utils.print_hits_short(group)
                 first_process = row1['ProcessDefinedStep']
                 # Compton interaction, recoil e- tracked
                 if first_process == 'compt':
@@ -65,28 +66,28 @@ def hits2cones_withDepth_byEventID(file_path, source_MeV, nentries=None, store_i
                         cones.append([eventid] + apex + direction + [cosT] + [200])
                         n_events_recoil_not_tracked += 1
                 else:
+                    # TODO deal with this case
                     print('*' * 100)
             else:
-                n_events_escape_primary_without_recoil += 1 # (=> e.g. escape without recoil e-)
+                n_events_escape += 1 # (=> e.g. escape without recoil e-)
                 # utils.print_hits_short(pandas.DataFrame([row1.values], columns=row1.index))
         else:
-            # TODO: several possible cases:
-            #  - secondary from outside the sensor
-            #  - secondary from inside the sensor (=> e.g. escape with recoil e-)
-            # utils.print_hits_short(pandas.DataFrame([row1.values], columns=row1.index))
-            n_events_secondary += 1
+            # TODO to verify
+            if row1['TrackID'] == 1:
+                n_events_secondary += 1
+            else:
+                n_events_escape += 1
 
-    print(f"{n_events_secondary} events from secondary particles")
-    print(f"{n_events_escape_primary_without_recoil} events with primary escape (without recoil)")
+    print(f"{n_events_secondary} events with secondary particles")
+    print(f"{n_events_escape} events with escape")
     print(f"{n_events_photoelectric} events with photoelectric absorption")
-    print(f"{n_events_recoil_tracked} events with recoil e- tracked")
-    print(f"{n_events_recoil_not_tracked} events with recoil e- not tracked")
-    # print(f"{round(100 * n_events_escape_primary_without_recoil / n_events)}  % events with partial energy deposit")
-    cones = cp.array(cones)
-    return cones
+    print(f"{n_events_recoil_tracked} valid events with recoil e- tracked")
+    print(f"{n_events_recoil_not_tracked} valid events with recoil e- not tracked")
+
+    return cp.array(cones)
 
 
-def singles2cones_withDepth_byGlobalTime(file_path):
+def singles2cones_byGlobalTime(file_path):
     singles = analysis_basics.analyse_singles(file_path=file_path)
     # TODO: should I sort dataframe by GlobalTime?
     current_time = singles['GlobalTime'].iloc[0]
