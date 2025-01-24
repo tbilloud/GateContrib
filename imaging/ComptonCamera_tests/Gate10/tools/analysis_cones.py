@@ -23,7 +23,8 @@ def hits2cones_byEventID(file_path, source_MeV, nentries=None, store_info=False)
     if not os.path.isfile(file_path):
         sys.exit(f"File {file_path} does not exist, probably no hit produced...")
     hits = uproot.open(file_path)['Hits'].arrays(library='pd', entry_stop=nentries)  # None to read all entries
-    # utils.print_hits_long(hits[-3:])  # , sys.exit()
+    utils.print_hits_short(hits)  # , sys.exit()
+    utils.plot_hits_TotalEnergyDeposit(hits)
     n_events = hits['EventID'].nunique()
     print(f"{n_events} events interacted in the sensor")
     grouped = hits.groupby('EventID')
@@ -81,8 +82,8 @@ def hits2cones_byEventID(file_path, source_MeV, nentries=None, store_info=False)
     print(f"{n_events_secondary} events with secondary particles")
     print(f"{n_events_escape} events with escape")
     print(f"{n_events_photoelectric} events with photoelectric absorption")
-    print(f"{n_events_recoil_tracked} valid events with recoil e- tracked")
-    print(f"{n_events_recoil_not_tracked} valid events with recoil e- not tracked")
+    print(f"{n_events_recoil_tracked} events valid with recoil e- tracked")
+    print(f"{n_events_recoil_not_tracked} events valid with recoil e- not tracked")
 
     return cp.array(cones)
 
