@@ -1,11 +1,10 @@
 import sys
 import cupy as cp
-import matplotlib.pyplot as plt
 import opengate as gate
 import opengate_core
 
 import imaging.ComptonCamera_tests.Gate10.tools.analysis_basics as analysis_basics
-import imaging.ComptonCamera_tests.Gate10.tools.analysis_cones as analysis_cones
+from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import hits2cones_byEventID
 from imaging.ComptonCamera_tests.tools.point_source_validation import point_source_cone_validation
 from imaging.ComptonCamera_tests.tools.reconstruction import reconstruct
 
@@ -29,7 +28,7 @@ sim.volume_manager.add_material_database('../data/GateMaterials.db')
 npix = 10
 pitch, thickness = 55 * um, 1 * mm
 sim.world.material = "Air"
-margin = 1 * mm # avoids segmentation fault
+margin = 1 * mm  # avoids segmentation fault
 sim.world.size = [npix * pitch + margin, npix * pitch + margin, thickness * 2 + margin]
 sensor = sim.add_volume("Box", "sensor")
 sensor.size = [npix * pitch, npix * pitch, thickness]
@@ -39,7 +38,7 @@ sensor.material = "Vacuum"
 pixel = sim.add_volume("Box", "pixel")
 pixel.mother = sensor.name
 pixel.size = [pitch, pitch, thickness]
-pixel.material = "CdTe" # Tungsten CdTe
+pixel.material = "CdTe"  # Tungsten CdTe
 # pixel.color = [0, 0, 0, 0]  # see trajectories better
 pixel.translation = gate.geometry.utility.get_grid_repetition([int(npix * pitch / pitch)] * 2 + [1], [pitch, pitch, 0])
 
@@ -112,7 +111,7 @@ sim.random_seed = 5
 ##=====================================================
 ##   M E A S U R E M E N T
 ##=====================================================
-source.n = 10000
+source.n = 1000
 # source.activity = 1000 * gate.g4_units.Bq # for sorting coincidences with GlobalTime
 sim.run()
 
@@ -125,16 +124,12 @@ sim.run()
 # plot_DigitizerProjectionActor(sim)
 
 # Cones
-c = analysis_cones.hits2cones_byEventID(sim.output_dir + '/' + hc.output_filename, source.energy.mono)
-if not c.shape[0]:
-    sys.exit('No cones')
-print('number of cones:', c.shape[0])
-print('number of cones with a nan value:', cp.isnan(c).any(axis=1).sum())
-# s = point_source_cone_validation(c, sim.world.size[2], source.position.translation, plot=False)
-# plt.imshow(cp.sum(cp.array(s).get(), axis=0), cmap='gray')
-# plt.show()
-opath = "output/reconstruction.npy"
-reconstruct(c, (256, 256, 256), sim.world.size[2]/256, output=opath, napari=False)
+c = hits2cones_byEventID(sim.output_dir + '/' + hc.output_filename, source.energy.mono)
+print(c.shape[0] if c.shape[0] else sys.exit('No cones'), 'cones,',cp.isnan(c).any(axis=1).sum(),'with NaNs')
+
+# Cone reconstruction
+point_source_cone_validation(c, sim.world.size[2], source.position.translation, plot_seq=False, plot_stack=True)
+# reconstruct(c, (256, 256, 256), sim.world.size[2] / 256, output='output/reconstruction.npy')
 
 # TODO: Qt-dependent functions (hit visualizer, reco) do not work here... i.e:
 # import imaging.ComptonCamera_tests.tools.hits_visualizer as hits_visualizer

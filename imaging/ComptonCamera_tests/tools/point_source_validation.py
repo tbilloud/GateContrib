@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import napari
 from pathlib import Path
+
+import numpy as np
+
 from imaging.ComptonCamera_tests.Gate9.tools.seqCoinc2Cones import *
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import *
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
@@ -23,7 +26,7 @@ cp.set_printoptions(linewidth=200)
 # - energy/spatial resolution
 
 # Units should be the same in cones_array, vpitch and source_pos
-def point_source_cone_validation(cones_array, world_z, source_pos, plot = False):
+def point_source_cone_validation(cones_array, world_z, source_pos, plot_seq = False, plot_stack = False):
 
     # Volume size and pitch
     vsize = (256, 256, 256)
@@ -42,11 +45,10 @@ def point_source_cone_validation(cones_array, world_z, source_pos, plot = False)
     # ######## RECONSTRUCT CONE BY CONE #######################################
     z_slice_stack = list()
     n_bad_cones = 0
-    # for i, cone in enumerate(cones_array):
     for cone,event in zip(cones_array,EventID):
         vol = compton_forward(volume=vol_init, cones=cone, volume_pitch=vpitch)
-        z_slice = vol[:, :, source_pos_in_voxels[2]]
-        z_slice_stack.append(z_slice.get())
+        z_slice = vol[:, :, source_pos_in_voxels[2]].get()
+        z_slice_stack.append(z_slice)
         if z_slice[source_pos_in_voxels[0], source_pos_in_voxels[1]] == 0:
             # TODO sometime cone is bad but z_slice is not 0
             n_bad_cones += 1
@@ -54,8 +56,8 @@ def point_source_cone_validation(cones_array, world_z, source_pos, plot = False)
         # ##############################################################
         # # Display stack with matplotlib (one by one)
         # ##############################################################
-        if plot:
-            plt.imshow(z_slice.get(), cmap='gray')
+        if plot_seq:
+            plt.imshow(z_slice, cmap='gray')
             plt.scatter(source_pos_in_voxels[0], source_pos_in_voxels[1], c='r', s=10)
             plt.scatter(vsize[0]//2,vsize[1]//2, c='b', s=10)
             plt.title(f'EventID: {int(event)}')
@@ -64,14 +66,17 @@ def point_source_cone_validation(cones_array, world_z, source_pos, plot = False)
 
     print(n_bad_cones, 'bad cones')
 
-    # ##############################################################
-    # # Display stack with napari (scrolling)
-    # ##############################################################
-    # vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2), axis_labels=["cone number", "x", "y"])
-    # viewer = napari.view_image(np.asarray(z_slice_stack), **vargs)
-    # viewer.axes.visible = True
-    # napari.run()
-    return z_slice_stack
+    if plot_stack:
+        plt.imshow(np.sum(np.asarray(z_slice_stack), axis=0), cmap='gray')
+        # plt.scatter(source_pos_in_voxels[0], source_pos_in_voxels[1], c='r', s=10)
+        plt.show()
+        # ##############################################################
+        # # Display stack with napari (scrolling)
+        # ##############################################################
+        # vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2), axis_labels=["cone number", "x", "y"])
+        # viewer = napari.view_image(np.asarray(z_slice_stack), **vargs)
+        # viewer.axes.visible = True
+        # napari.run()
 
 
 if __name__ == "__main__":
