@@ -23,7 +23,7 @@ cp.set_printoptions(linewidth=200)
 # - energy/spatial resolution
 
 # Units should be the same in cones_array, vpitch and source_pos
-def point_source_cone_validation(cones_array, world_z, source_pos):
+def point_source_cone_validation(cones_array, world_z, source_pos, plot = False):
 
     # Volume size and pitch
     vsize = (256, 256, 256)
@@ -35,7 +35,7 @@ def point_source_cone_validation(cones_array, world_z, source_pos):
 
     # Coordinate system
     # remove last column
-    cones_array, EventID = cones_array[:, :-1], cones_array[:, -1]
+    cones_array, EventID = cones_array[:, 1:], cones_array[:, 0]
     cones_array = coordinateOrigin2arrayCenter(cones_array, vpitch, vsize)
 
     # ######## RECONSTRUCT CONE BY CONE #######################################
@@ -53,12 +53,13 @@ def point_source_cone_validation(cones_array, world_z, source_pos):
         # ##############################################################
         # # Display stack with matplotlib (one by one)
         # ##############################################################
-        plt.imshow(z_slice.get(), cmap='gray')
-        plt.scatter(source_pos_in_voxels[0], source_pos_in_voxels[1], c='r', s=10)
-        plt.scatter(vsize[0]//2,vsize[1]//2, c='b', s=10)
-        plt.title(f'EventID: {int(event)}')
-        plt.colorbar()
-        plt.show()
+        if plot:
+            plt.imshow(z_slice.get(), cmap='gray')
+            plt.scatter(source_pos_in_voxels[0], source_pos_in_voxels[1], c='r', s=10)
+            plt.scatter(vsize[0]//2,vsize[1]//2, c='b', s=10)
+            plt.title(f'EventID: {int(event)}')
+            plt.colorbar()
+            plt.show()
 
     print(n_bad_cones, 'bad cones')
 

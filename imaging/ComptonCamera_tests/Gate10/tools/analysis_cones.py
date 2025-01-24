@@ -23,7 +23,7 @@ def hits2cones_withDepth_byEventID(file_path, source_MeV, nentries=None, store_i
     if not os.path.isfile(file_path):
         sys.exit(f"File {file_path} does not exist, probably no hit produced...")
     hits = uproot.open(file_path)['Hits'].arrays(library='pd', entry_stop=nentries)  # None to read all entries
-    utils.print_hits_simple(hits)  # , sys.exit()
+    # utils.print_hits_long(hits[-3:])  # , sys.exit()
     n_events = hits['EventID'].nunique()
     print(f"{n_events} events interacted in the sensor")
     grouped = hits.groupby('EventID')
@@ -31,30 +31,26 @@ def hits2cones_withDepth_byEventID(file_path, source_MeV, nentries=None, store_i
 
     # For now I only care about compton interactions from primary gamma with full energy deposited in sensor
     # TODO: deal with
-    #   low cuts
     #   doppler
     #   PIXE/fluo
-    #   e- was tracked
-    n_events_secondary, n_events_partial_edeposit, n_events_photoelectric = 0, 0, 0
+    n_events_secondary, n_events_escape_primary_without_recoil, n_events_photoelectric, n_events_recoil_tracked, n_events_recoil_not_tracked = 0, 0, 0, 0, 0
     for eventid, group in grouped:
         row1 = group.iloc[0]
         # Sensor received primary gamma
-        if row1['TrackID'] == 1:
+        if row1['ParentParticleName'] == 'unknown': # TODO: correct if source is a radioisotope?
             # All primary energy was deposited
+            # else: subcases differs! e.g. photon escapes after Compton and recoil e- tracked => photon track not stored
             if group['TotalEnergyDeposit'].sum() == source_MeV:
                 first_process = row1['ProcessDefinedStep']
                 # Compton interaction, recoil e- tracked
                 if first_process == 'compt':
-                    print(eventid, 'recoil e- was tracked')
-                    apex = [row1['PostPosition_X'], row1['PostPosition_Y'], row1['PostPosition_Z']]
-                    direction = [-row1['PostDirection_X'], -row1['PostDirection_Y'], -row1['PostDirection_Z']]
-                    apex2 = [row1['PrePosition_X'], row1['PrePosition_Y'], row1['PrePosition_Z']]
-                    direction2 = [-row1['PreDirection_X'], -row1['PreDirection_Y'], -row1['PreDirection_Z']]
-                    # TODO which is correct? direction and direction2 seem the same
-                    E1 = source_MeV - row1['TotalEnergyDeposit']
+                    apex = [row1['PrePosition_X'], row1['PrePosition_Y'], row1['PrePosition_Z']]
+                    direction = [-row1['PreDirection_X'], -row1['PreDirection_Y'], -row1['PreDirection_Z']]
+                    # TODO: why are PreDirection and PreDirection the same in some cases?
+                    E1 = source_MeV - row1['KineticEnergy']
                     cosT = 1 - (0.511 * E1) / (source_MeV * (source_MeV - E1))
-                    cone = apex + direction + [cosT] + [200]
-                    cones.append(cone + [eventid] if store_info else cone)
+                    cones.append([eventid] + apex + direction + [cosT] + [200])
+                    n_events_recoil_tracked += 1
                 # Several possible cases
                 elif first_process == 'Transportation':
                     # Photo-electric absorption
@@ -62,27 +58,31 @@ def hits2cones_withDepth_byEventID(file_path, source_MeV, nentries=None, store_i
                         n_events_photoelectric += 1
                     # Compton interaction, recoil e- not tracked
                     else:
-                        # TODO put this back
-                        # print(eventid, 'recoil e- was not tracked')
-                        # apex = [row1['PostPosition_X'], row1['PostPosition_Y'], row1['PostPosition_Z']]
-                        # direction = [-row1['PostDirection_X'], -row1['PostDirection_Y'],-row1['PostDirection_Z']]
-                        # E1 = row1['TotalEnergyDeposit']
-                        # cosT = 1 - (0.511 * E1) / (source_MeV * (source_MeV - E1))
-                        # cone = apex + direction + [cosT] + [200]
-                        # cones.append(cone + [eventid] if store_info else cone)
-                        continue
+                        apex = [row1['PostPosition_X'], row1['PostPosition_Y'], row1['PostPosition_Z']]
+                        direction = [-row1['PostDirection_X'], -row1['PostDirection_Y'], -row1['PostDirection_Z']]
+                        E1 = row1['TotalEnergyDeposit']
+                        cosT = 1 - (0.511 * E1) / (source_MeV * (source_MeV - E1))
+                        cones.append([eventid] + apex + direction + [cosT] + [200])
+                        n_events_recoil_not_tracked += 1
                 else:
                     print('*' * 100)
             else:
-                n_events_partial_edeposit += 1
+                n_events_escape_primary_without_recoil += 1 # (=> e.g. escape without recoil e-)
+                # utils.print_hits_short(pandas.DataFrame([row1.values], columns=row1.index))
         else:
+            # TODO: several possible cases:
+            #  - secondary from outside the sensor
+            #  - secondary from inside the sensor (=> e.g. escape with recoil e-)
+            # utils.print_hits_short(pandas.DataFrame([row1.values], columns=row1.index))
             n_events_secondary += 1
 
-    print(f"{round(100 * n_events_secondary / n_events)}  % events from secondary particles")
-    print(f"{round(100 * n_events_partial_edeposit / n_events)}  % events with partial energy deposit")
-    print(f"{round(100 * n_events_photoelectric / n_events)}  % events with photoelectric absorption")
+    print(f"{n_events_secondary} events from secondary particles")
+    print(f"{n_events_escape_primary_without_recoil} events with primary escape (without recoil)")
+    print(f"{n_events_photoelectric} events with photoelectric absorption")
+    print(f"{n_events_recoil_tracked} events with recoil e- tracked")
+    print(f"{n_events_recoil_not_tracked} events with recoil e- not tracked")
+    # print(f"{round(100 * n_events_escape_primary_without_recoil / n_events)}  % events with partial energy deposit")
     cones = cp.array(cones)
-
     return cones
 
 

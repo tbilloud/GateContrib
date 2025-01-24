@@ -25,22 +25,22 @@ sim.volume_manager.add_material_database('../data/GateMaterials.db')
 # ===========================
 # ==   GEOMETRY            ==
 # ===========================
-npix = 20
-pitch, thickness = 55 * um, 100 * mm
-sim.world.material = "Vacuum"
-margin = 10 * mm # avoids segmentation fault
+npix = 10
+pitch, thickness = 55 * um, 1 * mm
+sim.world.material = "Air"
+margin = 1 * mm # avoids segmentation fault
 sim.world.size = [npix * pitch + margin, npix * pitch + margin, thickness * 2 + margin]
 sensor = sim.add_volume("Box", "sensor")
 sensor.size = [npix * pitch, npix * pitch, thickness]
 sensor.translation = [0 * mm, 0 * mm, thickness / 2]
 # sensor.rotation = R.from_euler('z', 45, degrees=True).as_matrix()
-sensor.material = "CdTe"
-# pixel = sim.add_volume("Box", "pixel")
-# pixel.mother = sensor.name
-# pixel.size = [pitch, pitch, thickness]
-# pixel.material = "CdTe" # Tungsten CdTe
-# # pixel.color = [0, 0, 0, 0]  # see trajectories better
-# pixel.translation = gate.geometry.utility.get_grid_repetition([int(npix * pitch / pitch)] * 2 + [1], [pitch, pitch, 0])
+sensor.material = "Vacuum"
+pixel = sim.add_volume("Box", "pixel")
+pixel.mother = sensor.name
+pixel.size = [pitch, pitch, thickness]
+pixel.material = "CdTe" # Tungsten CdTe
+# pixel.color = [0, 0, 0, 0]  # see trajectories better
+pixel.translation = gate.geometry.utility.get_grid_repetition([int(npix * pitch / pitch)] * 2 + [1], [pitch, pitch, 0])
 
 ## ===========================
 ## ==  PHYSICS              ==
@@ -85,21 +85,21 @@ hc.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvailabl
 ## =============================
 ## == VERBOSITY               ==
 ## =============================
-# sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # not working if visualization
+sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # not working if visualization
 
 ## ============================
 ## ==  VISUALIZATION         ==
 ## ============================
-# sim.visu = True  # defaults to vrml, qt seems to not work on ubuntu yet
+sim.visu = True  # defaults to vrml, qt seems to not work on ubuntu yet
 
 ## ============================
 ## == SOURCE                 ==
 ## ============================
 source = sim.add_source("GenericSource", "source_point")
 source.particle = "gamma"
-source.energy.mono = 1000 * keV
-# source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
-source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
+source.energy.mono = 100 * keV
+source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
+# source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
 source.position.translation = [0 * mm, 0 * mm, -thickness / 2]
 
 ##====================================================
@@ -111,7 +111,7 @@ sim.random_seed = 5
 ##=====================================================
 ##   M E A S U R E M E N T
 ##=====================================================
-source.n = 10000
+source.n = 1000
 # source.activity = 1000 * gate.g4_units.Bq # for sorting coincidences with GlobalTime
 sim.run()
 
@@ -124,13 +124,12 @@ sim.run()
 # plot_DigitizerProjectionActor(sim)
 
 # Cones
-c = analysis_cones.hits2cones_withDepth_byEventID(sim.output_dir + '/' + hc.output_filename, source.energy.mono,
-                                                  store_info=True)
+c = analysis_cones.hits2cones_withDepth_byEventID(sim.output_dir + '/' + hc.output_filename, source.energy.mono)
 if not c.shape[0]:
     sys.exit('No cones')
 print('number of cones:', c.shape[0])
 print('number of cones with a nan value:', cp.isnan(c).any(axis=1).sum())
-s = point_source_cone_validation(c, sim.world.size[2], source.position.translation)
+s = point_source_cone_validation(c, sim.world.size[2], source.position.translation, plot=False)
 plt.imshow(cp.sum(cp.array(s).get(), axis=0), cmap='gray')
 plt.show()
 
