@@ -17,3 +17,8 @@ proj.input_digi_collections = ["Singles"]
 proj.spacing = [pitch, pitch]  # Set pixel spacing in mm
 proj.size = [npix, npix]  # Image size in pixels (128x128)
 proj.output_filename = 'projection.mhd'
+
+# TODO: Qt-dependent functions (in ComptonCamera_tests/tools) do not work in main.py:
+# hits_visualizer.main()
+# reconstruction.reconstruct()
+# etc...
