@@ -35,11 +35,10 @@ pixel.translation = gate.geometry.utility.get_grid_repetition([int(npix * pitch 
 ## ===========================
 ## ==  PHYSICS              ==
 ## ===========================
-doppler = True
+doppler = False
 fluo = True
 if doppler: sim.physics_manager.physics_list_name = 'G4EmLivermorePhysics'
-if fluo:
-    sim.physics_manager.global_production_cuts.all = 100 * um
+if fluo: sim.physics_manager.global_production_cuts.all = 100 * um
 sim.physics_manager.em_parameters.update(
     {'fluo': fluo,
      'pixe': fluo,
@@ -55,17 +54,6 @@ hc.attached_to = sensor.name
 # hc.authorize_repeated_volumes = True  # required according to doc, but seems useless
 hc.output_filename = 'CC_Hits.root'
 hc.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvailableDigiAttributeNames()
-# # SINGLES
-# sc = sim.add_actor("DigitizerAdderActor", "Singles")
-# sc.input_digi_collection = "Hits"
-# sc.policy = "EnergyWeightedCentroidPosition"
-# sc.output_filename = 'CC_Singles.root'  # if hc.output_filename, there will be two branches in the file
-# # TIMEPIX FRAME
-# proj = sim.add_actor("DigitizerProjectionActor", "Projection")
-# proj.input_digi_collections = ["Singles"]
-# proj.spacing = [pitch, pitch]  # Set pixel spacing in mm
-# proj.size = [npix, npix]  # Image size in pixels (128x128)
-# proj.output_filename = 'projection.mhd'
 
 ## =============================
 ## == VERBOSITY               ==
@@ -96,7 +84,7 @@ sim.random_seed = 5
 ##=====================================================
 ##   M E A S U R E M E N T
 ##=====================================================
-source.n = 61
+source.n = 10000
 # source.activity = 1000 * gate.g4_units.Bq # for sorting coincidences with GlobalTime
 sim.run()
 
@@ -107,13 +95,15 @@ sim.run()
 # analysis_basics.analyse_hits(sim.output_dir + '/' + hc.output_filename)
 # analysis.analyse_singles(sim.output_dir + '/' + sc.output_filename)
 # plot_DigitizerProjectionActor(sim)
+# analysis_basics.plot_hits_TotalEnergyDeposit(sim.output_dir + '/' + hc.output_filename)
 
 # Cones
 c = hits2cones_byEventID(sim.output_dir + '/' + hc.output_filename, source.energy.mono)
 print('=>', c.shape[0] if c.shape[0] else sys.exit('No cones'), 'cones,', cp.isnan(c).any(axis=1).sum(), 'with NaNs')
 
 # Cone reconstruction
-# point_source_cone_validation(c, sim.world.size[2], source.position.translation, plot_seq=False, plot_stack=True)
+point_source_cone_validation(c, sim.world.size[2], source.position.translation,
+                             plot_seq=False, plot_stack=True)
 # reconstruct(c, (256, 256, 256), sim.world.size[2] / 256, output='output/reconstruction.npy')
 
 # TODO: Qt-dependent functions (hit visualizer, reco) do not work here... i.e:

@@ -27,9 +27,3 @@ def print_hits_direction(hits_df):
                    'PrePosition_X', 'PrePosition_Y', 'PrePosition_Z', 'PostPosition_X', 'PostPosition_Y', 'PostPosition_Z',
                    'PreDirection_X','PreDirection_Y', 'PreDirection_Z', 'PostDirection_X', 'PostDirection_Y',
                    'PostDirection_Z']].to_string(index=False))
-
-def plot_hits_TotalEnergyDeposit(hits_df):
-    plt.hist(hits_df['TotalEnergyDeposit'], bins=100, range=(0, 0.1))
-    plt.xlabel('TotalEnergyDeposit [MeV]')
-    plt.ylabel('Counts')
-    plt.show()

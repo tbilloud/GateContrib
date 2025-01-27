@@ -24,7 +24,6 @@ def hits2cones_byEventID(file_path, source_MeV, nentries=None, store_info=False)
         sys.exit(f"File {file_path} does not exist, probably no hit produced...")
     hits = uproot.open(file_path)['Hits'].arrays(library='pd', entry_stop=nentries)  # None to read all entries
     utils.print_hits_short(hits)  # , sys.exit()
-    utils.plot_hits_TotalEnergyDeposit(hits)
     n_events = hits['EventID'].nunique()
     print(f"{n_events} events interacted in the sensor")
     grouped = hits.groupby('EventID')

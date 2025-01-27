@@ -1,5 +1,7 @@
 # Utility functions to analyse output files
 # Can be used in the main simulation script after sim.run() or offline (i.e. reading root files without simulation)
+import os
+import sys
 
 import pandas
 import uproot
@@ -67,4 +69,14 @@ def plot_DigitizerProjectionActor(sim):
     image_array = sitk.GetArrayFromImage(image)
     plt.imshow(image_array[0, :, :], cmap='gray', vmax=2)
     plt.colorbar()
+    plt.show()
+
+
+def plot_hits_TotalEnergyDeposit(file_path, bins=100):
+    if not os.path.isfile(file_path):
+        sys.exit(f"File {file_path} does not exist, probably no hit produced...")
+    hits = uproot.open(file_path)['Hits'].arrays(library='pd')  # None to read all entries
+    plt.hist(hits['TotalEnergyDeposit'], bins=bins)
+    plt.xlabel('TotalEnergyDeposit [MeV]')
+    plt.ylabel('Counts')
     plt.show()
