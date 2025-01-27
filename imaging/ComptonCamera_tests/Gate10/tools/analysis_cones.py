@@ -18,7 +18,86 @@ pandas.set_option('display.max_rows', 1000)
 pandas.set_option('display.float_format', lambda x: f'{x:.3}')  # G4 steps are logged with f'{x:.3}'
 
 
-# TODO: I need one version writing array for direct reco and one with extra simu info for validation?
+# # TODO: I need one version writing array for direct reco and one with extra simu info for validation?
+# def hits2cones_byEventID(file_path, source_MeV, nentries=None, store_info=False):
+#     if not os.path.isfile(file_path):
+#         sys.exit(f"File {file_path} does not exist, probably no hit produced...")
+#     hits = uproot.open(file_path)['Hits'].arrays(library='pd', entry_stop=nentries)  # None to read all entries
+#     utils.print_hits_short(hits)  # , sys.exit()
+#     n_events = hits['EventID'].nunique()
+#     print(f"{n_events} events interacted in the sensor")
+#     grouped = hits.groupby('EventID')
+#     cones = []
+#
+#     # For now I only care about compton interactions from primary gamma with full energy deposited in sensor
+#     # TODO: deal with
+#     #   doppler
+#     #   PIXE/fluo
+#     n_events_secondary, n_events_photoelectric, n_events_recoil_tracked, n_events_recoil_not_tracked = 0, 0, 0, 0
+#     n_events_escape_a, n_events_escape_b = 0, 0
+#     n_events_primary = 0
+#     n_events_full_energy_deposit = 0
+#     for eventid, group in grouped:
+#         row1 = group.iloc[0]
+#         apex, direction, E1 = False, False, False
+#         # Sensor received primary gamma
+#         if row1['ParentParticleName'] == 'unknown': # TODO: is this correct with radioisotope source?
+#             # All primary energy was deposited
+#             # else: subcases differs! e.g. photon escapes after Compton and recoil e- tracked => photon track not stored
+#             if round(group['TotalEnergyDeposit'].sum(),6) == source_MeV: # round to avoid float precision issues
+#                 first_process = row1['ProcessDefinedStep']
+#                 energy_dep = group[group['ParentID'] == 1]['TotalEnergyDeposit'].sum()
+#                 kinetic_energy_sum = group[group['ParentID'] == 1]['KineticEnergy'].iloc[0].sum()
+#                 print(energy_dep, kinetic_energy_sum)
+#                 # Compton interaction, recoil e- tracked
+#                 if first_process == 'compt':
+#                     apex = [row1['PrePosition_X'], row1['PrePosition_Y'], row1['PrePosition_Z']]
+#                     direction = [-row1['PreDirection_X'], -row1['PreDirection_Y'], -row1['PreDirection_Z']]
+#                     E1 = source_MeV - row1['KineticEnergy']
+#                     n_events_recoil_tracked += 1
+#                 # Several possible cases
+#                 elif first_process == 'Transportation':
+#                     # Photo-electric absorption
+#                     if group['TrackID'].value_counts()[1] == 1:
+#                         n_events_photoelectric += 1
+#                     # Compton interaction, recoil e- not tracked
+#                     else:
+#                         apex = [row1['PostPosition_X'], row1['PostPosition_Y'], row1['PostPosition_Z']]
+#                         direction = [-row1['PostDirection_X'], -row1['PostDirection_Y'], -row1['PostDirection_Z']]
+#                         E1 = row1['TotalEnergyDeposit']
+#                         n_events_recoil_not_tracked += 1
+#                 else:
+#                     # TODO deal with this case
+#                     print('*' * 100)
+#                 n_events_full_energy_deposit += 1
+#             else:
+#                 n_events_escape_a += 1 # (=> e.g. escape without recoil e-)
+#                 # utils.print_hits_short(pandas.DataFrame([row1.values], columns=row1.index))
+#             n_events_primary += 1
+#         else:
+#             # TODO to verify
+#             if row1['TrackID'] == 1:
+#                 n_events_secondary += 1
+#             else:
+#                 n_events_escape_b += 1
+#
+#         if apex:
+#             cosT = 1 - (0.511 * E1) / (source_MeV * (source_MeV - E1))
+#             cones.append([eventid] + apex + direction + [cosT] + [200])
+#
+#
+#
+#     print(f"{n_events_primary} events with primary particles")
+#     print(f"{n_events_full_energy_deposit} events with full energy deposit")
+#     print(f"{n_events_secondary} events with secondary particles")
+#     print(f"{n_events_escape_a} events a with escape")
+#     print(f"{n_events_escape_b} events b with escape")
+#     print(f"{n_events_photoelectric} events with photoelectric absorption")
+#     print(f"{n_events_recoil_tracked} events valid with recoil e- tracked")
+#     print(f"{n_events_recoil_not_tracked} events valid with recoil e- not tracked")
+#
+#     return cp.array(cones)
+
 def hits2cones_byEventID(file_path, source_MeV, nentries=None, store_info=False):
     if not os.path.isfile(file_path):
         sys.exit(f"File {file_path} does not exist, probably no hit produced...")
@@ -33,56 +112,25 @@ def hits2cones_byEventID(file_path, source_MeV, nentries=None, store_info=False)
     # TODO: deal with
     #   doppler
     #   PIXE/fluo
-    n_events_secondary, n_events_escape, n_events_photoelectric, n_events_recoil_tracked, n_events_recoil_not_tracked = 0, 0, 0, 0, 0
     for eventid, group in grouped:
-        row1 = group.iloc[0]
+        apex, direction, E1 = False, False, False
         # Sensor received primary gamma
-        if row1['ParentParticleName'] == 'unknown': # TODO: correct if source is a radioisotope?
+        # TODO: is this correct with radioisotope source?
+        # TODO: WARNING: first row might not be 1st interaction in sensor !
+        if 1 in group['TrackID'].values:
             # All primary energy was deposited
             # else: subcases differs! e.g. photon escapes after Compton and recoil e- tracked => photon track not stored
-            if group['TotalEnergyDeposit'].sum() == source_MeV:
-                # utils.print_hits_short(group)
+            if round(group['TotalEnergyDeposit'].sum(), 6) == source_MeV:  # round to avoid float precision issues
+                group = group.sort_values('GlobalTime')
+                row1 = group.iloc[0]
                 first_process = row1['ProcessDefinedStep']
-                # Compton interaction, recoil e- tracked
-                if first_process == 'compt':
-                    apex = [row1['PrePosition_X'], row1['PrePosition_Y'], row1['PrePosition_Z']]
-                    direction = [-row1['PreDirection_X'], -row1['PreDirection_Y'], -row1['PreDirection_Z']]
-                    # TODO: why are PreDirection and PreDirection the same in some cases?
-                    E1 = source_MeV - row1['KineticEnergy']
-                    cosT = 1 - (0.511 * E1) / (source_MeV * (source_MeV - E1))
-                    cones.append([eventid] + apex + direction + [cosT] + [200])
-                    n_events_recoil_tracked += 1
-                # Several possible cases
-                elif first_process == 'Transportation':
-                    # Photo-electric absorption
-                    if group['TrackID'].value_counts()[1] == 1:
-                        n_events_photoelectric += 1
-                    # Compton interaction, recoil e- not tracked
-                    else:
-                        apex = [row1['PostPosition_X'], row1['PostPosition_Y'], row1['PostPosition_Z']]
-                        direction = [-row1['PostDirection_X'], -row1['PostDirection_Y'], -row1['PostDirection_Z']]
-                        E1 = row1['TotalEnergyDeposit']
-                        cosT = 1 - (0.511 * E1) / (source_MeV * (source_MeV - E1))
-                        cones.append([eventid] + apex + direction + [cosT] + [200])
-                        n_events_recoil_not_tracked += 1
-                else:
-                    # TODO deal with this case
-                    print('*' * 100)
-            else:
-                n_events_escape += 1 # (=> e.g. escape without recoil e-)
-                # utils.print_hits_short(pandas.DataFrame([row1.values], columns=row1.index))
-        else:
-            # TODO to verify
-            if row1['TrackID'] == 1:
-                n_events_secondary += 1
-            else:
-                n_events_escape += 1
+                # print(group['TrackID'].value_counts())
+                # print(group['TrackID'].nunique())
+                # TODO: continue here !
 
-    print(f"{n_events_secondary} events with secondary particles")
-    print(f"{n_events_escape} events with escape")
-    print(f"{n_events_photoelectric} events with photoelectric absorption")
-    print(f"{n_events_recoil_tracked} events valid with recoil e- tracked")
-    print(f"{n_events_recoil_not_tracked} events valid with recoil e- not tracked")
+        if apex:
+            cosT = 1 - (0.511 * E1) / (source_MeV * (source_MeV - E1))
+            cones.append([eventid] + apex + direction + [cosT] + [200])
 
     return cp.array(cones)
 
