@@ -1,12 +1,18 @@
-This is a repository to test single layer Compton cameras with pixel detector such as Timepix3
+This is a repository to test single layer Compton cameras like Timepix3 with Gate
 
 Code to simulate compton cameras differs according to Gate version:
 - First module dedicated to compton cameras appeared in Gate 9.2 (see CCMod paper)
 - Gate 9.3 introduced a new way to handle digitizers
 - Gate 10 completely changed, scripts are now in python and compton camera actors have not been re-implemented (yet?)
 
+To get all possible information for event and cone analysis, Gate hits must be stored.
+Gate hits (stored usually in root files) differ from (internal) geant4 steps.
+G4 steps with dE(MeV) == 0 are not stored in the hit file.
+Some attribute names differ
+=> see Gate9/Gate10 subdirs for more details.
+
 Good cones:
-- From hitS:
+- From hits:
     Ideal cones can be obtained by filtering rows with 'compt' process in a primary track, checking that the full energy is
     deposited in the sensor, and read the energy/direction.
 - From singles:
@@ -21,7 +27,7 @@ Bad cones:
 - Limited detector resolution in:
   - energy (threshold and ToT fluctuations)
   - position (pixel segmentation, charge sharing, etc)
-  - time (pile-up in coincident events)
+  - time (pile-up in coincident events, timewalk)
 - Escape photons (photon leaving sensor after compton interaction)
 - Escape electrons (compton recoil electron or photo-electron track leaving sensor)
 - More than one compton scattering
