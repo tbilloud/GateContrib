@@ -1,7 +1,0 @@
-Gate hits (stored usually in root files) differ from (internal) geant4 steps.
-
-G4 steps with dE(MeV) == 0 are not stored in the hit file.
-
-Some attribute names differ: see Gate9/Gate10 subdirs.
-
-=> See hits_vs_steps.png

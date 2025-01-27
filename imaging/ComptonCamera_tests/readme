@@ -6,9 +6,9 @@ Code to simulate compton cameras differs according to Gate version:
 - Gate 10 completely changed, scripts are now in python and compton camera actors have not been re-implemented (yet?)
 
 To get all possible information for event and cone analysis, Gate hits must be stored.
-Gate hits (stored usually in root files) differ from (internal) geant4 steps.
-G4 steps with dE(MeV) == 0 are not stored in the hit file.
-Some attribute names differ
+Gate hits (stored usually in root files) differ from (internal) geant4 steps:
+* G4 steps with dE(MeV) == 0 are not stored in the hit file.
+* Some attribute names differ.
 => see Gate9/Gate10 subdirs for more details.
 
 Good cones:
