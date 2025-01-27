@@ -9,11 +9,12 @@ import SimpleITK as sitk
 import matplotlib.pyplot as plt
 import cupy as cp
 from pandas import Series
+from imaging.ComptonCamera_tests.Gate10.tools.utils import *
 
 pandas.set_option('display.max_columns', 100)
 pandas.set_option('display.width', 400)
 pandas.set_option('display.max_rows', 1000)
-pandas.set_option('display.float_format', lambda x: f'{x:.9f}')  # G4 steps are logged with f'{x:.3}'
+pandas.set_option('display.float_format', lambda x: f'{x:.3}')  # G4 steps are logged with f'{x:.3}'
 
 # List of all possible attributes for Hits:
 # ['Direction', 'EventDirection', 'EventID', 'EventKineticEnergy', 'EventPosition', 'GlobalTime', 'HitUniqueVolumeID',
@@ -30,8 +31,7 @@ def analyse_hits(file_path):
     print('\n =>', tree_hits.num_entries, 'entries in tree Hits')
     # print(tree.keys())
     hits = tree_hits.arrays(library='pd', entry_stop=None)  # None to read all entries
-    hits.loc[:, hits.columns.str.contains('Energy')] *= 1000  # convert to keV
-    hits.loc[:, hits.columns.str.contains('Position')] *= 1000  # convert to um
+    print_hits_short_sortedByGlobalTime(hits)
     # print(hits.to_string(index=False))
     # print(hits.groupby('EventID').first().to_string(index=False))
     # print(hits[hits['ParticleName'] == 'gamma'].to_string(index=False))
@@ -39,6 +39,7 @@ def analyse_hits(file_path):
     # print(hits['TotalEnergyDeposit'].sum())
     # print(hits[hits['TrackID']==2]['TotalEnergyDeposit'].sum())
     # print(hits.groupby('EventID').first())
+    # print_hits_inG4format(hits)
     return hits
 
 # List of available attributes for Singles:
@@ -78,5 +79,14 @@ def plot_hits_TotalEnergyDeposit(file_path, bins=100):
     hits = uproot.open(file_path)['Hits'].arrays(library='pd')  # None to read all entries
     plt.hist(hits['TotalEnergyDeposit'], bins=bins)
     plt.xlabel('TotalEnergyDeposit [MeV]')
+    plt.ylabel('Counts')
+    plt.show()
+
+def plot_hits_TotalEnergyDeposit_sumPerEvent(file_path, bins=100):
+    if not os.path.isfile(file_path):
+        sys.exit(f"File {file_path} does not exist, probably no hit produced...")
+    hits = uproot.open(file_path)['Hits'].arrays(library='pd')  # None to read all entries
+    plt.hist(hits.groupby('EventID')['TotalEnergyDeposit'].sum(), bins=bins)
+    plt.xlabel('Sum of TotalEnergyDeposit per EventID [MeV]')
     plt.ylabel('Counts')
     plt.show()
