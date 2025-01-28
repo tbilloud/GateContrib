@@ -31,8 +31,8 @@ def analyse_hits(file_path):
     print('\n =>', tree_hits.num_entries, 'entries in tree Hits')
     # print(tree.keys())
     hits = tree_hits.arrays(library='pd', entry_stop=None)  # None to read all entries
-    print_hits_short_sortedByGlobalTime(hits)
-    # print(hits.to_string(index=False))
+    # print_hits_short_sortedByGlobalTime(hits)
+    print(hits.to_string(index=False))
     # print(hits.groupby('EventID').first().to_string(index=False))
     # print(hits[hits['ParticleName'] == 'gamma'].to_string(index=False))
     # print(hits[hits['TrackCreatorProcess'] == 'compt'].to_string(index=False))

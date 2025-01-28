@@ -17,7 +17,7 @@ sim.volume_manager.add_material_database('../data/GateMaterials.db')
 # ===========================
 # ==   GEOMETRY            ==
 # ===========================
-npix, pitch, thickness = 1000, 55 * um, 100 * mm
+npix, pitch, thickness = 10, 55 * um, 100 * mm
 sim.world.material = "Vacuum"
 sim.world.size = [npix * pitch + 1, npix * pitch + 1, thickness * 2 + 1]  # + 1 avoids segmentation fault
 sensor = sim.add_volume("Box", "sensor")
@@ -25,10 +25,10 @@ sensor.material = "CdTe"
 sensor.size = [npix * pitch, npix * pitch, thickness]
 sensor.translation = [0 * mm, 0 * mm, thickness / 2]
 # sensor.rotation = R.from_euler('z', 45, degrees=True).as_matrix()
-# pixel = sim.add_volume("Box", "pixel")
-# pixel.mother, pixel.material, pixel.size = sensor.name, 'Tungsten', [pitch, pitch, thickness]
-# pixel.translation = gate.geometry.utility.get_grid_repetition([int(npix * pitch / pitch)] * 2 + [1], [pitch, pitch, 0])
-# # pixel.color = [0, 0, 0, 0]  # see trajectories better
+pixel = sim.add_volume("Box", "pixel")
+pixel.mother, pixel.material, pixel.size = sensor.name, 'Tungsten', [pitch, pitch, thickness]
+pixel.translation = gate.geometry.utility.get_grid_repetition([int(npix * pitch / pitch)] * 2 + [1], [pitch, pitch, 0])
+# pixel.color = [0, 0, 0, 0]  # see trajectories better
 
 ## ===========================
 ## ==  PHYSICS              ==
@@ -50,7 +50,8 @@ hits = sim.add_actor('DigitizerHitsCollectionActor', 'Hits')
 hits.attached_to = sensor.name
 # hc.authorize_repeated_volumes = True  # required according to doc, but seems useless
 hits.output_filename = 'CC_Hits.root'
-hits.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvailableDigiAttributeNames()
+# hits.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvailableDigiAttributeNames()
+hits.attributes = ["EventID", "TotalEnergyDeposit", "GlobalTime", "Position","HitUniqueVolumeID", "PDGCode", "TrackID", "ParentID"]
 
 ## =============================
 ## == VERBOSITY               ==
@@ -70,7 +71,7 @@ source.particle = "gamma"
 source.energy.mono = 1000 * keV
 # source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
 source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
-source.position.translation = [0 * mm, 0 * mm, -thickness / 2]
+source.position.translation = [0.1 * mm, 0 * mm, -thickness / 2]
 
 ##====================================================
 ##  R A N D O M   E N G I N E  A N D  S E E D

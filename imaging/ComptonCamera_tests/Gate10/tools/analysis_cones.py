@@ -51,6 +51,8 @@ pandas.set_option('display.float_format', lambda x: f'{x:.3}')  # G4 steps are l
 #                 print(energy_dep, kinetic_energy_sum)
 #                 # Compton interaction, recoil e- tracked
 #                 if first_process == 'compt':
+#                     # print(group['TrackID'].value_counts())
+#                     # print(group['TrackID'].nunique())
 #                     apex = [row1['PrePosition_X'], row1['PrePosition_Y'], row1['PrePosition_Z']]
 #                     direction = [-row1['PreDirection_X'], -row1['PreDirection_Y'], -row1['PreDirection_Z']]
 #                     E1 = source_MeV - row1['KineticEnergy']
@@ -122,10 +124,8 @@ def hits2cones_byEventID(file_path, source_MeV, nentries=None, store_info=False)
             # else: subcases differs! e.g. photon escapes after Compton and recoil e- tracked => photon track not stored
             if round(group['TotalEnergyDeposit'].sum(), 6) == source_MeV:  # round to avoid float precision issues
                 group = group.sort_values('GlobalTime')
-                row1 = group.iloc[0]
-                first_process = row1['ProcessDefinedStep']
-                # print(group['TrackID'].value_counts())
-                # print(group['TrackID'].nunique())
+                first_hit = group.iloc[0]
+                first_process = first_hit['ProcessDefinedStep']
                 # TODO: continue here !
 
         if apex:
