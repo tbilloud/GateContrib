@@ -17,7 +17,7 @@ sim.volume_manager.add_material_database('../data/GateMaterials.db')
 # ===========================
 # ==   GEOMETRY            ==
 # ===========================
-npix, pitch, thickness = 10, 55 * um, 100 * mm
+npix, pitch, thickness = 1000, 55 * um, 100 * mm
 sim.world.material = "Vacuum"
 sim.world.size = [npix * pitch + 1, npix * pitch + 1, thickness * 2 + 1]  # + 1 avoids segmentation fault
 sensor = sim.add_volume("Box", "sensor")
@@ -25,16 +25,16 @@ sensor.material = "CdTe"
 sensor.size = [npix * pitch, npix * pitch, thickness]
 sensor.translation = [0 * mm, 0 * mm, thickness / 2]
 # sensor.rotation = R.from_euler('z', 45, degrees=True).as_matrix()
-pixel = sim.add_volume("Box", "pixel")
-pixel.mother, pixel.material, pixel.size = sensor.name, 'Tungsten', [pitch, pitch, thickness]
-pixel.translation = gate.geometry.utility.get_grid_repetition([int(npix * pitch / pitch)] * 2 + [1], [pitch, pitch, 0])
-# pixel.color = [0, 0, 0, 0]  # see trajectories better
+# pixel = sim.add_volume("Box", "pixel")
+# pixel.mother, pixel.material, pixel.size = sensor.name, 'Tungsten', [pitch, pitch, thickness]
+# pixel.translation = gate.geometry.utility.get_grid_repetition([int(npix * pitch / pitch)] * 2 + [1], [pitch, pitch, 0])
+# # pixel.color = [0, 0, 0, 0]  # see trajectories better
 
 ## ===========================
 ## ==  PHYSICS              ==
 ## ===========================
 doppler = False
-fluo = True
+fluo = False
 if doppler: sim.physics_manager.physics_list_name = 'G4EmLivermorePhysics'
 if fluo: sim.physics_manager.global_production_cuts.all = 100 * um
 sim.physics_manager.em_parameters.update(
@@ -50,8 +50,7 @@ hits = sim.add_actor('DigitizerHitsCollectionActor', 'Hits')
 hits.attached_to = sensor.name
 # hc.authorize_repeated_volumes = True  # required according to doc, but seems useless
 hits.output_filename = 'CC_Hits.root'
-# hits.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvailableDigiAttributeNames()
-hits.attributes = ["EventID", "TotalEnergyDeposit", "GlobalTime", "Position","HitUniqueVolumeID", "PDGCode", "TrackID", "ParentID"]
+hits.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvailableDigiAttributeNames()
 
 ## =============================
 ## == VERBOSITY               ==
@@ -89,19 +88,20 @@ sim.run()
 ##   ANALYSIS
 ##=====================================================
 hits_path = sim.output_dir + '/' + hits.output_filename
+
 # Basics
 analysis_basics.analyse_hits(hits_path)
 # analysis.analyse_singles(sim.output_dir + '/' + sc.output_filename)
 # plot_DigitizerProjectionActor(sim)
 # analysis_basics.plot_hits_TotalEnergyDeposit(hits_path)
 # analysis_basics.plot_hits_TotalEnergyDeposit_sumPerEvent(hits_path)
-sys.exit()
+# sys.exit()
 
 # Cones
 c = hits2cones_byEventID(hits_path, source.energy.mono)
 print('=>', c.shape[0] if c.shape[0] else sys.exit('No cones'), 'cones,', cp.isnan(c).any(axis=1).sum(), 'with NaNs')
-
-# Cone reconstruction
 point_source_cone_validation(c, sim.world.size[2], source.position.translation,
                              plot_seq=True, plot_stack=False)
+
+# Image reconstruction
 # reconstruct(c, (256, 256, 256), sim.world.size[2] / 256, output='output/reconstruction.npy')
