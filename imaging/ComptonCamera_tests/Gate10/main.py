@@ -36,11 +36,11 @@ sensor.translation = [0 * mm, 0 * mm, thickness / 2]
 doppler = False
 fluo = False
 if doppler: sim.physics_manager.physics_list_name = 'G4EmLivermorePhysics'
-if fluo: sim.physics_manager.global_production_cuts.all = 100 * um
+if fluo: sim.physics_manager.global_production_cuts.all = 10 * um
 sim.physics_manager.em_parameters.update(
     {'fluo': fluo,
      'pixe': fluo,
-     'deexcitation_ignore_cut': False,  # TODO: impacts number of hits greatly
+     'deexcitation_ignore_cut': False,  # TODO: impacts number of hits greatly, and depends if cuts were set or not
      'auger': fluo, 'auger_cascade': fluo})
 
 ## =============================
@@ -70,17 +70,17 @@ source.particle = "gamma"
 source.energy.mono = 1000 * keV
 # source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
 source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
-source.position.translation = [0.1 * mm, 0 * mm, -thickness / 2]
+source.position.translation = [0 * mm, 0 * mm, -thickness / 2]
 
 ##====================================================
 ##  R A N D O M   E N G I N E  A N D  S E E D
 ##====================================================
-sim.random_engine, sim.random_seed = "MersenneTwister", 2
+sim.random_engine, sim.random_seed = "MersenneTwister", 1
 
 ##=====================================================
 ##   M E A S U R E M E N T
 ##=====================================================
-source.n = 4
+source.n = 810
 # source.activity = 1000 * gate.g4_units.Bq # for sorting coincidences with GlobalTime
 sim.run()
 
@@ -90,7 +90,7 @@ sim.run()
 hits_path = sim.output_dir + '/' + hits.output_filename
 
 # Basics
-analysis_basics.analyse_hits(hits_path)
+# analysis_basics.analyse_hits(hits_path), sys.exit()
 # analysis.analyse_singles(sim.output_dir + '/' + sc.output_filename)
 # plot_DigitizerProjectionActor(sim)
 # analysis_basics.plot_hits_TotalEnergyDeposit(hits_path)
