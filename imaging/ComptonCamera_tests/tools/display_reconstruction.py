@@ -11,5 +11,6 @@ def display_reconstruction(vol, vsize):
 
 
 if __name__ == "__main__":
-    vol = np.load(Path('../Gate10/output') / "reconstruction.npy")
+    # TODO: not displayed the same as by reconstruction.py with napari=True
+    vol = np.load(Path('../Gate10/output') / "reco_fluoTrue_dopplerFalse.npy")
     display_reconstruction(vol, (256, 256, 256))

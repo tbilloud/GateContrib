@@ -52,4 +52,8 @@ if __name__ == "__main__":
     # cones_array = remove_nans(cones_array)
     # print(len(cones_array), 'cones after removing nans')
 
-    reconstruct(cones_array, (256, 256, 256), 0.78125)
+    reconstruct(cones_array,
+                (256, 256, 256),
+                0.78515625,
+                output=False,
+                napari=True)
