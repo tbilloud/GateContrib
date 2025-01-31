@@ -34,7 +34,7 @@ sensor.translation = [0 * mm, 0 * mm, thickness / 2]
 ## ==  PHYSICS              ==
 ## ===========================
 doppler = False
-fluo = False
+fluo = True
 if doppler: sim.physics_manager.physics_list_name = 'G4EmLivermorePhysics'
 if fluo: sim.physics_manager.global_production_cuts.all = 10 * um
 sim.physics_manager.em_parameters.update(
@@ -55,7 +55,7 @@ hits.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvaila
 ## =============================
 ## == VERBOSITY               ==
 ## =============================
-sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # not working if visualization
+# sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # not working if visualization
 
 ## ============================
 ## ==  VISUALIZATION         ==
@@ -68,8 +68,8 @@ sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # not working if visual
 source = sim.add_source("GenericSource", "source_point")
 source.particle = "gamma"
 source.energy.mono = 1000 * keV
-# source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
-source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
+source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
+# source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
 source.position.translation = [0 * mm, 0 * mm, -thickness / 2]
 
 ##====================================================
@@ -101,7 +101,8 @@ hits_path = sim.output_dir + '/' + hits.output_filename
 c = hits2cones_byEventID(hits_path, source.energy.mono)
 print('=>', c.shape[0] if c.shape[0] else sys.exit('No cones'), 'cones,', cp.isnan(c).any(axis=1).sum(), 'with NaNs')
 point_source_cone_validation(c, sim.world.size[2], source.position.translation,
-                             plot_seq=True, plot_stack=False)
+                             plot_seq=False, plot_stack=True)
 
 # Image reconstruction
-# reconstruct(c, (256, 256, 256), sim.world.size[2] / 256, output='output/reconstruction.npy')
+name = f'fluo{fluo}_doppler{doppler}'
+reconstruct(c, (256, 256, 256), sim.world.size[2] / 256, output=f'output/reco_{name}.npy')

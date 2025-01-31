@@ -52,7 +52,7 @@ def point_source_cone_validation(cones_array, world_z, source_pos, plot_seq = Fa
         if z_slice[source_pos_in_voxels[0], source_pos_in_voxels[1]] == 0:
             # TODO sometime cone is bad but z_slice is not 0
             n_bad_cones += 1
-            print(event, 'bad cone')
+            print(int(event), 'bad cone')
 
         # ##############################################################
         # # Display stack with matplotlib (one by one)
