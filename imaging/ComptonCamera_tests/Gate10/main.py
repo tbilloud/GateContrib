@@ -5,6 +5,7 @@ import imaging.ComptonCamera_tests.Gate10.tools.analysis_basics as analysis_basi
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import hits2cones_byEventID
 from imaging.ComptonCamera_tests.tools.point_source_validation import point_source_cone_validation
 from imaging.ComptonCamera_tests.tools.reconstruction import reconstruct
+from opengate.geometry.volumes import RepeatParametrisedVolume, BoxVolume
 
 sim, sim.output_dir = gate.Simulation(), "output"
 um, mm, keV, MeV, deg = gate.g4_units.um, gate.g4_units.mm, gate.g4_units.keV, gate.g4_units.MeV, gate.g4_units.deg
@@ -17,7 +18,7 @@ sim.volume_manager.add_material_database('../data/GateMaterials.db')
 # ===========================
 # ==   GEOMETRY            ==
 # ===========================
-npix, pitch, thickness = 1000, 55 * um, 100 * mm
+npix, pitch, thickness = 10, 55 * um, 1 * mm
 sim.world.material = "Vacuum"
 sim.world.size = [npix * pitch + 1, npix * pitch + 1, thickness * 2 + 1]  # + 1 avoids segmentation fault
 sensor = sim.add_volume("Box", "sensor")
@@ -25,10 +26,20 @@ sensor.material = "CdTe"
 sensor.size = [npix * pitch, npix * pitch, thickness]
 sensor.translation = [0 * mm, 0 * mm, thickness / 2]
 # sensor.rotation = R.from_euler('z', 45, degrees=True).as_matrix()
+# ##### PIXEL REPETITION #####
+# METHOD 1: short but slow
 # pixel = sim.add_volume("Box", "pixel")
 # pixel.mother, pixel.material, pixel.size = sensor.name, 'Tungsten', [pitch, pitch, thickness]
 # pixel.translation = gate.geometry.utility.get_grid_repetition([int(npix * pitch / pitch)] * 2 + [1], [pitch, pitch, 0])
-# # pixel.color = [0, 0, 0, 0]  # see trajectories better
+# METHOD 2: longer but faster
+# TODO: WARNING Could not check overlap for volume pixel_param. => problem?
+pixel = sim.add_volume("Box", "pixel")
+pixel.mother, pixel.material, pixel.size = sensor.name, 'CdTe', [pitch, pitch, thickness]
+pixelp = RepeatParametrisedVolume(repeated_volume=pixel)
+pixelp.linear_repeat, pixelp.translation = [npix, npix, 1], [pitch, pitch, 0]
+sim.volume_manager.add_volume(pixelp)
+# pixel.color = [0, 0, 0, 0]  # see trajectories better
+
 
 ## ===========================
 ## ==  PHYSICS              ==
@@ -67,7 +78,7 @@ hits.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvaila
 ## ============================
 source = sim.add_source("GenericSource", "source_point")
 source.particle = "gamma"
-source.energy.mono = 1000 * keV
+source.energy.mono = 10 * keV
 source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
 # source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
 source.position.translation = [0 * mm, 0 * mm, -thickness / 2]
@@ -80,7 +91,7 @@ sim.random_engine, sim.random_seed = "MersenneTwister", 1
 ##=====================================================
 ##   M E A S U R E M E N T
 ##=====================================================
-source.n = 810
+source.n = 1
 # source.activity = 1000 * gate.g4_units.Bq # for sorting coincidences with GlobalTime
 sim.run()
 
@@ -90,7 +101,7 @@ sim.run()
 hits_path = sim.output_dir + '/' + hits.output_filename
 
 # Basics
-# analysis_basics.analyse_hits(hits_path), sys.exit()
+analysis_basics.analyse_hits(hits_path), sys.exit()
 # analysis.analyse_singles(sim.output_dir + '/' + sc.output_filename)
 # plot_DigitizerProjectionActor(sim)
 # analysis_basics.plot_hits_TotalEnergyDeposit(hits_path)
