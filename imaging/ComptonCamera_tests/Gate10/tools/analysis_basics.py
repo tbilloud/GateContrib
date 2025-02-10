@@ -39,8 +39,8 @@ def analyse_hits(file_path):
     # print(hits['TotalEnergyDeposit'].sum())
     # print(hits[hits['TrackID']==2]['TotalEnergyDeposit'].sum())
     # print(hits.groupby('EventID').first())
-    # print_hits_inG4format(hits)
-    print_hits_inG4format_sortedByGlobalTime(hits[hits['EventID'] == 586])
+    print_hits_inG4format(hits)
+    # print_hits_inG4format_sortedByGlobalTime(hits[hits['EventID'] == 586])
     return hits
 
 # List of available attributes for Singles:

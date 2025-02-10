@@ -5,7 +5,7 @@
 # If pandas.set_option('display.float_format'...) is used in script calling the function, remove it
 def print_hits_inG4format(hits_df):
     print(
-        hits_df[['GlobalTime','PostPosition_X', 'PostPosition_Y', 'PostPosition_Z', 'KineticEnergy', 'TotalEnergyDeposit',
+        hits_df[['PostPosition_X', 'PostPosition_Y', 'PostPosition_Z', 'KineticEnergy', 'TotalEnergyDeposit',
                  'StepLength', 'TrackLength', 'HitUniqueVolumeID', 'ProcessDefinedStep', 'ParticleName', 'TrackID',
                  'ParentID', 'ParentParticleName',
                  'TrackCreatorProcess', 'TrackCreatorModelName'
