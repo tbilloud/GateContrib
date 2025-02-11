@@ -26,7 +26,7 @@ cp.set_printoptions(linewidth=200)
 # - energy/spatial resolution
 
 # Units should be the same in cones_array, vpitch and source_pos
-def point_source_cone_validation(cones_array, world_z, source_pos, plot_seq = False, plot_stack = False, plot_seq_napari = False):
+def point_source_cone_validation(cones_array, world_z, source_pos, plot_seq = False, plot_stack = False, plot_seq_napari = False, legend = False):
 
     # Volume size and pitch
     vsize = (256, 256, 256)
@@ -52,7 +52,7 @@ def point_source_cone_validation(cones_array, world_z, source_pos, plot_seq = Fa
         if z_slice[source_pos_in_voxels[0], source_pos_in_voxels[1]] == 0:
             # TODO sometime cone is bad but z_slice is not 0
             n_bad_cones += 1
-            print('bad cone in event',int(event))
+            # print('bad cone in event',int(event))
 
         # ##############################################################
         # # Display stack with matplotlib (one by one)
@@ -68,7 +68,20 @@ def point_source_cone_validation(cones_array, world_z, source_pos, plot_seq = Fa
     print(n_bad_cones, 'bad cones')
 
     if plot_stack:
-        plt.imshow(np.sum(np.asarray(z_slice_stack), axis=0), cmap='gray')
+        fig, ax = plt.subplots()
+        plt.title(legend if legend else f'{EventID.shape[0]} cones')
+        ax.imshow(np.sum(np.asarray(z_slice_stack), axis=0), cmap='gray')
+        ax.set_xlabel('X (pixels)')
+        ax.set_ylabel('Y (pixels)')
+        Xmm = ax.secondary_xaxis('top')
+        Xmm.set_xlabel('X (mm)', color='red')
+        Xmm.set_xticks(ax.get_xticks())
+        Xmm.set_xticklabels(np.round(ax.get_xticks() * vpitch, 2), color='red')
+        Ymm = ax.secondary_yaxis('right', color='red')
+        Ymm.set_ylabel('Y (mm)', color='red')
+        Ymm.set_yticks(ax.get_yticks())
+        Ymm.set_yticklabels(np.round(ax.get_yticks() * vpitch, 2), color='red')
+        plt.tight_layout()
         plt.show()
 
     if plot_seq_napari:
