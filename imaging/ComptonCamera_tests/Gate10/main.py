@@ -1,14 +1,16 @@
 import sys
 import cupy as cp
-import opengate as gate, opengate_core
+from opengate.utility import g4_units
+from opengate.managers import Simulation
+from opengate_core import GateDigiAttributeManager
 import imaging.ComptonCamera_tests.Gate10.tools.analysis_basics as analysis_basics
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import hits2cones_byEventID
 from imaging.ComptonCamera_tests.tools.point_source_validation import point_source_cone_validation
 from imaging.ComptonCamera_tests.tools.reconstruction import reconstruct
 from opengate.geometry.volumes import RepeatParametrisedVolume, BoxVolume
 
-sim, sim.output_dir = gate.Simulation(), "output"
-um, mm, keV, MeV, deg = gate.g4_units.um, gate.g4_units.mm, gate.g4_units.keV, gate.g4_units.MeV, gate.g4_units.deg
+sim, sim.output_dir = Simulation(), "output"
+um, mm, keV, MeV, deg = g4_units.um, g4_units.mm, g4_units.keV, g4_units.MeV, g4_units.deg
 
 ## ===========================
 ## == LOAD DATABASE         ==
@@ -22,16 +24,10 @@ npix, pitch, thickness = 10, 55 * um, 1 * mm
 sim.world.material = "Vacuum"
 sim.world.size = [npix * pitch + 1, npix * pitch + 1, thickness * 2 + 1]  # + 1 avoids segmentation fault
 sensor = sim.add_volume("Box", "sensor")
-sensor.material = "CdTe"
+sensor.material = "Air"
 sensor.size = [npix * pitch, npix * pitch, thickness]
 sensor.translation = [0 * mm, 0 * mm, thickness / 2]
 # sensor.rotation = R.from_euler('z', 45, degrees=True).as_matrix()
-# ##### PIXEL REPETITION #####
-# METHOD 1: short but slow
-# pixel = sim.add_volume("Box", "pixel")
-# pixel.mother, pixel.material, pixel.size = sensor.name, 'Tungsten', [pitch, pitch, thickness]
-# pixel.translation = gate.geometry.utility.get_grid_repetition([int(npix * pitch / pitch)] * 2 + [1], [pitch, pitch, 0])
-# METHOD 2: longer but faster
 # TODO: WARNING Could not check overlap for volume pixel_param. => problem?
 pixel = sim.add_volume("Box", "pixel")
 pixel.mother, pixel.material, pixel.size = sensor.name, 'CdTe', [pitch, pitch, thickness]
@@ -61,7 +57,7 @@ hits = sim.add_actor('DigitizerHitsCollectionActor', 'Hits')
 hits.attached_to = sensor.name
 # hc.authorize_repeated_volumes = True  # required according to doc, but seems useless
 hits.output_filename = 'CC_Hits.root'
-hits.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvailableDigiAttributeNames()
+hits.attributes = GateDigiAttributeManager.GetInstance().GetAvailableDigiAttributeNames()
 
 ## =============================
 ## == VERBOSITY               ==
@@ -111,9 +107,12 @@ analysis_basics.analyse_hits(hits_path), sys.exit()
 # Cones
 c = hits2cones_byEventID(hits_path, source.energy.mono)
 print('=>', c.shape[0] if c.shape[0] else sys.exit('No cones'), 'cones,', cp.isnan(c).any(axis=1).sum(), 'with NaNs')
-point_source_cone_validation(c, sim.world.size[2], source.position.translation,
-                             plot_seq=False, plot_stack=True)
+point_source_cone_validation(c,sim.world.size[2], source.position.translation,
+                             plot_seq=False,
+                             plot_stack=False,
+                             plot_seq_napari=True)
 
 # Image reconstruction
 name = f'fluo{fluo}_doppler{doppler}'
-reconstruct(c, (256, 256, 256), sim.world.size[2] / 256, output=f'output/reco_{name}.npy')
+reconstruct(c, (256, 256, 256), sim.world.size[2] / 256, output=f'output/reco_{name}.npy',
+            napari=True)

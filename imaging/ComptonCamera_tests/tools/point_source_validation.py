@@ -26,7 +26,7 @@ cp.set_printoptions(linewidth=200)
 # - energy/spatial resolution
 
 # Units should be the same in cones_array, vpitch and source_pos
-def point_source_cone_validation(cones_array, world_z, source_pos, plot_seq = False, plot_stack = False):
+def point_source_cone_validation(cones_array, world_z, source_pos, plot_seq = False, plot_stack = False, plot_seq_napari = False):
 
     # Volume size and pitch
     vsize = (256, 256, 256)
@@ -52,7 +52,7 @@ def point_source_cone_validation(cones_array, world_z, source_pos, plot_seq = Fa
         if z_slice[source_pos_in_voxels[0], source_pos_in_voxels[1]] == 0:
             # TODO sometime cone is bad but z_slice is not 0
             n_bad_cones += 1
-            print(int(event), 'bad cone')
+            print('bad cone in event',int(event))
 
         # ##############################################################
         # # Display stack with matplotlib (one by one)
@@ -69,15 +69,16 @@ def point_source_cone_validation(cones_array, world_z, source_pos, plot_seq = Fa
 
     if plot_stack:
         plt.imshow(np.sum(np.asarray(z_slice_stack), axis=0), cmap='gray')
-        # plt.scatter(source_pos_in_voxels[0], source_pos_in_voxels[1], c='r', s=10)
         plt.show()
-        # ##############################################################
-        # # Display stack with napari (scrolling)
-        # ##############################################################
-        # vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2), axis_labels=["cone number", "x", "y"])
-        # viewer = napari.view_image(np.asarray(z_slice_stack), **vargs)
-        # viewer.axes.visible = True
-        # napari.run()
+
+    if plot_seq_napari:
+        ##############################################################
+        # Display stack with napari (scrolling)
+        ##############################################################
+        vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2), axis_labels=["cone number", "x", "y"])
+        viewer = napari.view_image(np.asarray(z_slice_stack), **vargs)
+        viewer.axes.visible = True
+        napari.run()
 
 
 if __name__ == "__main__":
