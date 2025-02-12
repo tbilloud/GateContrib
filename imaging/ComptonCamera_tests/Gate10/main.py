@@ -20,13 +20,12 @@ sim.volume_manager.add_material_database('../data/GateMaterials.db')
 ## ============================
 ## ==  VISUALIZATION         ==
 ## ============================
-sim.visu = True  # defaults to vrml, qt seems to not work on ubuntu yet
+sim.visu = False  # defaults to vrml, qt seems to not work on ubuntu yet
 
 # ===========================
 # ==   GEOMETRY            ==
 # ===========================
-npix, pitch, thickness = 1000, 55 * um, 100 * mm
-
+npix, pitch, thickness = 256, 55 * um, 10 * mm
 sim.world.material = "Vacuum"
 sim.world.size = [npix * pitch + 1, npix * pitch + 1, thickness * 2 + 1]  # + 1 avoids segmentation fault
 sensor = sim.add_volume("Box", "sensor")
@@ -42,7 +41,6 @@ if not sim.visu:
     pixelp.linear_repeat, pixelp.translation = [npix, npix, 1], [pitch, pitch, 0]
     sim.volume_manager.add_volume(pixelp)
     # pixel.color = [0, 0, 0, 0]  # see trajectories better
-
 
 ## ===========================
 ## ==  PHYSICS              ==
@@ -73,10 +71,13 @@ hits.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvaila
 ## ============================
 ## == SOURCE                 ==
 ## ============================
-source = sim.add_source("GenericSource", "source_point")
+source = sim.add_source("GenericSource", "source")
 source.particle = "gamma"
-source.energy.mono = 500 * keV
-source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
+source.energy.mono = 200 * keV
+# source.position.type, source.position.radius = "sphere", 10 * mm
+source.position.type, source.position.size = "box", [5 * mm, 5 * mm, 5 * mm]
+# source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
+# TODO: use mother volumes for box/sphere to help with visualization?
 # source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
 source.position.translation = [0 * mm, 0 * mm, -thickness / 2]
 
@@ -88,7 +89,7 @@ sim.random_engine, sim.random_seed = "MersenneTwister", 1
 ##=====================================================
 ##   M E A S U R E M E N T
 ##=====================================================
-source.n = 100
+source.n = 1000000
 # source.activity = 1000 * gate.g4_units.Bq # for sorting coincidences with GlobalTime
 hits.output_filename = f'MeV{source.energy.mono}_events{source.n}_doppler{doppler}_fluo{fluo}.root'
 sim.run()
@@ -106,10 +107,9 @@ hits_path = sim.output_dir + '/' + hits.output_filename
 # plot_hits_TotalEnergyDeposit_sumPerEvent(hits_path)
 
 # Cones
+# TODO much slower than simulation time...
 c = hits2cones_byEventID(hits_path, source.energy.mono, to_array=True)
 # print(c)
-
-# Preprocessing
 print('=>', c.shape[0] if c.shape[0] else sys.exit('No cones'), 'cones,', cp.isnan(c).any(axis=1).sum(), 'with NaNs')
 
 # Point source validation
@@ -119,14 +119,14 @@ point_source_cone_validation(c,
                              plot_seq=False,
                              plot_stack=True,
                              plot_seq_napari=False,
-                             legend=hits.output_filename.replace("_", "\n")+f'\n{c.shape[0]} cones',
+                             legend=hits.output_filename.replace("_", "\n").replace(".root", f'\n{c.shape[0]} cones'),
                              )
 
 # Image reconstruction
 reconstruct(c,
             vsize=(256, 256, 256),
             vpitch=sim.world.size[2] / 256,
-            output=False,# f'output/reco_fluo{fluo}_doppler{doppler}.npy',
+            output= hits_path.replace(".root", ".npy"),
             napari=True,
             detector={'size': sensor.size, 'position': sensor.translation}
             )

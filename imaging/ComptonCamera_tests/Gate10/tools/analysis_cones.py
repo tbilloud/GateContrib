@@ -23,6 +23,8 @@ pandas.set_option('display.float_format', lambda x: f'{x:.9}')  # G4 steps are l
 def hits2cones_byEventID(file_path, source_MeV, nentries=None, to_array=False):
     if not os.path.isfile(file_path):
         sys.exit(f"File {file_path} does not exist, probably no hit produced...")
+    else:
+        print(f"Reading {file_path} for cone analysis")
     hits = uproot.open(file_path)['Hits'].arrays(library='pd', entry_stop=nentries)  # None to read all entries
     n_events = hits['EventID'].nunique()
     print(f"{n_events} events interacted in the sensor")
