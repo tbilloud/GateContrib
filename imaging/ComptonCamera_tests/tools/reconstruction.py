@@ -9,12 +9,9 @@ from imaging.ComptonCamera_tests.tools.display_reconstruction import display_rec
 # Script to reconstruct 3D image from cones
 
 # Units should be the same in cones_array and vpitch
-def reconstruct(cones_array, vsize, vpitch, output=False, napari=False):
+def reconstruct(cones_array, vsize, vpitch, output=False, napari=False, detector=False):
     # Format cones array
     cones_array, EventID = cones_array[:, 1:], cones_array[:, 0]
-
-    # Transfer coordinate system
-    cones_array = coordinateOrigin2arrayCenter(cones_array, vpitch, vsize)
 
     vol = compton_forward(volume=cp.zeros(vsize, dtype=cp.float32), cones=cones_array, volume_pitch=vpitch)
     vol = (vol / vol.max()).get()
@@ -22,7 +19,7 @@ def reconstruct(cones_array, vsize, vpitch, output=False, napari=False):
     if output:
         cp.save(output, vol)
     if napari:
-        display_reconstruction(vol, vsize)
+        display_reconstruction(vol, vsize, vpitch, detector)
 
     return vol
 

@@ -17,6 +17,11 @@ um, mm, keV, MeV, deg = g4_units.um, g4_units.mm, g4_units.keV, g4_units.MeV, g4
 ## ===========================
 sim.volume_manager.add_material_database('../data/GateMaterials.db')
 
+## ============================
+## ==  VISUALIZATION         ==
+## ============================
+sim.visu = True  # defaults to vrml, qt seems to not work on ubuntu yet
+
 # ===========================
 # ==   GEOMETRY            ==
 # ===========================
@@ -30,18 +35,19 @@ sensor.size = [npix * pitch, npix * pitch, thickness]
 sensor.translation = [0 * mm, 0 * mm, thickness / 2]
 # sensor.rotation = R.from_euler('z', 45, degrees=True).as_matrix()
 # TODO: WARNING Could not check overlap for volume pixel_param. => problem?
-pixel = sim.add_volume("Box", "pixel")
-pixel.mother, pixel.material, pixel.size = sensor.name, 'CdTe', [pitch, pitch, thickness]
-pixelp = RepeatParametrisedVolume(repeated_volume=pixel)
-pixelp.linear_repeat, pixelp.translation = [npix, npix, 1], [pitch, pitch, 0]
-sim.volume_manager.add_volume(pixelp)
-# pixel.color = [0, 0, 0, 0]  # see trajectories better
+if not sim.visu:
+    pixel = sim.add_volume("Box", "pixel")
+    pixel.mother, pixel.material, pixel.size = sensor.name, 'CdTe', [pitch, pitch, thickness]
+    pixelp = RepeatParametrisedVolume(repeated_volume=pixel)
+    pixelp.linear_repeat, pixelp.translation = [npix, npix, 1], [pitch, pitch, 0]
+    sim.volume_manager.add_volume(pixelp)
+    # pixel.color = [0, 0, 0, 0]  # see trajectories better
 
 
 ## ===========================
 ## ==  PHYSICS              ==
 ## ===========================
-doppler = True
+doppler = False
 fluo = True
 if doppler: sim.physics_manager.physics_list_name = 'G4EmLivermorePhysics'
 if fluo: sim.physics_manager.global_production_cuts.all = 10 * um
@@ -57,7 +63,6 @@ sim.physics_manager.em_parameters.update(
 hits = sim.add_actor('DigitizerHitsCollectionActor', 'Hits')
 hits.attached_to = sensor.name
 # hits.authorize_repeated_volumes = True  # required according to doc, but seems useless
-hits.output_filename = 'CC_Hits.root'
 hits.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvailableDigiAttributeNames()
 
 ## =============================
@@ -66,18 +71,13 @@ hits.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvaila
 # sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # not working if visualization
 
 ## ============================
-## ==  VISUALIZATION         ==
-## ============================
-# sim.visu = True  # defaults to vrml, qt seems to not work on ubuntu yet
-
-## ============================
 ## == SOURCE                 ==
 ## ============================
 source = sim.add_source("GenericSource", "source_point")
 source.particle = "gamma"
 source.energy.mono = 500 * keV
-# source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
-source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
+source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
+# source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
 source.position.translation = [0 * mm, 0 * mm, -thickness / 2]
 
 ##====================================================
@@ -88,8 +88,9 @@ sim.random_engine, sim.random_seed = "MersenneTwister", 1
 ##=====================================================
 ##   M E A S U R E M E N T
 ##=====================================================
-source.n = 1000
+source.n = 100
 # source.activity = 1000 * gate.g4_units.Bq # for sorting coincidences with GlobalTime
+hits.output_filename = f'MeV{source.energy.mono}_events{source.n}_doppler{doppler}_fluo{fluo}.root'
 sim.run()
 
 ##=====================================================
@@ -118,7 +119,7 @@ point_source_cone_validation(c,
                              plot_seq=False,
                              plot_stack=True,
                              plot_seq_napari=False,
-                             legend=f'{source.energy.mono} MeV\nDoppler {doppler}\n{c.shape[0]} cones',
+                             legend=hits.output_filename.replace("_", "\n")+f'\n{c.shape[0]} cones',
                              )
 
 # Image reconstruction
@@ -126,4 +127,6 @@ reconstruct(c,
             vsize=(256, 256, 256),
             vpitch=sim.world.size[2] / 256,
             output=False,# f'output/reco_fluo{fluo}_doppler{doppler}.npy',
-            napari=True)
+            napari=True,
+            detector={'size': sensor.size, 'position': sensor.translation}
+            )
