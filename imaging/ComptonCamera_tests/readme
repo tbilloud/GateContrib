@@ -23,16 +23,15 @@ Bad cones:
 - primary gamma interacted in air before sensor
 - Doppler broadening (use physics list emlivermore)
 - X-ray fluorescence (use cuts < 100 um)
-- Rayleigh sctattering (see note below)
+- Rayleigh scattering (see note below)
 - Limited detector resolution in:
   - energy (threshold and ToT fluctuations)
   - position (pixel segmentation, charge sharing, etc)
-  - time (pile-up in coincident events, timewalk)
-- Escape photons (photon leaving sensor after compton interaction)
+  - time (pile-up, timewalk, etc)
+- Escape photons (photon leaving sensor after compton interaction or fluorescence)
 - Escape electrons (compton recoil electron or photo-electron track leaving sensor)
-- More than one compton scattering
-- Compton scattering was not from incident particle but from fluorescent X-ray
-- Compton and photo-elec interactions in the same pixel
+- Multiple compton scattering (coincident group > 2)
+- Multiple interactions in same pixel (Compton, photo-elec, fluorescence)
 
 Investigating photo-electric interactions:
 Because post-step processes are not saved (at least in Gate 10), photo-electric events are not labeled if the emitted e- is not tracked.
