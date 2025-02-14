@@ -3,6 +3,8 @@ import subprocess
 import pandas as pd
 import uproot
 
+from imaging.ComptonCamera_tests.Gate10.tools.utils import compute_pixel_id
+
 
 def run_allpix(sim, output_dir='allpix/'):
     # TODO: simulate timewalk / fToA !
@@ -84,11 +86,6 @@ include = "PixelHit"
     # os.system(f'{binary_path} -c {output_dir}main.conf')
 
     subprocess.run([binary_path, '-c', output_dir + 'main.conf'], check=True)
-
-
-# Define pixel index computation function
-def compute_pixel_id(x, y):
-    return x * 256 + y  # Assuming 256x256 pixel grid (adjust if needed)
 
 
 def pixelHitAllpixTxt2pixelHit(text_file):

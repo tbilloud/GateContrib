@@ -59,3 +59,7 @@ def print_hits_inG4format_sortedByGlobalTime(hits_df):
 def print_hits_long_sortedByGlobalTime(hits_df):
     hits_df = hits_df.groupby('EventID').apply(lambda x: x.sort_values('GlobalTime'))
     print_hits_long(hits_df)
+
+
+def compute_pixel_id(x, y):
+    return x * 256 + y  # Assuming 256x256 pixel grid (adjust if needed)
