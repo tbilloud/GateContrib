@@ -5,6 +5,7 @@ from opengate.utility import g4_units
 from opengate.managers import Simulation
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import analyse_hits
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import gHits2cones_byEventID
+from imaging.ComptonCamera_tests.Gate10.tools.pixelHits import singles2pixelHits
 from imaging.ComptonCamera_tests.tools.point_source_validation import point_source_cone_validation
 from imaging.ComptonCamera_tests.tools.reconstruction import reconstruct
 from opengate.geometry.volumes import RepeatParametrisedVolume, BoxVolume
@@ -25,7 +26,7 @@ sim.visu = False  # defaults to vrml, qt seems to not work on ubuntu yet
 # ===========================
 # ==   GEOMETRY            ==
 # ===========================
-npix, pitch, thickness = 256, 55 * um, 10 * mm
+npix, pitch, thickness = 256, 55 * um, 1 * mm
 sim.world.material = "Vacuum"
 sim.world.size = [npix * pitch + 1, npix * pitch + 1, thickness * 2 + 1]  # + 1 avoids segmentation fault
 sensor = sim.add_volume("Box", "sensor")
@@ -64,16 +65,16 @@ hits.attached_to = sensor.name
 # hits.authorize_repeated_volumes = True  # required according to doc, but seems useless
 hits.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvailableDigiAttributeNames()
 # SINGLES
-sc = sim.add_actor("DigitizerAdderActor", "Singles")
-sc.input_digi_collection = "Hits"
-sc.policy = "EnergyWeightedCentroidPosition"
-sc.output_filename = 'CC_Singles.root'  # if hc.output_filename, there will be two branches in the file
-# TIMEPIX FRAME
-proj = sim.add_actor("DigitizerProjectionActor", "Projection")
-proj.input_digi_collections = ["Singles"]
-proj.spacing = [pitch, pitch]  # Set pixel spacing in mm
-proj.size = [npix, npix]  # Image size in pixels (128x128)
-proj.output_filename = 'projection.mhd'
+singles = sim.add_actor("DigitizerAdderActor", "Singles")
+singles.input_digi_collection = "Hits"
+singles.policy = "EnergyWeightedCentroidPosition"
+singles.output_filename = 'CC_Singles.root'  # if hc.output_filename, there will be two branches in the file
+# # TIMEPIX FRAME
+# proj = sim.add_actor("DigitizerProjectionActor", "Projection")
+# proj.input_digi_collections = ["Singles"]
+# proj.spacing = [pitch, pitch]  # Set pixel spacing in mm
+# proj.size = [npix, npix]  # Image size in pixels (128x128)
+# proj.output_filename = 'projection.mhd'
 
 ## =============================
 ## == VERBOSITY               ==
@@ -85,7 +86,7 @@ proj.output_filename = 'projection.mhd'
 ## ============================
 source = sim.add_source("GenericSource", "source")
 source.particle = "gamma"
-source.energy.mono = 200 * keV
+source.energy.mono = 50 * keV
 # source.position.type, source.position.radius = "sphere", 10 * mm
 source.position.type, source.position.size = "box", [5 * mm, 5 * mm, 5 * mm]
 # source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
@@ -101,7 +102,7 @@ sim.random_engine, sim.random_seed = "MersenneTwister", 1
 ##=====================================================
 ##   M E A S U R E M E N T
 ##=====================================================
-source.n = 1000000
+source.n = 10
 # source.activity = 1000 * gate.g4_units.Bq # for sorting coincidences with GlobalTime
 hits.output_filename = f'MeV{source.energy.mono}_events{source.n}_doppler{doppler}_fluo{fluo}.root'
 sim.run()
@@ -110,6 +111,7 @@ sim.run()
 ##   ANALYSIS
 ##=====================================================
 hits_path = sim.output_dir + '/' + hits.output_filename
+singles_path = sim.output_dir + '/' + singles.output_filename
 
 # Basics
 # analyse_hits(hits_path)
@@ -121,30 +123,31 @@ hits_path = sim.output_dir + '/' + hits.output_filename
 # Cones
 # ### IDEAL ###
 # TODO much slower than simulation time...
-c = gHits2cones_byEventID(hits_path, source.energy.mono, to_array=True)
-# ### GATE ###
-# format conversion singles2pixelHits ?
-# c = pixelHits2cones(pixel_hits)
-# ### ALLPIX ###
-# pixelHits = runallpix(hits_path)
-# format conversion allpixHits2pixelHits ?
-# c = pixelHits2cones(pixel_hits)
+# cones = gHits2cones_byEventID(hits_path, source.energy.mono, to_array=True)
+# ### GATE / ALLPIX ###
+# TODO pixelHits = singles2pixelHits(singles_path) / runallpix(hits_path)
+# TODO pixelClusters = pixelHits2pixelClusters
+# TODO coincidences = pixelClusters2coincidences
+# TODO cones = coincidences2cones(pixel_hits)
+pixelHits = singles2pixelHits(singles_path)
+
+sys.exit()
 
 # print(c)
-print('=>', c.shape[0] if c.shape[0] else sys.exit('No cones'), 'cones,', cp.isnan(c).any(axis=1).sum(), 'with NaNs')
+print('=>', cones.shape[0] if cones.shape[0] else sys.exit('No cones'), 'cones,', cp.isnan(cones).any(axis=1).sum(), 'with NaNs')
 
 # Point source validation
-point_source_cone_validation(c,
+point_source_cone_validation(cones,
                              world_z=sim.world.size[2],
                              source_pos=source.position.translation,
                              plot_seq=False,
                              plot_stack=True,
                              plot_seq_napari=False,
-                             legend=hits.output_filename.replace("_", "\n").replace(".root", f'\n{c.shape[0]} cones'),
+                             legend=hits.output_filename.replace("_", "\n").replace(".root", f'\n{cones.shape[0]} cones'),
                              )
 
 # Image reconstruction
-reconstruct(c,
+reconstruct(cones,
             vsize=(256, 256, 256),
             vpitch=sim.world.size[2] / 256,
             output= hits_path.replace(".root", ".npy"),
