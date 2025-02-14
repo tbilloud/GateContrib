@@ -4,7 +4,7 @@ import opengate_core
 from opengate.utility import g4_units
 from opengate.managers import Simulation
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import analyse_hits
-from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import hits2cones_byEventID
+from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import gHits2cones_byEventID
 from imaging.ComptonCamera_tests.tools.point_source_validation import point_source_cone_validation
 from imaging.ComptonCamera_tests.tools.reconstruction import reconstruct
 from opengate.geometry.volumes import RepeatParametrisedVolume, BoxVolume
@@ -58,10 +58,22 @@ sim.physics_manager.em_parameters.update(
 ## =============================
 ## == ACTORS                  ==
 ## =============================
+# HITS
 hits = sim.add_actor('DigitizerHitsCollectionActor', 'Hits')
 hits.attached_to = sensor.name
 # hits.authorize_repeated_volumes = True  # required according to doc, but seems useless
 hits.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvailableDigiAttributeNames()
+# SINGLES
+sc = sim.add_actor("DigitizerAdderActor", "Singles")
+sc.input_digi_collection = "Hits"
+sc.policy = "EnergyWeightedCentroidPosition"
+sc.output_filename = 'CC_Singles.root'  # if hc.output_filename, there will be two branches in the file
+# TIMEPIX FRAME
+proj = sim.add_actor("DigitizerProjectionActor", "Projection")
+proj.input_digi_collections = ["Singles"]
+proj.spacing = [pitch, pitch]  # Set pixel spacing in mm
+proj.size = [npix, npix]  # Image size in pixels (128x128)
+proj.output_filename = 'projection.mhd'
 
 ## =============================
 ## == VERBOSITY               ==
@@ -107,8 +119,17 @@ hits_path = sim.output_dir + '/' + hits.output_filename
 # plot_hits_TotalEnergyDeposit_sumPerEvent(hits_path)
 
 # Cones
+# ### IDEAL ###
 # TODO much slower than simulation time...
-c = hits2cones_byEventID(hits_path, source.energy.mono, to_array=True)
+c = gHits2cones_byEventID(hits_path, source.energy.mono, to_array=True)
+# ### GATE ###
+# format conversion singles2pixelHits ?
+# c = pixelHits2cones(pixel_hits)
+# ### ALLPIX ###
+# pixelHits = runallpix(hits_path)
+# format conversion allpixHits2pixelHits ?
+# c = pixelHits2cones(pixel_hits)
+
 # print(c)
 print('=>', c.shape[0] if c.shape[0] else sys.exit('No cones'), 'cones,', cp.isnan(c).any(axis=1).sum(), 'with NaNs')
 

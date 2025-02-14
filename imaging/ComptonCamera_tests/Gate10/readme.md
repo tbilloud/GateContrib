@@ -19,17 +19,3 @@ Solution:
 ```
 mv /home/billoud/PycharmProjects/GateContrib/venv/lib/python3.10/site-packages/opengate_core/plugins /home/billoud/PycharmProjects/GateContrib/venv/lib/python3.10/site-packages/opengate_core/plugins.bak`
 ```
-
-
-# To simulate singles and timepix frame
-# SINGLES
-sc = sim.add_actor("DigitizerAdderActor", "Singles")
-sc.input_digi_collection = "Hits"
-sc.policy = "EnergyWeightedCentroidPosition"
-sc.output_filename = 'CC_Singles.root'  # if hc.output_filename, there will be two branches in the file
-# TIMEPIX FRAME
-proj = sim.add_actor("DigitizerProjectionActor", "Projection")
-proj.input_digi_collections = ["Singles"]
-proj.spacing = [pitch, pitch]  # Set pixel spacing in mm
-proj.size = [npix, npix]  # Image size in pixels (128x128)
-proj.output_filename = 'projection.mhd'

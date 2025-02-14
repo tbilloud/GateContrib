@@ -20,7 +20,7 @@ pandas.set_option('display.max_rows', 1000)
 pandas.set_option('display.float_format', lambda x: f'{x:.9}')  # G4 steps are logged with f'{x:.3}'
 
 
-def hits2cones_byEventID(file_path, source_MeV, nentries=None, to_array=False):
+def gHits2cones_byEventID(file_path, source_MeV, nentries=None, to_array=False):
     if not os.path.isfile(file_path):
         sys.exit(f"File {file_path} does not exist, probably no hit produced...")
     else:

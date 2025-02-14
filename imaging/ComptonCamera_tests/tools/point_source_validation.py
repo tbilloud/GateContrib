@@ -111,7 +111,7 @@ if __name__ == "__main__":
 
     # ###### READING Gate10 hit root files ##############
     fname, E0_MeV, world_z, source_pos = Path('../Gate10/output'), 1.0, 200, [0, 0, -50]
-    cones_array = hits2cones_byEventID(fname / 'CC_Hits.root', E0_MeV)
+    cones_array = gHits2cones_byEventID(fname / 'CC_Hits.root', E0_MeV)
 
     # ###### Preprocessing #########
     # print('number of cones with a nan value:', cp.isnan(cones_array).any(axis=1).sum())
