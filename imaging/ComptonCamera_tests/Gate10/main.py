@@ -5,6 +5,7 @@ from opengate.utility import g4_units
 from opengate.managers import Simulation
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import analyse_hits
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import gHits2cones_byEventID
+from imaging.ComptonCamera_tests.Gate10.tools.allpix import run_allpix
 from imaging.ComptonCamera_tests.Gate10.tools.pixelHits import singles2pixelHits
 from imaging.ComptonCamera_tests.tools.point_source_validation import point_source_cone_validation
 from imaging.ComptonCamera_tests.tools.reconstruction import reconstruct
@@ -122,14 +123,14 @@ singles_path = sim.output_dir + '/' + singles.output_filename
 
 # Cones
 # ### IDEAL ###
-# TODO much slower than simulation time...
-# cones = gHits2cones_byEventID(hits_path, source.energy.mono, to_array=True)
+# cones = gHits2cones_byEventID(hits_path, source.energy.mono, to_array=True) # TODO make it faster
 # ### GATE / ALLPIX ###
 # TODO pixelHits = singles2pixelHits(singles_path) / runallpix(hits_path)
 # TODO pixelClusters = pixelHits2pixelClusters
 # TODO coincidences = pixelClusters2coincidences
 # TODO cones = coincidences2cones(pixel_hits)
-pixelHits = singles2pixelHits(singles_path)
+# pixelHits = singles2pixelHits(singles_path)
+pixelHits = run_allpix(sim)
 
 sys.exit()
 
