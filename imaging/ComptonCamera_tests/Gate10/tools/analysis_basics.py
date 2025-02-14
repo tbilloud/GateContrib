@@ -31,6 +31,7 @@ def analyse_hits(file_path):
     print('\n =>', tree_hits.num_entries, 'entries in tree Hits')
     # print(tree.keys())
     hits = tree_hits.arrays(library='pd', entry_stop=None)  # None to read all entries
+    print_hits_short(hits)
     # print_hits_short_sortedByGlobalTime(hits)
     # print(hits.to_string(index=False))
     # print(hits.groupby('EventID').first().to_string(index=False))
@@ -39,8 +40,8 @@ def analyse_hits(file_path):
     # print(hits['TotalEnergyDeposit'].sum())
     # print(hits[hits['TrackID']==2]['TotalEnergyDeposit'].sum())
     # print(hits.groupby('EventID').first())
-    print_hits_inG4format(hits)
-    # print_hits_inG4format_sortedByGlobalTime(hits[hits['EventID'] == 586])
+    # print_hits_inG4format(hits)
+    # print_hits_inG4format_sortedByGlobalTime(hits)
     return hits
 
 # List of available attributes for Singles:
