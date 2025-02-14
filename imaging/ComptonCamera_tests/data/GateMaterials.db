@@ -462,7 +462,7 @@ Testis: d=1.04 g/cm3 ; n=9
         +el: name=Chlorine   ; f=0.002000
         +el: name=Potassium  ; f=0.002000
 
-CdTe:   d=5.85 g/cm3; n=2; state=Solid
+cadmium_telluride:   d=5.85 g/cm3; n=2; state=Solid
         +el: name=Cadmium; n=1
         +el: name=Tellurium; n=1
 

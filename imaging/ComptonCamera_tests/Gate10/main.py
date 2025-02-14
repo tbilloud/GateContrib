@@ -5,7 +5,7 @@ from opengate.utility import g4_units
 from opengate.managers import Simulation
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import analyse_hits
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import gHits2cones_byEventID
-from imaging.ComptonCamera_tests.Gate10.tools.allpix import run_allpix
+from imaging.ComptonCamera_tests.Gate10.tools.allpix import gHits2pixelHits_allpix, save_pixelHits_burdaman_format
 from imaging.ComptonCamera_tests.Gate10.tools.pixelHits import singles2pixelHits
 from imaging.ComptonCamera_tests.tools.point_source_validation import point_source_cone_validation
 from imaging.ComptonCamera_tests.tools.reconstruction import reconstruct
@@ -31,14 +31,14 @@ npix, pitch, thickness = 256, 55 * um, 1 * mm
 sim.world.material = "Vacuum"
 sim.world.size = [npix * pitch + 1, npix * pitch + 1, thickness * 2 + 1]  # + 1 avoids segmentation fault
 sensor = sim.add_volume("Box", "sensor")
-sensor.material = "CdTe"
+sensor.material = "cadmium_telluride"
 sensor.size = [npix * pitch, npix * pitch, thickness]
 sensor.translation = [0 * mm, 0 * mm, thickness / 2]
 # sensor.rotation = R.from_euler('z', 45, degrees=True).as_matrix()
 # TODO: WARNING Could not check overlap for volume pixel_param. => problem?
 if not sim.visu:
     pixel = sim.add_volume("Box", "pixel")
-    pixel.mother, pixel.material, pixel.size = sensor.name, 'CdTe', [pitch, pitch, thickness]
+    pixel.mother, pixel.material, pixel.size = sensor.name, 'cadmium_telluride', [pitch, pitch, thickness]
     pixelp = RepeatParametrisedVolume(repeated_volume=pixel)
     pixelp.linear_repeat, pixelp.translation = [npix, npix, 1], [pitch, pitch, 0]
     sim.volume_manager.add_volume(pixelp)
@@ -103,8 +103,8 @@ sim.random_engine, sim.random_seed = "MersenneTwister", 1
 ##=====================================================
 ##   M E A S U R E M E N T
 ##=====================================================
-source.n = 10
-# source.activity = 1000 * gate.g4_units.Bq # for sorting coincidences with GlobalTime
+# source.n = 10
+source.activity = 100 * g4_units.Bq # for sorting coincidences with GlobalTime
 hits.output_filename = f'MeV{source.energy.mono}_events{source.n}_doppler{doppler}_fluo{fluo}.root'
 sim.run()
 
@@ -115,7 +115,7 @@ hits_path = sim.output_dir + '/' + hits.output_filename
 singles_path = sim.output_dir + '/' + singles.output_filename
 
 # Basics
-# analyse_hits(hits_path)
+analyse_hits(hits_path)
 # analyse_singles(sim.output_dir + '/' + sc.output_filename)
 # plot_DigitizerProjectionActor(sim)
 # plot_hits_TotalEnergyDeposit(hits_path)
@@ -125,12 +125,13 @@ singles_path = sim.output_dir + '/' + singles.output_filename
 # ### IDEAL ###
 # cones = gHits2cones_byEventID(hits_path, source.energy.mono, to_array=True) # TODO make it faster
 # ### GATE / ALLPIX ###
-# TODO pixelHits = singles2pixelHits(singles_path) / runallpix(hits_path)
+pixelHits = singles2pixelHits(singles_path) # Gate
+print(pixelHits)
+pixelHits = gHits2pixelHits_allpix(sim) # Allpix
+save_pixelHits_burdaman_format(pixelHits, output_path=hits_path.replace(".root", ".txt"))
 # TODO pixelClusters = pixelHits2pixelClusters
 # TODO coincidences = pixelClusters2coincidences
 # TODO cones = coincidences2cones(pixel_hits)
-# pixelHits = singles2pixelHits(singles_path)
-pixelHits = run_allpix(sim)
 
 sys.exit()
 

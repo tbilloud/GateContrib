@@ -25,9 +25,9 @@ def singles2pixelHits(file_path, nentries=None):
         sys.exit(f"File {file_path} does not exist, probably no hit produced...")
     else:
         print(f"Converting {file_path} to pixel hits")
-    singles = uproot.open(file_path)['Singles'].arrays(library='pd', entry_stop=nentries)  # None to read all entries
+
+    singles = uproot.open(file_path)['Singles'].arrays(library='pd', entry_stop=nentries)
     print(f"{len(singles)} singles")
-    print(singles)
-    # grouped = hits.groupby('EventID')
-    # cones = []
-    # return pixelHits
+    pixelHits = singles[['EventID','GlobalTime', 'HitUniqueVolumeID','KineticEnergy']]
+    return pixelHits
+
