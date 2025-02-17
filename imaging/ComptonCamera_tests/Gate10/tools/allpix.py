@@ -40,12 +40,11 @@ bump_height = 20.0um
     """
 
     nevents = source.n if source.n else uproot.open(hits_root_file)['Hits'].arrays(library='pd')['EventID'].max()
-    print(nevents)
     main_conf_content = f"""[Allpix]
 log_level = "FATAL"
 log_format = "DEFAULT"
 detectors_file = "geometry.conf"
-number_of_events = {nevents}
+number_of_events = {nevents+1}
 model_paths = ["."]
 output_directory = "."
 random_seed = 1
@@ -121,7 +120,6 @@ def pixelHitAllpixTxt2pixelHit(text_file):
 
     df = pd.DataFrame(records, columns=["EventID", "PixelID", "GlobalTime", "PixelCharge",  "PositionX", "PositionY",
                                         "PositionZ"])
-    print(df)
 
     return df
 
