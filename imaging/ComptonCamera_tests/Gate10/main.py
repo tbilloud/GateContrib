@@ -105,7 +105,7 @@ if __name__ == "__main__":
     ##   M E A S U R E M E N T
     ##=====================================================
     # source.n = 10
-    source.activity, sim.run_timing_intervals = 10 * Bq, [[0, 1 * sec]]
+    source.activity, sim.run_timing_intervals = 5 * Bq, [[0, 1 * sec]]
     hits.output_filename = f'MeV{source.energy.mono}_events{source.n}_doppler{doppler}_fluo{fluo}.root'
     sim.run()
 

@@ -41,7 +41,7 @@ bump_height = 20.0um
 
     nevents = source.n if source.n else uproot.open(hits_root_file)['Hits'].arrays(library='pd')['EventID'].max()
     main_conf_content = f"""[Allpix]
-log_level = "FATAL"
+log_level = "INFO"
 log_format = "DEFAULT"
 detectors_file = "geometry.conf"
 number_of_events = {nevents+1}
@@ -58,9 +58,9 @@ branch_names = ["EventID", "TotalEnergyDeposit", "GlobalTime", "Position_X", "Po
 output_plots = true
 [GenericPropagation]
 temperature = 293K
-charge_per_step = 100
+charge_per_step = 50
 [SimpleTransfer]
-max_depth_distance = 100mm
+max_depth_distance = 10mm
 [DefaultDigitizer]
 threshold = 1e
 [DetectorHistogrammer]
