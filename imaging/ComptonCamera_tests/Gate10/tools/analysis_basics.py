@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import cupy as cp
 from pandas import Series
 from imaging.ComptonCamera_tests.Gate10.tools.utils import *
+from opengate.utility import g4_units
 
 pandas.set_option('display.max_columns', 100)
 pandas.set_option('display.width', 400)
@@ -62,6 +63,8 @@ def analyse_singles(file_path):
 
 def plot_DigitizerProjectionActor(sim):
 
+    Bq, sec = g4_units.Bq, g4_units.s
+
     proj = sim.actor_manager.get_actor("Projection")
 
     # Load the .mhd file
@@ -71,6 +74,9 @@ def plot_DigitizerProjectionActor(sim):
     # Convert to a NumPy array for plotting
     image_array = sitk.GetArrayFromImage(image)
     plt.imshow(image_array[0, :, :], cmap='gray')
+    source = sim.source_manager.get_source("source")
+    events = f'{source.n} events' if source.n else f'{int(source.activity/Bq)}Bq {sum_time_intervals(sim.run_timing_intervals)/sec} sec'
+    plt.title(f'{source.particle} {source.energy.mono} MeV \n {events}')
     plt.colorbar(label='number of pixel hits summed over all events')
     plt.show()
 

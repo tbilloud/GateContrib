@@ -63,3 +63,6 @@ def print_hits_long_sortedByGlobalTime(hits_df):
 
 def compute_pixel_id(x, y):
     return x * 256 + y  # Assuming 256x256 pixel grid (adjust if needed)
+
+def sum_time_intervals(time_intervals):
+    return sum([time_interval[1] - time_interval[0] for time_interval in time_intervals])

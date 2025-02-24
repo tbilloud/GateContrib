@@ -6,6 +6,7 @@ from opengate.managers import Simulation
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import analyse_hits, plot_DigitizerProjectionActor
 from imaging.ComptonCamera_tests.Gate10.allpix.allpix import run_allpix, allpixTxt2pixelHit
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import plot_pixelHits_byEventID, singles2pixelHits
+from imaging.ComptonCamera_tests.Gate10.tools.utils import sum_time_intervals
 from imaging.ComptonCamera_tests.tools.point_source_validation import point_source_cone_validation
 from imaging.ComptonCamera_tests.tools.reconstruction import reconstruct
 from opengate.geometry.volumes import RepeatParametrisedVolume
@@ -27,7 +28,7 @@ if __name__ == "__main__":
     # ===========================
     # ==   GEOMETRY            ==
     # ===========================
-    npix, pitch, thickness = 256, 55 * um, 1 * mm
+    npix, pitch, thickness = 10, 55 * um, 1 * mm
     sim.world.material = "Vacuum"
     sim.world.size = [npix * pitch + 1, npix * pitch + 1, thickness * 2 + 1]  # + 1 avoids segmentation fault
     sensor = sim.add_volume("Box", "sensor")
@@ -87,7 +88,7 @@ if __name__ == "__main__":
     ## ============================
     source = sim.add_source("GenericSource", "source")
     source.particle = "proton"
-    source.energy.mono = 10 * keV
+    source.energy.mono = 100 * keV
     # source.position.type, source.position.radius = "sphere", 10 * mm # TODO: use mother volumes for box/sphere to help with visualization?
     # source.position.type, source.position.size = "box", [5 * mm, 5 * mm, 5 * mm] # TODO: use mother volumes for box/sphere to help with visualization?
     # source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
@@ -102,9 +103,9 @@ if __name__ == "__main__":
     ##=====================================================
     ##   M E A S U R E M E N T
     ##=====================================================
-    source.n = 1
-    # source.activity, sim.run_timing_intervals = 5 * Bq, [[0, 1 * sec]]
-    events = f'{source.n}events' if source.n else f'{int(source.activity/Bq)}Bq_{int(sim.run_timing_intervals[0][1]/sec)}sec'
+    # source.n = 1
+    source.activity, sim.run_timing_intervals = 5 * Bq, [[0, 1 * sec],[2 * sec, 3 * sec]]
+    events = f'{source.n}events' if source.n else f'{int(source.activity/Bq)}Bq_{int(sum_time_intervals(sim.run_timing_intervals))/sec}sec'
     hits.output_filename = f'source{source.energy.mono}MeV_{events}_doppler{doppler}_fluo{fluo}.root'
     sim.run()
 
