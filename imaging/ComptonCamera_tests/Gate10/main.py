@@ -3,7 +3,7 @@ import cupy as cp
 import opengate_core
 from opengate.utility import g4_units
 from opengate.managers import Simulation
-from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import analyse_hits
+from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import analyse_hits, plot_DigitizerProjectionActor
 from imaging.ComptonCamera_tests.Gate10.allpix.allpix import run_allpix, allpixTxt2pixelHit
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import plot_pixelHits_byEventID, singles2pixelHits
 from imaging.ComptonCamera_tests.tools.point_source_validation import point_source_cone_validation
@@ -70,12 +70,12 @@ if __name__ == "__main__":
     singles.input_digi_collection = "Hits"
     singles.policy = "EnergyWeightedCentroidPosition"
     singles.output_filename = 'CC_Singles.root'  # if hc.output_filename, there will be two branches in the file
-    # # TIMEPIX FRAME
-    # proj = sim.add_actor("DigitizerProjectionActor", "Projection")
-    # proj.input_digi_collections = ["Singles"]
-    # proj.spacing = [pitch, pitch]  # Set pixel spacing in mm
-    # proj.size = [npix, npix]  # Image size in pixels (128x128)
-    # proj.output_filename = 'projection.mhd'
+    # IMAGE OF TOTAL ENERGY DEPOSIT
+    proj = sim.add_actor("DigitizerProjectionActor", "Projection")
+    proj.input_digi_collections = ["Singles"]
+    proj.spacing = [pitch, pitch]  # Set pixel spacing in mm
+    proj.size = [npix, npix]  # Image size in pixels (128x128)
+    proj.output_filename = 'projection.mhd'
 
     ## =============================
     ## == VERBOSITY               ==
@@ -86,13 +86,12 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.particle = "gamma"
-    source.energy.mono = 100 * keV
-    # source.position.type, source.position.radius = "sphere", 10 * mm
-    source.position.type, source.position.size = "box", [5 * mm, 5 * mm, 5 * mm]
+    source.particle = "proton"
+    source.energy.mono = 10 * keV
+    # source.position.type, source.position.radius = "sphere", 10 * mm # TODO: use mother volumes for box/sphere to help with visualization?
+    # source.position.type, source.position.size = "box", [5 * mm, 5 * mm, 5 * mm] # TODO: use mother volumes for box/sphere to help with visualization?
     # source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
-    # TODO: use mother volumes for box/sphere to help with visualization?
-    # source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
+    source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
     source.position.translation = [0 * mm, 0 * mm, -thickness / 2]
 
     ##====================================================
@@ -103,10 +102,10 @@ if __name__ == "__main__":
     ##=====================================================
     ##   M E A S U R E M E N T
     ##=====================================================
-    # source.n = 1
-    source.activity, sim.run_timing_intervals = 10 * Bq, [[0, 1 * sec]]
+    source.n = 1
+    # source.activity, sim.run_timing_intervals = 5 * Bq, [[0, 1 * sec]]
     events = f'{source.n}events' if source.n else f'{int(source.activity/Bq)}Bq_{int(sim.run_timing_intervals[0][1]/sec)}sec'
-    hits.output_filename = f'MeV{source.energy.mono}_{events}_doppler{doppler}_fluo{fluo}.root'
+    hits.output_filename = f'source{source.energy.mono}MeV_{events}_doppler{doppler}_fluo{fluo}.root'
     sim.run()
 
     ##=====================================================
@@ -115,29 +114,31 @@ if __name__ == "__main__":
     hits_path = sim.output_dir + '/' + hits.output_filename
     singles_path = sim.output_dir + '/' + singles.output_filename
 
-    # Basics
+    # BASICS
     analyse_hits(hits_path)
     # analyse_singles(sim.output_dir + '/' + sc.output_filename)
-    # plot_DigitizerProjectionActor(sim)
+    plot_DigitizerProjectionActor(sim)
     # plot_hits_TotalEnergyDeposit(hits_path)
     # plot_hits_TotalEnergyDeposit_sumPerEvent(hits_path)
 
-    # Pixel hits
-    # ### From singles ###
+    # PIXEL HITS
+    # 1) From singles
     pixelHits = singles2pixelHits(singles_path) # Gate
     print(pixelHits.to_string(index=False))
     # plot_pixelHits_byEventID(pixelHits, eventID=0, n_pixels=npix)
-    # ### From hits + allpix ###
+    # 2) From hits + allpix
     run_allpix(sim, output_dir='allpix/', log_level='FATAL') # log_level can be INFO, FATAL
     pixelHits = allpixTxt2pixelHit('allpix/data.txt')
     # save_pixelHits_burdaman_format(pixelHits, output_path=hits_path.replace(".root", ".txt"))
     print(pixelHits.to_string(index=False))
     # plot_pixelHits_byEventID(pixelHits, eventID=0, n_pixels=npix)
+
+    # PIXEL CLUSTERING
     # TODO pixelClusters = pixelHits2pixelClusters
     # TODO coincidences = pixelClusters2coincidences
     # TODO cones = coincidences2cones(pixel_hits)
 
-    # Cones
+    # CONES
     # ### IDEAL ###
     # cones = gHits2cones_byEventID(hits_path, source.energy.mono, to_array=True) # TODO make it faster
 

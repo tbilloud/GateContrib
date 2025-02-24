@@ -70,8 +70,8 @@ def plot_DigitizerProjectionActor(sim):
 
     # Convert to a NumPy array for plotting
     image_array = sitk.GetArrayFromImage(image)
-    plt.imshow(image_array[0, :, :], cmap='gray', vmax=2)
-    plt.colorbar()
+    plt.imshow(image_array[0, :, :], cmap='gray')
+    plt.colorbar(label='number of pixel hits summed over all events')
     plt.show()
 
 
