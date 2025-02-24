@@ -27,9 +27,12 @@ def singles2pixelHits(file_path, nentries=None):
         print(f"Converting {file_path} to pixel hits")
 
     singles = uproot.open(file_path)['Singles'].arrays(library='pd', entry_stop=nentries)
-    print(f"{len(singles)} singles")
-    pixelHits = singles[['EventID','GlobalTime', 'HitUniqueVolumeID','KineticEnergy']]
-    return pixelHits
+    singles['HitUniqueVolumeID'] = singles['HitUniqueVolumeID'].astype(str).str.replace(r'0_', '', regex=True)
+    singles.rename(columns={'HitUniqueVolumeID': 'PixelID'}, inplace=True)
+    singles.rename(columns={'KineticEnergy': 'Energy'}, inplace=True)
+    singles.rename(columns={'GlobalTime': 'ToA'}, inplace=True)
+
+    return singles[['EventID', 'PixelID', 'ToA', 'Energy']]
 
 def plot_pixelHits_byEventID(pixelHits, eventID, n_pixels, output_dir='output/'):
     event = pixelHits[pixelHits['EventID'] == eventID]
@@ -40,7 +43,7 @@ def plot_pixelHits_byEventID(pixelHits, eventID, n_pixels, output_dir='output/')
     fig, ax = plt.subplots()
     print(event)
     h = ax.hist2d(event['PixelID'] % n_pixels, event['PixelID'] // n_pixels, bins=[n_pixels, n_pixels],
-                  weights=event['PixelCharge'], cmap='viridis', range=[[0, n_pixels], [0, n_pixels]])
+                  weights=event['Energy'], cmap='viridis', range=[[0, n_pixels], [0, n_pixels]])
     fig.colorbar(h[3], ax=ax, label='Pixel Charge')
     ax.set_aspect('equal')
     ax.set_xlabel('Pixel x')

@@ -4,9 +4,9 @@ import pandas as pd
 import uproot
 
 from imaging.ComptonCamera_tests.Gate10.tools.utils import compute_pixel_id
+from imaging.ComptonCamera_tests.Gate10.allpix.conf_chains import *
 
-
-def run_allpix(sim, output_dir='allpix/'):
+def run_allpix(sim, output_dir='allpix/', log_level='FATAL'):
     # TODO: simulate timewalk / fToA !
     # TODO: simulate ToT (DefaultDigitizer or CSADigitizer?)
     hits_actor = sim.actor_manager.get_actor("Hits")
@@ -41,7 +41,7 @@ bump_height = 20.0um
 
     nevents = source.n if source.n else uproot.open(hits_root_file)['Hits'].arrays(library='pd')['EventID'].max()
     main_conf_content = f"""[Allpix]
-log_level = "FATAL"
+log_level = {log_level}
 log_format = "DEFAULT"
 detectors_file = "geometry.conf"
 number_of_events = {nevents+1}
@@ -54,23 +54,16 @@ file_name = "../{hits_root_file}"
 tree_name = "Hits"
 detector_name_chars = 3
 unit_length = "mm"
+unit_time = {"s" if source.n else "ns"} # if source.n is used in Gate instead of source.activity, time is not simulated, but this allows for dummy non-zero values
 branch_names = ["EventID", "TotalEnergyDeposit", "GlobalTime", "Position_X", "Position_Y", "Position_Z", "HitUniqueVolumeID", "PDGCode", "TrackID", "ParentID"]
 output_plots = true
-[GenericPropagation]
-temperature = 293K
-charge_per_step = 50
-[SimpleTransfer]
-max_depth_distance = 10mm
-[DefaultDigitizer]
-threshold = 1e
+{chain_simple}
 [DetectorHistogrammer]
-name = "0_0" # !!! EDIT !!!
-# [ROOTObjectWriter]
+name = "0_0"
 [TextWriter]
 include = "PixelHit"
     """
 
-    # Step 2: Write the content to the respective .conf files
     with open(output_dir + 'geometry.conf', 'w') as geometry_conf_file:
         geometry_conf_file.write(geometry_conf_content)
 
@@ -86,41 +79,42 @@ include = "PixelHit"
 
     subprocess.run([binary_path, '-c', output_dir + 'main.conf'], check=True)
 
-
 def allpixTxt2pixelHit(text_file):
-    records = []
+    df = pd.DataFrame(columns=["EventID", "PixelID", "ToT", "ToA", "PositionX", "PositionY", "PositionZ"])
+    rows = []
 
-    # Read file and parse data
     with open(text_file, "r") as file:
         event_id = None
         for line in file:
             line = line.strip()
 
-            # Check for event ID
             if line.startswith("==="):
-                event_id = int(line.split()[1]) - 1 # allpix adds 1 to event ID
+                event_id = int(line.split()[1]) - 1  # allpix adds 1 to event ID
                 continue
 
-            # Skip lines starting with '---'
             if line.startswith("---"):
                 continue
 
-            # Process PixelHit lines
             if line.startswith("PixelHit"):
                 parts = line.split()
                 x, y = int(parts[1].strip(',')), int(parts[2].strip(','))
                 pixel_id = compute_pixel_id(x, y)
-                pixel_charge = float(parts[3].strip(','))
+                tot = float(parts[3].strip(',')) # TODO: deal with different types according to simulation chain!
+                toa = float(parts[4].strip(',')) # TODO: deal with different types according to simulation chain!
                 global_time = float(parts[5].strip(','))
                 position_x = float(parts[6].strip(','))
                 position_y = float(parts[7].strip(','))
                 position_z = float(parts[8].strip(','))
 
-                records.append([event_id, pixel_id, int(global_time), int(pixel_charge/100),  position_x, position_y, position_z])
+                rows.append({
+                    "EventID": event_id,
+                    "PixelID": pixel_id,
+                    "ToT": tot,
+                    "ToA": global_time + toa, # because ToA is measured from the beginning of the event
+                    "PositionX": position_x,
+                    "PositionY": position_y,
+                    "PositionZ": position_z
+                })
 
-    df = pd.DataFrame(records, columns=["EventID", "PixelID", "GlobalTime", "PixelCharge",  "PositionX", "PositionY",
-                                        "PositionZ"])
-
+    df = pd.concat([df, pd.DataFrame(rows)], ignore_index=True)
     return df
-
-

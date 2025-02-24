@@ -15,7 +15,7 @@ def print_hits_inG4format(hits_df):
 # Prints only few relevant columns from hits tree
 def print_hits_short(hits_df):
     print(hits_df[['EventID', 'TrackID', 'ParticleName', 'ParentID', 'ParentParticleName', 'KineticEnergy',
-                   'TotalEnergyDeposit', 'ProcessDefinedStep', 'TrackCreatorProcess', 'GlobalTime']].to_string(index=False))
+                   'TotalEnergyDeposit', 'ProcessDefinedStep', 'TrackCreatorProcess', 'GlobalTime','HitUniqueVolumeID']].to_string(index=False))
 
 
 def print_hits_long(hits_df):

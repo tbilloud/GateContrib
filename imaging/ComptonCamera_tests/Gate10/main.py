@@ -87,7 +87,7 @@ if __name__ == "__main__":
     ## ============================
     source = sim.add_source("GenericSource", "source")
     source.particle = "gamma"
-    source.energy.mono = 50 * keV
+    source.energy.mono = 100 * keV
     # source.position.type, source.position.radius = "sphere", 10 * mm
     source.position.type, source.position.size = "box", [5 * mm, 5 * mm, 5 * mm]
     # source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
@@ -103,9 +103,10 @@ if __name__ == "__main__":
     ##=====================================================
     ##   M E A S U R E M E N T
     ##=====================================================
-    # source.n = 10
-    source.activity, sim.run_timing_intervals = 5 * Bq, [[0, 1 * sec]]
-    hits.output_filename = f'MeV{source.energy.mono}_events{source.n}_doppler{doppler}_fluo{fluo}.root'
+    # source.n = 1
+    source.activity, sim.run_timing_intervals = 10 * Bq, [[0, 1 * sec]]
+    events = f'{source.n}events' if source.n else f'{int(source.activity/Bq)}Bq_{int(sim.run_timing_intervals[0][1]/sec)}sec'
+    hits.output_filename = f'MeV{source.energy.mono}_{events}_doppler{doppler}_fluo{fluo}.root'
     sim.run()
 
     ##=====================================================
@@ -124,13 +125,13 @@ if __name__ == "__main__":
     # Pixel hits
     # ### From singles ###
     pixelHits = singles2pixelHits(singles_path) # Gate
-    print(pixelHits)
+    print(pixelHits.to_string(index=False))
     # plot_pixelHits_byEventID(pixelHits, eventID=0, n_pixels=npix)
     # ### From hits + allpix ###
-    run_allpix(sim, output_dir='allpix/')
+    run_allpix(sim, output_dir='allpix/', log_level='FATAL') # log_level can be INFO, FATAL
     pixelHits = allpixTxt2pixelHit('allpix/data.txt')
     # save_pixelHits_burdaman_format(pixelHits, output_path=hits_path.replace(".root", ".txt"))
-    print(pixelHits)
+    print(pixelHits.to_string(index=False))
     # plot_pixelHits_byEventID(pixelHits, eventID=0, n_pixels=npix)
     # TODO pixelClusters = pixelHits2pixelClusters
     # TODO coincidences = pixelClusters2coincidences
