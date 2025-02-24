@@ -4,12 +4,11 @@ import opengate_core
 from opengate.utility import g4_units
 from opengate.managers import Simulation
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import analyse_hits
-from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import gHits2cones_byEventID
-from imaging.ComptonCamera_tests.Gate10.tools.allpix import gHits2pixelHits_allpix, save_pixelHits_burdaman_format
-from imaging.ComptonCamera_tests.Gate10.tools.pixelHits import singles2pixelHits
+from imaging.ComptonCamera_tests.Gate10.allpix.allpix import run_allpix, allpixTxt2pixelHit
+from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import plot_pixelHits_byEventID, singles2pixelHits
 from imaging.ComptonCamera_tests.tools.point_source_validation import point_source_cone_validation
 from imaging.ComptonCamera_tests.tools.reconstruction import reconstruct
-from opengate.geometry.volumes import RepeatParametrisedVolume, BoxVolume
+from opengate.geometry.volumes import RepeatParametrisedVolume
 
 if __name__ == "__main__":
     sim, sim.output_dir = Simulation(), "output"
@@ -122,18 +121,24 @@ if __name__ == "__main__":
     # plot_hits_TotalEnergyDeposit(hits_path)
     # plot_hits_TotalEnergyDeposit_sumPerEvent(hits_path)
 
-    # Cones
-    # ### IDEAL ###
-    # cones = gHits2cones_byEventID(hits_path, source.energy.mono, to_array=True) # TODO make it faster
-    # ### GATE / ALLPIX ###
-    # pixelHits = singles2pixelHits(singles_path) # Gate
-    # print(pixelHits)
-    pixelHits = gHits2pixelHits_allpix(sim) # Allpix
+    # Pixel hits
+    # ### From singles ###
+    pixelHits = singles2pixelHits(singles_path) # Gate
+    print(pixelHits)
+    # plot_pixelHits_byEventID(pixelHits, eventID=0, n_pixels=npix)
+    # ### From hits + allpix ###
+    run_allpix(sim, output_dir='allpix/')
+    pixelHits = allpixTxt2pixelHit('allpix/data.txt')
     # save_pixelHits_burdaman_format(pixelHits, output_path=hits_path.replace(".root", ".txt"))
     print(pixelHits)
+    # plot_pixelHits_byEventID(pixelHits, eventID=0, n_pixels=npix)
     # TODO pixelClusters = pixelHits2pixelClusters
     # TODO coincidences = pixelClusters2coincidences
     # TODO cones = coincidences2cones(pixel_hits)
+
+    # Cones
+    # ### IDEAL ###
+    # cones = gHits2cones_byEventID(hits_path, source.energy.mono, to_array=True) # TODO make it faster
 
     sys.exit()
 

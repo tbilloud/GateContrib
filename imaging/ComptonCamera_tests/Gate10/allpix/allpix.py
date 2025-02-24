@@ -41,7 +41,7 @@ bump_height = 20.0um
 
     nevents = source.n if source.n else uproot.open(hits_root_file)['Hits'].arrays(library='pd')['EventID'].max()
     main_conf_content = f"""[Allpix]
-log_level = "INFO"
+log_level = "FATAL"
 log_format = "DEFAULT"
 detectors_file = "geometry.conf"
 number_of_events = {nevents+1}
@@ -87,7 +87,7 @@ include = "PixelHit"
     subprocess.run([binary_path, '-c', output_dir + 'main.conf'], check=True)
 
 
-def pixelHitAllpixTxt2pixelHit(text_file):
+def allpixTxt2pixelHit(text_file):
     records = []
 
     # Read file and parse data
@@ -124,62 +124,3 @@ def pixelHitAllpixTxt2pixelHit(text_file):
     return df
 
 
-def gHits2pixelHits_allpix(sim, output_dir='allpix/', nentries=None):
-    run_allpix(sim, output_dir)
-    return pixelHitAllpixTxt2pixelHit(output_dir + 'data.txt')
-
-def save_pixelHits_burdaman_format(pixelHits_df, output_path):
-    # TODO set types correctly (else visu with TrackLab will not work)
-    # TODO => https://software.utef.cvut.cz/tracklab/manual/a01627.html
-    pixelHits_df['fTOA'] = 0
-    pixelHits_df[['PixelID', 'GlobalTime', 'fTOA', 'PixelCharge']].to_csv(output_path, header=False, index=False, sep='\t')
-
-    # Define the custom header
-    custom_header = """# Start of measurement: 10/1/2017 17:34:41.8467094
-# Start of measurement - unix time: 1506872081.846
-# Chip ID: H3-W00036
-# Readout IP address: 192.168.1.105
-# Back-end location: Satigny, CH
-# Detector mode: ToA & ToT
-# Readout mode: Data-Driven Mode
-# Bias voltage: 229.72V
-# THL = 1570 (0.875V)
-# Sensor temperature: 58.9°C
-# Readout temperature: 42.9°C
-# ------- Internal DAC values ---------------
-# Ibias_Preamp_ON:\t128\t(1.208V)
-# Ibias_Preamp_OFF:\t8\t(1.350V)
-# VPreamp_NCAS:\t\t128\t(0.702V)
-# Ikrum:\t\t15\t(1.128V)
-# Vfbk:\t\t164\t(0.891V)
-# Vthreshold_fine:\t505\t(0.877V)
-# Vthreshold_coarse:\t7\t(0.875V)
-# Ibias_DiscS1_ON:\t100\t(1.109V)
-# Ibias_DiscS1_OFF:\t8\t(1.321V)
-# Ibias_DiscS2_ON:\t128\t(0.396V)
-# Ibias_DiscS2_OFF:\t8\t(0.256V)
-# Ibias_PixelDAC:\t128\t(0.984V)
-# Ibias_TPbufferIn:\t128\t(1.169V)
-# Ibias_TPbufferOut:\t128\t(1.077V)
-# VTP_coarse:\t\t128\t(0.693V)
-# VTP_fine:\t\t256\t(0.724V)
-# Ibias_CP_PLL:\t\t128\t(0.557V)
-# PLL_Vcntrl:\t\t128\t(0.874V)
-# BandGap output:\t--- \t(0.684V)
-# BandGap_Temp:\t\t--- \t(0.733V)
-# Ibias_dac:\t\t--- \t(1.241V)
-# Ibias_dac_cas:\t\t--- \t(1.004V)
-# DACs: \t128\t8\t128\t15\t164\t505\t7\t100\t8\t128\t8\t128\t128\t128\t128\t256\t128\t128
-# DACs Scans: \t1.208V\t1.350V\t0.702V\t1.128V\t0.891V\t0.877V\t0.875V\t1.109V\t1.321V\t0.396V\t0.256V\t0.984V\t1.169V\t1.077V\t0.693V\t0.724V\t0.557V\t0.874V\t0.684V\t0.733V\t1.241V\t1.004V
-# -----------------------------------------------------------------------------------------------------------------------------
-"""
-
-    # Read the CSV file and add the custom header
-    with open(output_path, 'r', encoding='utf-8') as file:
-        lines = file.readlines()
-
-    lines.insert(0, custom_header)
-
-    # Write the modified content back to the file
-    with open(output_path, 'w', encoding='utf-8') as file:
-        file.writelines(lines)
