@@ -17,6 +17,7 @@ pandas.set_option('display.width', 400)
 pandas.set_option('display.max_rows', 1000)
 pandas.set_option('display.float_format', lambda x: f'{x:.3}')  # G4 steps are logged with f'{x:.3}'
 
+
 # List of all possible attributes for Hits:
 # ['Direction', 'EventDirection', 'EventID', 'EventKineticEnergy', 'EventPosition', 'GlobalTime', 'HitUniqueVolumeID',
 # 'KineticEnergy', 'LocalTime', 'PDGCode', 'ParentID', 'ParentParticleName', 'ParticleName', 'ParticleType', 'Position',
@@ -45,6 +46,7 @@ def analyse_hits(file_path):
     # print_hits_inG4format_sortedByGlobalTime(hits)
     return hits
 
+
 # List of available attributes for Singles:
 #  EventID  TrackID  ParentID  ParentParticleName  ParticleName  KineticEnergy  TotalEnergyDeposit  TrackCreatorProcess
 #  ProcessDefinedStep     Position_X     Position_Y    Position_Z  PreStepUniqueVolumeID  PostPosition_X  PostPosition_Y
@@ -61,23 +63,19 @@ def analyse_singles(file_path):
     # singles = singles.loc[:, ~singles.columns.str.contains('Position', case=False)]
     return singles
 
+
 def plot_DigitizerProjectionActor(sim):
-
     Bq, sec = g4_units.Bq, g4_units.s
-
     proj = sim.actor_manager.get_actor("Projection")
-
-    # Load the .mhd file
     file_path = sim.output_dir + '/' + proj.output_filename  # Replace with the actual path to your .mhd file
     image = sitk.ReadImage(file_path)
-
-    # Convert to a NumPy array for plotting
-    image_array = sitk.GetArrayFromImage(image)
-    plt.imshow(image_array[0, :, :], cmap='gray')
+    im = sitk.GetArrayFromImage(image)[0, :, :].astype(int)
+    plt.imshow(im, cmap='gray')
     source = sim.source_manager.get_source("source")
-    events = f'{source.n} events' if source.n else f'{int(source.activity/Bq)}Bq {sum_time_intervals(sim.run_timing_intervals)/sec} sec'
+    events = f'{source.n} events' if source.n else f'{int(source.activity / Bq)}Bq {sum_time_intervals(sim.run_timing_intervals) / sec} sec'
     plt.title(f'{source.particle} {source.energy.mono} MeV \n {events}')
-    plt.colorbar(label='number of pixel hits summed over all events')
+    cbar = plt.colorbar(label='number of pixel hits summed over all events')
+    cbar.set_ticks(np.arange(np.min(im), np.max(im) + 1))
     plt.show()
 
 
@@ -89,6 +87,7 @@ def plot_hits_TotalEnergyDeposit(file_path, bins=100):
     plt.xlabel('TotalEnergyDeposit [MeV]')
     plt.ylabel('Counts')
     plt.show()
+
 
 def plot_hits_TotalEnergyDeposit_sumPerEvent(file_path, bins=100):
     if not os.path.isfile(file_path):
