@@ -5,7 +5,8 @@ from opengate.utility import g4_units
 from opengate.managers import Simulation
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import analyse_hits, plot_DigitizerProjectionActor
 from imaging.ComptonCamera_tests.Gate10.allpix.allpix import run_allpix, allpixTxt2pixelHit
-from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import plot_pixelHits_byEventID, singles2pixelHits
+from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import plot_pixelHits_byEventID, singles2pixelHits, \
+    save_pixelHits_burdaman_format
 from imaging.ComptonCamera_tests.Gate10.tools.utils import sum_time_intervals, \
     get_pointSourcePhi
 from imaging.ComptonCamera_tests.tools.point_source_validation import point_source_cone_validation
@@ -24,7 +25,7 @@ if __name__ == "__main__":
     ## ============================
     ## ==  VISUALIZATION         ==
     ## ============================
-    sim.visu = True  # defaults to vrml, qt seems to not work on ubuntu yet
+    sim.visu = False  # defaults to vrml, qt seems to not work on ubuntu yet
 
     # ===========================
     # ==   GEOMETRY            ==
@@ -88,8 +89,8 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.particle = "proton"
-    source.energy.mono = 1000 * keV
+    source.particle = "gamma"
+    source.energy.mono = 100 * keV
     source.position.translation = [0 * mm, 0 * mm, -thickness / 2]
     # source.position.type, source.position.radius = "sphere", 10 * mm # TODO: use mother volumes for box/sphere to help with visualization?
     # source.position.type, source.position.size = "box", [5 * mm, 5 * mm, 5 * mm] # TODO: use mother volumes for box/sphere to help with visualization?
@@ -100,13 +101,13 @@ if __name__ == "__main__":
     ##====================================================
     ##  R A N D O M   E N G I N E  A N D  S E E D
     ##====================================================
-    sim.random_engine, sim.random_seed = "MersenneTwister", 1
+    sim.random_engine, sim.random_seed = "MersenneTwister", 2
 
     ##=====================================================
     ##   M E A S U R E M E N T
     ##=====================================================
-    source.n = 50
-    # source.activity, sim.run_timing_intervals = 5 * Bq, [[0, 1 * sec],[2 * sec, 3 * sec]]
+    # source.n = 4
+    source.activity, sim.run_timing_intervals = 1 * Bq, [[0, 2 * sec]] #,[2 * sec, 3 * sec]]
     events = f'{source.n}events' if source.n else f'{int(source.activity / Bq)}Bq_{int(sum_time_intervals(sim.run_timing_intervals)) / sec}sec'
     hits.output_filename = f'source{source.energy.mono}MeV_{events}_doppler{doppler}_fluo{fluo}.root'
     sim.run()

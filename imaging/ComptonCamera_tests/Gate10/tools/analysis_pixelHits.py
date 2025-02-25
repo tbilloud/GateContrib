@@ -19,6 +19,7 @@ pandas.set_option('display.width', 400)
 pandas.set_option('display.max_rows', 1000)
 pandas.set_option('display.float_format', lambda x: f'{x:.9}')  # G4 steps are logged with f'{x:.3}'
 
+pixelHits_columns = ['PixelID', 'ToA', 'Energy']
 
 def singles2pixelHits(file_path, nentries=None):
     if not os.path.isfile(file_path):
@@ -32,7 +33,7 @@ def singles2pixelHits(file_path, nentries=None):
     singles.rename(columns={'KineticEnergy': 'Energy'}, inplace=True)
     singles.rename(columns={'GlobalTime': 'ToA'}, inplace=True)
 
-    return singles[['EventID', 'PixelID', 'ToA', 'Energy']]
+    return singles[pixelHits_columns]
 
 def plot_pixelHits_byEventID(pixelHits, eventID, n_pixels, output_dir='output/'):
     event = pixelHits[pixelHits['EventID'] == eventID]
@@ -41,7 +42,6 @@ def plot_pixelHits_byEventID(pixelHits, eventID, n_pixels, output_dir='output/')
         return
     print(f"Plotting pixel hits for event {eventID}")
     fig, ax = plt.subplots()
-    print(event)
     h = ax.hist2d(event['PixelID'] % n_pixels, event['PixelID'] // n_pixels, bins=[n_pixels, n_pixels],
                   weights=event['Energy'], cmap='viridis', range=[[0, n_pixels], [0, n_pixels]])
     fig.colorbar(h[3], ax=ax, label='Pixel Charge')
@@ -58,10 +58,13 @@ def save_pixelHits_burdaman_format(pixelHits_df, output_path):
     # TODO set types correctly (else visu with TrackLab will not work)
     # TODO => https://software.utef.cvut.cz/tracklab/manual/a01627.html
     # TODO: set dummy values
-    pixelHits_df['fTOA'] = 0
-    pixelHits_df[['PixelID', 'GlobalTime', 'fTOA', 'PixelCharge']].to_csv(output_path, header=False, index=False, sep='\t')
+    # insert a column with 0s at the 3rd position
+    pixelHits_df.insert(2, 'fTOA', 0)
+    print(pixelHits_df)
+    pixelHits_df.to_csv(output_path, header=False, index=False, sep='\t')
 
-    # Define the custom header
+    # Dummy header
+    # TODO replace values with NaNs
     custom_header = """# Start of measurement: 10/1/2017 17:34:41.8467094
 # Start of measurement - unix time: 1506872081.846
 # Chip ID: H3-W00036
