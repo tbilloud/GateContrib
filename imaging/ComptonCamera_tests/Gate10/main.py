@@ -6,7 +6,8 @@ from opengate.managers import Simulation
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import analyse_hits, plot_DigitizerProjectionActor
 from imaging.ComptonCamera_tests.Gate10.allpix.allpix import run_allpix, allpixTxt2pixelHit
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import plot_pixelHits_byEventID, singles2pixelHits
-from imaging.ComptonCamera_tests.Gate10.tools.utils import sum_time_intervals
+from imaging.ComptonCamera_tests.Gate10.tools.utils import sum_time_intervals, \
+    get_pointSourcePhi
 from imaging.ComptonCamera_tests.tools.point_source_validation import point_source_cone_validation
 from imaging.ComptonCamera_tests.tools.reconstruction import reconstruct
 from opengate.geometry.volumes import RepeatParametrisedVolume
@@ -23,7 +24,7 @@ if __name__ == "__main__":
     ## ============================
     ## ==  VISUALIZATION         ==
     ## ============================
-    sim.visu = False  # defaults to vrml, qt seems to not work on ubuntu yet
+    sim.visu = True  # defaults to vrml, qt seems to not work on ubuntu yet
 
     # ===========================
     # ==   GEOMETRY            ==
@@ -88,12 +89,13 @@ if __name__ == "__main__":
     ## ============================
     source = sim.add_source("GenericSource", "source")
     source.particle = "proton"
-    source.energy.mono = 100 * keV
+    source.energy.mono = 1000 * keV
+    source.position.translation = [0 * mm, 0 * mm, -thickness / 2]
     # source.position.type, source.position.radius = "sphere", 10 * mm # TODO: use mother volumes for box/sphere to help with visualization?
     # source.position.type, source.position.size = "box", [5 * mm, 5 * mm, 5 * mm] # TODO: use mother volumes for box/sphere to help with visualization?
-    # source.direction.type, source.direction.theta, source.direction.phi = "iso", [160 * deg, 180 * deg], [0, 360 * deg]
-    source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
-    source.position.translation = [0 * mm, 0 * mm, -thickness / 2]
+    source.direction.type, source.direction.theta, source.direction.phi = "iso", [
+        get_pointSourcePhi(sensor, source) * deg, 180 * deg], [0, 360 * deg]
+    # source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
 
     ##====================================================
     ##  R A N D O M   E N G I N E  A N D  S E E D
@@ -103,9 +105,9 @@ if __name__ == "__main__":
     ##=====================================================
     ##   M E A S U R E M E N T
     ##=====================================================
-    # source.n = 1
-    source.activity, sim.run_timing_intervals = 5 * Bq, [[0, 1 * sec],[2 * sec, 3 * sec]]
-    events = f'{source.n}events' if source.n else f'{int(source.activity/Bq)}Bq_{int(sum_time_intervals(sim.run_timing_intervals))/sec}sec'
+    source.n = 50
+    # source.activity, sim.run_timing_intervals = 5 * Bq, [[0, 1 * sec],[2 * sec, 3 * sec]]
+    events = f'{source.n}events' if source.n else f'{int(source.activity / Bq)}Bq_{int(sum_time_intervals(sim.run_timing_intervals)) / sec}sec'
     hits.output_filename = f'source{source.energy.mono}MeV_{events}_doppler{doppler}_fluo{fluo}.root'
     sim.run()
 
@@ -124,15 +126,15 @@ if __name__ == "__main__":
 
     # PIXEL HITS
     # 1) From singles
-    pixelHits = singles2pixelHits(singles_path) # Gate
+    pixelHits = singles2pixelHits(singles_path)  # Gate
     print(pixelHits.to_string(index=False))
     # plot_pixelHits_byEventID(pixelHits, eventID=0, n_pixels=npix)
-    # 2) From hits + allpix
-    run_allpix(sim, output_dir='allpix/', log_level='FATAL') # log_level can be INFO, FATAL
-    pixelHits = allpixTxt2pixelHit('allpix/data.txt')
-    # save_pixelHits_burdaman_format(pixelHits, output_path=hits_path.replace(".root", ".txt"))
-    print(pixelHits.to_string(index=False))
-    # plot_pixelHits_byEventID(pixelHits, eventID=0, n_pixels=npix)
+    # # 2) From hits + allpix
+    # run_allpix(sim, output_dir='allpix/', log_level='FATAL') # log_level can be INFO, FATAL
+    # pixelHits = allpixTxt2pixelHit('allpix/data.txt')
+    # # save_pixelHits_burdaman_format(pixelHits, output_path=hits_path.replace(".root", ".txt"))
+    # print(pixelHits.to_string(index=False))
+    # # plot_pixelHits_byEventID(pixelHits, eventID=0, n_pixels=npix)
 
     # PIXEL CLUSTERING
     # TODO pixelClusters = pixelHits2pixelClusters
@@ -146,7 +148,8 @@ if __name__ == "__main__":
     sys.exit()
 
     # print(c)
-    print('=>', cones.shape[0] if cones.shape[0] else sys.exit('No cones'), 'cones,', cp.isnan(cones).any(axis=1).sum(), 'with NaNs')
+    print('=>', cones.shape[0] if cones.shape[0] else sys.exit('No cones'), 'cones,', cp.isnan(cones).any(axis=1).sum(),
+          'with NaNs')
 
     # Point source validation
     point_source_cone_validation(cones,
@@ -155,14 +158,15 @@ if __name__ == "__main__":
                                  plot_seq=False,
                                  plot_stack=True,
                                  plot_seq_napari=False,
-                                 legend=hits.output_filename.replace("_", "\n").replace(".root", f'\n{cones.shape[0]} cones'),
+                                 legend=hits.output_filename.replace("_", "\n").replace(".root",
+                                                                                        f'\n{cones.shape[0]} cones'),
                                  )
 
     # Image reconstruction
     reconstruct(cones,
                 vsize=(256, 256, 256),
                 vpitch=sim.world.size[2] / 256,
-                output= hits_path.replace(".root", ".npy"),
+                output=hits_path.replace(".root", ".npy"),
                 napari=True,
                 detector={'size': sensor.size, 'position': sensor.translation}
                 )
