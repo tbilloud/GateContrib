@@ -7,8 +7,7 @@ from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import analyse_hit
 from imaging.ComptonCamera_tests.Gate10.allpix.allpix import run_allpix, allpixTxt2pixelHit
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import plot_pixelHits_byEventID, singles2pixelHits, \
     save_pixelHits_burdaman_format
-from imaging.ComptonCamera_tests.Gate10.tools.utils import sum_time_intervals, \
-    get_pointSourcePhi
+from imaging.ComptonCamera_tests.Gate10.tools.utils import sum_time_intervals, get_source_theta_phi, get_worldSize
 from imaging.ComptonCamera_tests.tools.point_source_validation import point_source_cone_validation
 from imaging.ComptonCamera_tests.tools.reconstruction import reconstruct
 from opengate.geometry.volumes import RepeatParametrisedVolume
@@ -25,14 +24,15 @@ if __name__ == "__main__":
     ## ============================
     ## ==  VISUALIZATION         ==
     ## ============================
-    sim.visu = False  # defaults to vrml, qt seems to not work on ubuntu yet
+    sim.visu = True  # defaults to vrml, qt seems to not work on ubuntu yet
 
     # ===========================
     # ==   GEOMETRY            ==
     # ===========================
-    npix, pitch, thickness = 10, 55 * um, 1 * mm
+    npix, pitch, thickness = 256, 55 * um, 1 * mm
     sim.world.material = "Vacuum"
-    sim.world.size = [npix * pitch + 1, npix * pitch + 1, thickness * 2 + 1]  # + 1 avoids segmentation fault
+    # sim.world.size = [npix * pitch + 1, npix * pitch + 1, thickness * 2 + 1]  # + 1 avoids segmentation fault
+    # sim.world.color = [0, 0, 0, 0]  # see trajectories better
     sensor = sim.add_volume("Box", "sensor")
     sensor.material = "cadmium_telluride"
     sensor.size = [npix * pitch, npix * pitch, thickness]
@@ -91,12 +91,12 @@ if __name__ == "__main__":
     source = sim.add_source("GenericSource", "source")
     source.particle = "gamma"
     source.energy.mono = 100 * keV
-    source.position.translation = [0 * mm, 0 * mm, -thickness / 2]
+    source.position.translation = [0 * mm, 0 * mm, -10*thickness / 2]
     # source.position.type, source.position.radius = "sphere", 10 * mm # TODO: use mother volumes for box/sphere to help with visualization?
-    # source.position.type, source.position.size = "box", [5 * mm, 5 * mm, 5 * mm] # TODO: use mother volumes for box/sphere to help with visualization?
-    source.direction.type, source.direction.theta, source.direction.phi = "iso", [
-        get_pointSourcePhi(sensor, source) * deg, 180 * deg], [0, 360 * deg]
+    source.position.type, source.position.size = "box", [5 * mm, 5 * mm, 5 * mm] # TODO: use mother volumes for box/sphere to help with visualization?
+    source.direction.theta, source.direction.phi = get_source_theta_phi(sensor, source)
     # source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
+    sim.world.size = get_worldSize(sensor, source)
 
     ##====================================================
     ##  R A N D O M   E N G I N E  A N D  S E E D
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     ##   M E A S U R E M E N T
     ##=====================================================
     # source.n = 4
-    source.activity, sim.run_timing_intervals = 1 * Bq, [[0, 2 * sec]] #,[2 * sec, 3 * sec]]
+    source.activity, sim.run_timing_intervals = 100 * Bq, [[0, 2 * sec]] #,[2 * sec, 3 * sec]]
     events = f'{source.n}events' if source.n else f'{int(source.activity / Bq)}Bq_{int(sum_time_intervals(sim.run_timing_intervals)) / sec}sec'
     hits.output_filename = f'source{source.energy.mono}MeV_{events}_doppler{doppler}_fluo{fluo}.root'
     sim.run()
