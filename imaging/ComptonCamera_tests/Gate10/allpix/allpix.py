@@ -1,10 +1,7 @@
 import sys
 import subprocess
-import pandas as pd
 import uproot
 
-from imaging.ComptonCamera_tests.Gate10.tools.utils import compute_pixel_id
-from imaging.ComptonCamera_tests.Gate10.allpix.conf_chains import *
 
 def run_allpix(sim, output_dir='allpix/', log_level='FATAL'):
     # TODO: simulate timewalk / fToA !
@@ -15,7 +12,7 @@ def run_allpix(sim, output_dir='allpix/', log_level='FATAL'):
     if sim.visu is True:
         sys.exit("Allpix cannot be run with visualization enabled")
     else:
-        print(f"Converting gate hits {hits_root_file} to pixel hits using Allpix")
+        print(f"Running Allpix2 with input {hits_root_file}")
 
     sensor = sim.volume_manager.get_volume("sensor")
     pixel = sim.volume_manager.get_volume("pixel_param")
@@ -39,12 +36,14 @@ bump_cylinder_radius = 7.0um
 bump_height = 20.0um
     """
 
-    nevents = source.n if source.n else uproot.open(hits_root_file)['Hits'].arrays(library='pd')['EventID'].max()
+    nevents = source.n if source.n else \
+        uproot.open(hits_root_file)['Hits'].arrays(library='pd')[
+            'EventID'].max()
     main_conf_content = f"""[Allpix]
 log_level = {log_level}
 log_format = "DEFAULT"
 detectors_file = "geometry.conf"
-number_of_events = {nevents+1}
+number_of_events = {nevents + 1}
 model_paths = ["."]
 output_directory = "."
 random_seed = 1
@@ -67,7 +66,8 @@ include = "PixelHit"
     with open(output_dir + 'geometry.conf', 'w') as geometry_conf_file:
         geometry_conf_file.write(geometry_conf_content)
 
-    with open(output_dir + 'detector_model.conf', 'w') as detector_model_conf_file:
+    with open(output_dir + 'detector_model.conf',
+              'w') as detector_model_conf_file:
         detector_model_conf_file.write(detector_model_conf_content)
 
     with open(output_dir + 'main.conf', 'w') as main_conf_file:
@@ -79,42 +79,49 @@ include = "PixelHit"
 
     subprocess.run([binary_path, '-c', output_dir + 'main.conf'], check=True)
 
-def allpixTxt2pixelHit(text_file):
-    df = pd.DataFrame(columns=["EventID", "PixelID", "ToT", "ToA", "PositionX", "PositionY", "PositionZ"])
-    rows = []
 
-    with open(text_file, "r") as file:
-        event_id = None
-        for line in file:
-            line = line.strip()
+# Different simulation (sub-)chains for Allpix
+# https://allpix-squared.docs.cern.ch/docs/03_getting_started/06_simulation_chain/
+# QDC: charge-to-digital converter
+# TDC: time-to-digital converter
+# https://allpix-squared.docs.cern.ch/docs/08_modules/defaultdigitizer/
 
-            if line.startswith("==="):
-                event_id = int(line.split()[1]) - 1  # allpix adds 1 to event ID
-                continue
+# For basic tests
+# => input hits do not always produce output pixel hits
+# TODO pixelID does not always match the pixelID in the output...
+chain_simple = """
+[GenericPropagation]
+[SimpleTransfer]
+max_depth_distance = 1m
+[DefaultDigitizer]
+threshold = 0e
+"""
 
-            if line.startswith("---"):
-                continue
+chain_advanced = """
+[ElectricFieldReader]
+model = "constant"
+bias_voltage = -1000V
+[GenericPropagation]
+mobility_model = "constant"
+mobility_electron = 10000cm*cm/V/s
+mobility_hole = 500cm*cm/V/s
+[PulseTransfer]
+[DefaultDigitizer]
+threshold = 1e
+threshold_smearing = 0
+qdc_resolution = 8 # Resolution of the QDC in units of bits. Thus, a value of 8 would translate to a QDC range of 0 to 255. A value of 0bit switches off the QDC simulation and returns the actual charge in electrons. Defaults to 0.
+qdc_smearing = 0 # Standard deviation of the Gaussian noise in the ADC conversion (after applying the threshold). Defaults to 300 electrons.
+qdc_slope = 10e # Slope of the QDC calibration in electrons per ADC unit (unit: e). Defaults to 10e.
+qdc_offset = -1 # Offset of the QDC calibration in electrons. In order to simulate a ToT (time-over-threshold) device, this offset should be configured to the negative value of the threshold. Defaults to 0.
+tdc_resolution = 0 # Resolution of the TDC in units of bits. Thus, a value of 8 would translate to a TDC range of 0 to 255. A value of 0bit switches off the TDC simulation and returns the actual time of arrival in nanoseconds. Defaults to 0.
+tdc_smearing = 0
+tdc_slope = 0 # Slope of the TDC calibration in nanoseconds per TDC unit (unit: ns). Defaults to 10ns.
+tdc_offset = 0 # Offset of the TDC calibration in nanoseconds. Defaults to 0.
+"""
 
-            if line.startswith("PixelHit"):
-                parts = line.split()
-                x, y = int(parts[1].strip(',')), int(parts[2].strip(','))
-                pixel_id = compute_pixel_id(x, y)
-                tot = float(parts[3].strip(',')) # TODO: deal with different types according to simulation chain!
-                toa = float(parts[4].strip(',')) # TODO: deal with different types according to simulation chain!
-                global_time = float(parts[5].strip(','))
-                position_x = float(parts[6].strip(','))
-                position_y = float(parts[7].strip(','))
-                position_z = float(parts[8].strip(','))
-
-                rows.append({
-                    "EventID": event_id,
-                    "PixelID": pixel_id,
-                    "ToT": tot,
-                    "ToA": global_time + toa, # because ToA is measured from the beginning of the event
-                    "PositionX": position_x,
-                    "PositionY": position_y,
-                    "PositionZ": position_z
-                })
-
-    df = pd.concat([df, pd.DataFrame(rows)], ignore_index=True)
-    return df
+# TODO
+chain_advanced_csa = """
+[TransientPropagation]
+[PulseTransfer]
+[CSADigitizer]
+"""
