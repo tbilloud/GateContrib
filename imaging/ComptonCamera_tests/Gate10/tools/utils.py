@@ -70,10 +70,10 @@ def print_hits_long_sortedByGlobalTime(hits_df):
     print_hits_long(hits_df)
 
 
-def compute_pixel_id(x, y):
-    return x * 256 + y  # Assuming 256x256 pixel grid (adjust if needed)
+def get_pixID(x, y, n_pixels = 256):
+    return x * n_pixels + y
 
-def compute_pixel_id_2D(pixel_id, n_pixels=256):
+def get_pixID_2D(pixel_id, n_pixels=256):
     x = pixel_id // n_pixels
     y = pixel_id % n_pixels
     return x, y
