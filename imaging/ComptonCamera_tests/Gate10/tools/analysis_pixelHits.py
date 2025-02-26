@@ -2,65 +2,85 @@
 
 import os
 import sys
-import numpy as np
 import pandas
+import pandas as pd
 import uproot
-import SimpleITK as sitk
 import matplotlib.pyplot as plt
-import cupy as cp
-from pandas import Series
-import imaging.ComptonCamera_tests.Gate10.tools.analysis_basics as analysis_basics
 from imaging.ComptonCamera_tests.Gate10.tools.utils import *
-from imaging.ComptonCamera_tests.Gate10.tools.utils import print_hits_inG4format
+import matplotlib.colors as mcolors
+from matplotlib.ticker import MaxNLocator
+
+from imaging.ComptonCamera_tests.Gate10.tools.utils import get_pixID
 
 pandas.set_option('display.max_columns', 100)
 pandas.set_option('display.width', 400)
 pandas.set_option('display.max_rows', 1000)
-pandas.set_option('display.float_format', lambda x: f'{x:.9}')  # G4 steps are logged with f'{x:.3}'
+pandas.set_option('display.float_format', lambda x: f'{x:.9}')  # G4 steps x:.3
 
-pixelHits_columns = ['PixelID', 'ToA', 'Energy']
+PIXEL_ID = 'PixelID_int16'
+TOA = 'ToA_ns'
+ENERGY = 'Energy_keV'
+pixelHits_columns = [PIXEL_ID, TOA, ENERGY]
+EVENTID = 'EventID'
+TOT = 'ToT'
+POSITION_X = 'PositionX'
+POSITION_Y = 'PositionY'
+POSITION_Z = 'PositionZ'
+simulation_columns = [EVENTID, TOT, POSITION_X, POSITION_Y, POSITION_Z]
 
-def singles2pixelHits(file_path, nentries=None):
+
+def singles2pixelHits(file_path):
     if not os.path.isfile(file_path):
-        sys.exit(f"File {file_path} does not exist, probably no hit produced...")
+        sys.exit(f"{file_path} does not exist, probably no hit produced...")
     else:
         print(f"Converting {file_path} to pixel hits")
 
-    singles = uproot.open(file_path)['Singles'].arrays(library='pd', entry_stop=nentries)
-    singles['HitUniqueVolumeID'] = singles['HitUniqueVolumeID'].astype(str).str.replace(r'0_', '', regex=True)
-    singles.rename(columns={'HitUniqueVolumeID': 'PixelID'}, inplace=True)
-    singles.rename(columns={'KineticEnergy': 'Energy'}, inplace=True)
-    singles.rename(columns={'GlobalTime': 'ToA'}, inplace=True)
-
+    singles = uproot.open(file_path)['Singles'].arrays(library='pd')
+    singles['HitUniqueVolumeID'] = singles['HitUniqueVolumeID'].astype(
+        str).str.replace(r'0_', '', regex=True)
+    singles.rename(columns={'HitUniqueVolumeID': PIXEL_ID}, inplace=True)
+    singles[PIXEL_ID] = singles[PIXEL_ID].astype(int)
+    singles.rename(columns={'TotalEnergyDeposit': ENERGY}, inplace=True)
+    singles[ENERGY] = singles[ENERGY] * 1e3  # Convert MeV to keV
+    singles.rename(columns={'GlobalTime': TOA}, inplace=True)
     return singles[pixelHits_columns]
 
-def plot_pixelHits_byEventID(pixelHits, eventID, n_pixels, output_dir='output/'):
-    event = pixelHits[pixelHits['EventID'] == eventID]
-    if len(event) == 0:
-        print(f"No pixel hit for event {eventID}")
-        return
-    print(f"Plotting pixel hits for event {eventID}")
-    fig, ax = plt.subplots()
-    h = ax.hist2d(event['PixelID'] % n_pixels, event['PixelID'] // n_pixels, bins=[n_pixels, n_pixels],
-                  weights=event['Energy'], cmap='viridis', range=[[0, n_pixels], [0, n_pixels]])
-    fig.colorbar(h[3], ax=ax, label='Pixel Charge')
-    ax.set_aspect('equal')
-    ax.set_xlabel('Pixel x')
-    ax.set_ylabel('Pixel y')
-    ax.set_title(f"Pixel hits for event {eventID}")
+
+def plot_pixelHits(pixelHits_df, n_pixels, log_scale=[False, False]):
+    df, np = pixelHits_df, n_pixels
+    x, y = zip(*df[PIXEL_ID].apply(get_pixID_2D, args=(np,)))
+
+    fig, ax = plt.subplots(1, 2, figsize=(12, 6))
+
+    nc, ne = [mcolors.LogNorm() if log else None for log in log_scale]
+
+    hc = ax[0].hist2d(x, y, bins=[np] * 2, range=[[0, n_pixels]] * 2, norm=nc)
+    cb = fig.colorbar(hc[3], ax=ax[0], label='Count')
+    cb.locator = MaxNLocator(integer=True)
+    cb.update_ticks()
+    ax[0].set_title('Hit Count')
+
+    he = ax[1].hist2d(x, y, bins=[np] * 2, weights=df[ENERGY], range=[[0, np]] * 2, norm=ne)
+    fig.colorbar(he[3], ax=ax[1], label='Energy Sum')
+    ax[1].set_title('Energy Sum')
+
+    for a in ax:
+        a.set_aspect('equal')
+        a.set_xlabel('Pixel x')
+        a.set_ylabel('Pixel y')
+
+    plt.tight_layout()
     plt.show()
-    # plt.savefig(output_dir + f'pixelHits_event{eventID}.png')
-    # plt.close()
 
 
-def save_pixelHits_burdaman_format(pixelHits_df, output_path):
+def pixelHits2burdaman(pixelHits_df, out_path):
     # TODO set types correctly (else visu with TrackLab will not work)
     # TODO => https://software.utef.cvut.cz/tracklab/manual/a01627.html
     # TODO: set dummy values
     # insert a column with 0s at the 3rd position
     pixelHits_df.insert(2, 'fTOA', 0)
     print(pixelHits_df)
-    pixelHits_df.to_csv(output_path, header=False, index=False, sep='\t')
+    pixelHits_df.to_csv(out_path, header=False, index=False, sep='\t')
 
     # Dummy header
     # TODO replace values with NaNs
@@ -104,11 +124,57 @@ def save_pixelHits_burdaman_format(pixelHits_df, output_path):
 """
 
     # Read the CSV file and add the custom header
-    with open(output_path, 'r', encoding='utf-8') as file:
+    with open(out_path, 'r', encoding='utf-8') as file:
         lines = file.readlines()
 
     lines.insert(0, custom_header)
 
     # Write the modified content back to the file
-    with open(output_path, 'w', encoding='utf-8') as file:
+    with open(out_path, 'w', encoding='utf-8') as file:
         file.writelines(lines)
+
+
+def allpixTxt2pixelHit(text_file, n_pixels=256):
+    # TODO adapt to different simulation chains
+
+    df = pd.DataFrame(columns=pixelHits_columns + simulation_columns)
+    rows = []
+
+    with open(text_file, "r") as file:
+        event_id = None
+        for line in file:
+            line = line.strip()
+
+            if line.startswith("==="):
+                event_id = int(
+                    line.split()[1]) - 1  # allpix adds 1 to event ID
+                continue
+
+            if line.startswith("---"):
+                continue
+
+            if line.startswith("PixelHit"):
+                parts = line.split()
+                x, y = int(parts[1].strip(',')), int(parts[2].strip(','))
+                pixel_id = get_pixID(x, y, n_pixels=n_pixels)
+                tot = float(parts[3].strip(','))
+                toa = float(parts[4].strip(','))
+                global_time = float(parts[5].strip(','))
+                position_x = float(parts[6].strip(','))
+                position_y = float(parts[7].strip(','))
+                position_z = float(parts[8].strip(','))
+
+                rows.append({
+                    EVENTID: event_id,
+                    PIXEL_ID: pixel_id,
+                    TOT: tot,
+                    ENERGY: tot,  # TODO: temporary
+                    TOA: global_time + toa,
+                    # because ToA is measured from the beginning of the event
+                    POSITION_X: position_x,
+                    POSITION_Y: position_y,
+                    POSITION_Z: position_z
+                })
+
+    df = pd.concat([df, pd.DataFrame(rows)], ignore_index=True)
+    return df
