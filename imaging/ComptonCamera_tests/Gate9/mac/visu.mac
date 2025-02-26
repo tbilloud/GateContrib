@@ -1,6 +1,20 @@
+# Visualization macro
+#
+# Usage:
+# 1) In main.mac, uncomment /control/execute mac/visu.mac and reduce simulation time
+# 2) Gate --qt mac/main.mac
+# 3) To see source shape, type in the GUI console:
+# /gate/source/source_name/visualize 1000 yellow 1
+
+# Mandatory commands
 /vis/open                     OGL
 /vis/drawVolume
 
+# Tune view point
+/vis/viewer/zoom 5
+/vis/viewer/set/viewpointThetaPhi -110 -30
+
+# Show particle trajectories
 /vis/scene/add/trajectories rich
 /vis/modeling/trajectories/create/drawByParticleID #  gamma=green, e-=red
 /vis/modeling/trajectories/drawByParticleID-0/default/setDrawStepPts true
@@ -8,9 +22,6 @@
 /vis/scene/add/eventID
 
 /vis/scene/endOfEventAction   accumulate 100
-
-/vis/viewer/zoom 5
-/vis/viewer/set/viewpointThetaPhi -110 -30
 
 /vis/scene/add/axes            0 0 0 50 mm
 /vis/scene/add/text            10 0 0 mm  20 0 0   X
