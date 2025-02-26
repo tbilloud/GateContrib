@@ -13,6 +13,10 @@ from imaging.ComptonCamera_tests.tools.reconstruction import *
 from opengate.geometry.volumes import *
 from scipy.spatial.transform import Rotation as R
 
+# TODO: how to visualize volume sources?
+#  -> use mother volumes for box/sphere to help with visualization?
+#  -> Or as in Gate9: /gate/source/source_name/visualize 1000 yellow 1
+
 if __name__ == "__main__":
     sim, sim.output_dir = Simulation(), "output"
     um, mm, keV, MeV, deg, Bq, sec = g4_units.um, g4_units.mm, g4_units.keV, g4_units.MeV, g4_units.deg, g4_units.Bq, g4_units.s
@@ -37,8 +41,7 @@ if __name__ == "__main__":
     # TODO: WARNING Could not check overlap for volume ... => problem?
     pixel = sim.add_volume("Box", "pixel")
     pixel.mother, pixel.size = sensor.name, [pitch, pitch, thickness]
-    pixel.material = sensor.material # TODO necessary?
-    # pixel
+    pixel.material = sensor.material
     par = RepeatParametrisedVolume(repeated_volume=pixel)
     par.linear_repeat, par.translation = [npix, npix, 1], [pitch, pitch, 0]
     sim.volume_manager.add_volume(par)
@@ -68,13 +71,6 @@ if __name__ == "__main__":
     singles.input_digi_collection = "Hits"
     singles.policy = "EnergyWeightedCentroidPosition"
     singles.output_filename = 'CC_Singles.root'  # if hc.output_filename, there will be two branches in the file
-    # INTEGRATED HIT FRAME
-    proj = sim.add_actor("DigitizerProjectionActor", "Projection")
-    proj.input_digi_collections = ["Singles"]
-    proj.authorize_repeated_volumes = True
-    proj.spacing = [pitch, pitch]
-    proj.size = [npix, npix]
-    proj.output_filename = 'projection.mhd'
 
     ## ============================
     ## == SOURCE                 ==
@@ -85,7 +81,6 @@ if __name__ == "__main__":
     source.position.translation = [0 * mm, 0 * mm, -1 * mm]
     # source.position.type, source.position.radius = "sphere", 5 * mm
     # source.position.type, source.position.size = "box", [5 * mm] * 3
-    # TODO: use mother volumes for box/sphere to help with visualization?
     # source.direction.theta, source.direction.phi = theta_phi(sensor, source)
     source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
     # sim.world.size = get_worldSize(sensor, source)
@@ -106,7 +101,7 @@ if __name__ == "__main__":
     singles_path = sim.output_dir + '/' + singles.output_filename
 
     # BASICS
-    analyse_hits(hits_path)
+    analyse_hits(hits_path), sys.exit()
     analyse_singles(singles_path)
     plot_DigitizerProjectionActor(sim)
     # plot_hits_TotalEnergyDeposit(hits_path)

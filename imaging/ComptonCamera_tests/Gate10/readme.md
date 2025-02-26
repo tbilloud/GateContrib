@@ -19,3 +19,16 @@ Solution:
 ```
 mv /home/billoud/PycharmProjects/GateContrib/venv/lib/python3.10/site-packages/opengate_core/plugins /home/billoud/PycharmProjects/GateContrib/venv/lib/python3.10/site-packages/opengate_core/plugins.bak`
 ```
+
+# Using the DigitizerProjectionActor
+This actor could give an image with integrated sum of pixel hits over events. But using it gives:  
+`Exception: Sorry, cannot (yet) use ProjectionActor with repeated volumes, set 'authorize_repeated_volumes' to False`  
+When fixed, use plot_DigitizerProjectionActor(sim) from analysis_basics.py and:  
+```
+proj = sim.add_actor("DigitizerProjectionActor", "Projection")
+proj.input_digi_collections = ["Singles"]
+proj.authorize_repeated_volumes = True
+proj.spacing = [pitch, pitch]
+proj.size = [npix, npix]
+proj.output_filename = 'projection.mhd'
+```
