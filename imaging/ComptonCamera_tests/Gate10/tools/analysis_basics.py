@@ -55,9 +55,7 @@ def analyse_singles(file_path):
     tree_singles = uproot.open(file_path)['Singles']
     print('\n =>', tree_singles.num_entries, 'entries in tree Singles')
     singles = tree_singles.arrays(library='pd', entry_stop=None)  # None to read all entries
-    singles.loc[:, singles.columns.str.contains('Energy')] *= 1000  # convert to keV
-    singles.loc[:, singles.columns.str.contains('Position')] *= 1000  # convert to um
-    # print(singles.to_string(index=False))
+    print(singles.to_string(index=False))
     # print(singles[singles['TrackCreatorProcess'] == 'compt'].to_string(index=False))
     # print(Series(singles['PreStepUniqueVolumeID'].to_numpy()).value_counts(normalize=True) * 100,'\n')  # !! entry_stop = None  !!
     # singles = singles.loc[:, ~singles.columns.str.contains('Position', case=False)]
@@ -70,7 +68,7 @@ def plot_DigitizerProjectionActor(sim):
     file_path = sim.output_dir + '/' + proj.output_filename  # Replace with the actual path to your .mhd file
     image = sitk.ReadImage(file_path)
     im = sitk.GetArrayFromImage(image)[0, :, :].astype(int)
-    plt.imshow(im, cmap='gray')
+    plt.imshow(im, cmap='gray',vmax=2)
     source = sim.source_manager.get_source("source")
     events = f'{source.n} events' if source.n else f'{int(source.activity / Bq)}Bq {sum_time_intervals(sim.run_timing_intervals) / sec} sec'
     plt.title(f'{source.particle} {source.energy.mono} MeV \n {events}')

@@ -1,6 +1,5 @@
-# Utility functions to analyse output files
-# Can be used in the main simulation script after sim.run() or offline (i.e. reading root files without simulation)
-# Calling E1 the energy deposited in the Compton scattering, as in CCMod paper
+# Functions to process pixelHits dataframes
+
 import os
 import sys
 import numpy as np
