@@ -30,15 +30,13 @@ if __name__ == "__main__":
     # ===========================
     npix, pitch, thickness = 10, 55 * um, 1 * mm
     sim.world.material = "Vacuum"
-    sim.world.size = [10 * mm] * 3
     # sim.world.color = [0] * 4
     sensor = sim.add_volume("Box", "sensor")
     sensor.material = "cadmium_telluride"
     sensor.size = [npix * pitch, npix * pitch, thickness]
     sensor.translation = [0 * mm, 0 * mm, 1 * mm]
     sensor.rotation = R.from_euler('y', 45, degrees=True).as_matrix()
-    # if not sim.visu: # TODO add this when using many pixels
-    # TODO: WARNING Could not check overlap for volume ... => problem?
+    # TODO: block below triggers 'WARNING Could not check overlap...' => problem?
     pixel = sim.add_volume("Box", "pixel")
     pixel.mother, pixel.size = sensor.name, [pitch, pitch, thickness]
     pixel.material = sensor.material
@@ -61,13 +59,12 @@ if __name__ == "__main__":
     ## =============================
     ## == ACTORS                  ==
     ## =============================
-    # HITS
     hits = sim.add_actor('DigitizerHitsCollectionActor', 'Hits')
     hits.attached_to = sensor.name
-    hits.authorize_repeated_volumes = True # TODO required (doc), but useless
+    hits.authorize_repeated_volumes = True  # TODO required (doc), but useless
     hits.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvailableDigiAttributeNames()
-    # SINGLES
     singles = sim.add_actor("DigitizerAdderActor", "Singles")
+    singles.authorize_repeated_volumes = True  # TODO required (doc), but useless
     singles.input_digi_collection = "Hits"
     singles.policy = "EnergyWeightedCentroidPosition"
     singles.output_filename = 'CC_Singles.root'  # if hc.output_filename, there will be two branches in the file
@@ -83,7 +80,7 @@ if __name__ == "__main__":
     # source.position.type, source.position.size = "box", [5 * mm] * 3
     # source.direction.theta, source.direction.phi = theta_phi(sensor, source)
     source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
-    # sim.world.size = get_worldSize(sensor, source)
+    sim.world.size = get_worldSize(sensor, source, margin=2)
 
     ##=====================================================
     ##   M E A S U R E M E N T
@@ -103,7 +100,6 @@ if __name__ == "__main__":
     # BASICS
     analyse_hits(hits_path), sys.exit()
     analyse_singles(singles_path)
-    plot_DigitizerProjectionActor(sim)
     # plot_hits_TotalEnergyDeposit(hits_path)
     # plot_hits_TotalEnergyDeposit_sumPerEvent(hits_path)
 

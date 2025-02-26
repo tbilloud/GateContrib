@@ -90,10 +90,10 @@ def theta_phi(sensor, source):
     phi_deg = 180 - np.degrees(np.arctan(sensor_size / (2 * distance)))
     return [phi_deg * deg, 180 * deg],  [0, 360 * deg]
 
-def get_worldSize(sensor, source):
+def get_worldSize(sensor, source, margin = 0.1):
     stype = source.position.type
     if stype not in ["point", "sphere", "box"]:
         raise ValueError("Function get_worldSize() is only implemented for point/sphere/box sources")
     ssize = source.position.size if stype in ['point','box'] else [source.position.radius]*3
-    return [np.max([abs(st) + sz / 2, abs(sp) + ss / 2]) * 2.1 for st, sz, sp, ss in
+    return [np.max([abs(st) + sz / 2, abs(sp) + ss / 2]) * (2+margin) for st, sz, sp, ss in
             zip(sensor.translation, sensor.size, source.position.translation, ssize)]
