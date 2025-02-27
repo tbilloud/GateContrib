@@ -45,12 +45,9 @@ def singles2pixelHits(file_path):
     singles.rename(columns={'GlobalTime': TOA}, inplace=True)
     return singles[pixelHits_columns]
 
-
-def plot_pixelHits(pixelHits_df, n_pixels, log_scale=[False, False]):
+def pixelHits_fig_ax(pixelHits_df, n_pixels, fig, ax, log_scale):
     df, np = pixelHits_df, n_pixels
     x, y = zip(*df[PIXEL_ID].apply(get_pixID_2D, args=(np,)))
-
-    fig, ax = plt.subplots(1, 2, figsize=(12, 6))
 
     nc, ne = [mcolors.LogNorm() if log else None for log in log_scale]
 
@@ -70,9 +67,7 @@ def plot_pixelHits(pixelHits_df, n_pixels, log_scale=[False, False]):
         a.set_ylabel('Pixel y')
 
     plt.tight_layout()
-    plt.show()
-    return fig
-
+    return fig, ax
 
 def pixelHits2burdaman(pixelHits_df, out_path):
     # TODO set types correctly (else visu with TrackLab will not work)

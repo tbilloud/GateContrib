@@ -25,7 +25,7 @@ if __name__ == "__main__":
     # ===========================
     # ==   GEOMETRY            ==
     # ===========================
-    npix, pitch, thickness = 10, 55 * um, 1 * mm
+    npix, pitch, thickness = 4, 1000 * um, 1 * mm
     sim.world.material = "Vacuum"
     # sim.world.color = [0] * 4
     sensor = sim.add_volume("Box", "sensor")
@@ -64,28 +64,27 @@ if __name__ == "__main__":
     singles.authorize_repeated_volumes = True  # TODO required (doc), but useless
     singles.input_digi_collection = "Hits"
     singles.policy = "EnergyWeightedCentroidPosition"
-    singles.output_filename = 'CC_Singles.root'  # if hc.output_filename, there will be two branches in the file
 
     ## ============================
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.n = 2
+    source.n = 1
     # source.activity, sim.run_timing_intervals = 100 * Bq, [[0, 2 * sec]] #,[2 * sec, 3 * sec]]
     source.particle = "proton"
-    source.energy.mono = 1000 * MeV
+    source.energy.mono = 1 * MeV
     source.position.translation = [0 * mm, 0 * mm, 0 * mm]
     # source.position.type, source.position.radius = "sphere", 5 * mm
     # source.position.type, source.position.size = "box", [5 * mm] * 3
-    source.direction.theta, source.direction.phi = theta_phi(sensor, source)
-    # source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
+    # source.direction.theta, source.direction.phi = theta_phi(sensor, source)
+    source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
     sim.world.size = get_worldSize(sensor, source, margin=10)
 
     ##=====================================================
-    ##   M E A S U R E M E N T
+    ##   RUN
     ##=====================================================
-    events = f'{source.n}events' if source.n else f'{int(source.activity / Bq)}Bq_{int(sum_time_intervals(sim.run_timing_intervals)) / sec}sec'
-    hits.output_filename = f'source{source.energy.mono}MeV_{events}_doppler{doppler}_fluo{fluo}.root'
+    hits.output_filename = 'hits_' + get_file_name(sim, doppler, fluo)
+    singles.output_filename = 'singles_' + get_file_name(sim, doppler, fluo)
     sim.run()
 
     ##=====================================================
@@ -95,7 +94,7 @@ if __name__ == "__main__":
     singles_path = sim.output_dir + '/' + singles.output_filename
 
     # BASICS
-    # analyse_hits(hits_path)
+    analyse_hits(hits_path)
     # analyse_singles(singles_path)
     # plot_hits_TotalEnergyDeposit(hits_path)
     # plot_hits_TotalEnergyDeposit_sumPerEvent(hits_path)
@@ -103,17 +102,18 @@ if __name__ == "__main__":
     # PIXEL HITS
     log_scale = [True, True]
     # 1) From singles
-    pixelHits = singles2pixelHits(singles_path)  # Gate
-    print(pixelHits.to_string(index=False))
-    fig_gate = plot_pixelHits(pixelHits,n_pixels=npix, log_scale=log_scale)
-    # # 2) From hits + allpix
-    # TODO: not working for any geometry... test with MIPs and rotation
+    pixelHits_singles = singles2pixelHits(singles_path)  # Gate
+    print(pixelHits_singles.to_string(index=False))
+    # 2) From hits + allpix
+    # # TODO: not working for any geometry... test with MIPs and rotation
     run_allpix(sim, output_dir='allpix/', log_level='FATAL') # INFO, FATAL, ...
-    pixelHits = allpixTxt2pixelHit('allpix/data.txt',n_pixels=npix)
-    print(pixelHits.to_string(index=False))
-    fig_allpix = plot_pixelHits(pixelHits,n_pixels=npix, log_scale=log_scale)
-    # merge figures and plot
-
+    pixelHits_allpix = allpixTxt2pixelHit('allpix/data.txt',n_pixels=npix)
+    print(pixelHits_allpix.to_string(index=False))
+    # Plot
+    fig, ax = plt.subplots(2, 2, figsize=(12, 6))
+    pixelHits_fig_ax(pixelHits_singles, npix, fig, ax[0], log_scale)
+    pixelHits_fig_ax(pixelHits_allpix, npix, fig, ax[1], log_scale)
+    plt.show()
     sys.exit()
 
     # PIXEL CLUSTERING

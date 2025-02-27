@@ -12,8 +12,10 @@ um, mm, keV, MeV, deg, Bq, sec = g4_units.um, g4_units.mm, g4_units.keV, g4_unit
 # If pandas.set_option('display.float_format'...) is used in script calling the function, remove it
 def print_hits_inG4format(hits_df):
     print(
-        hits_df[['PostPosition_X', 'PostPosition_Y', 'PostPosition_Z', 'KineticEnergy', 'TotalEnergyDeposit',
-                 'StepLength', 'TrackLength', 'HitUniqueVolumeID', 'ProcessDefinedStep', 'ParticleName', 'TrackID',
+        hits_df[['PostPosition_X', 'PostPosition_Y', 'PostPosition_Z',
+                 'KineticEnergy', 'TotalEnergyDeposit',
+                 'StepLength', 'TrackLength', 'HitUniqueVolumeID',
+                 'ProcessDefinedStep', 'ParticleName', 'TrackID',
                  'ParentID', 'ParentParticleName',
                  'TrackCreatorProcess', 'TrackCreatorModelName'
                  ]])
@@ -21,17 +23,22 @@ def print_hits_inG4format(hits_df):
 
 # Prints only few relevant columns from hits tree
 def print_hits_short(hits_df):
-    print(hits_df[['EventID', 'TrackID', 'ParticleName', 'ParentID', 'ParentParticleName', 'KineticEnergy',
-                   'TotalEnergyDeposit', 'ProcessDefinedStep', 'TrackCreatorProcess', 'GlobalTime',
+    print(hits_df[['EventID', 'TrackID', 'ParticleName', 'ParentID',
+                   'ParentParticleName', 'KineticEnergy',
+                   'TotalEnergyDeposit', 'ProcessDefinedStep',
+                   'TrackCreatorProcess', 'GlobalTime',
                    'HitUniqueVolumeID']].to_string(index=False))
 
 
 def print_hits_long(hits_df):
     print(hits_df[[
-        'EventID', 'TrackID', 'ParticleName', 'ParentID', 'ParentParticleName', 'KineticEnergy',
+        'EventID', 'TrackID', 'ParticleName', 'ParentID', 'ParentParticleName',
+        'KineticEnergy',
         'TotalEnergyDeposit', 'ProcessDefinedStep', 'TrackCreatorProcess',
-        'PrePosition_X', 'PrePosition_Y', 'PrePosition_Z', 'PostPosition_X', 'PostPosition_Y', 'PostPosition_Z',
-        'PreDirection_X', 'PreDirection_Y', 'PreDirection_Z', 'PostDirection_X', 'PostDirection_Y', 'PostDirection_Z'
+        'PrePosition_X', 'PrePosition_Y', 'PrePosition_Z', 'PostPosition_X',
+        'PostPosition_Y', 'PostPosition_Z',
+        'PreDirection_X', 'PreDirection_Y', 'PreDirection_Z',
+        'PostDirection_X', 'PostDirection_Y', 'PostDirection_Z'
     ]].to_string(index=False))
 
 
@@ -40,15 +47,18 @@ def print_hits_long(hits_df):
 def print_hits_direction(hits_df):
     print(hits_df[[
         'EventID', 'TrackID', 'ParticleName', 'ProcessDefinedStep',
-        'PrePosition_X', 'PrePosition_Y', 'PrePosition_Z', 'PostPosition_X', 'PostPosition_Y', 'PostPosition_Z',
-        'PreDirection_X', 'PreDirection_Y', 'PreDirection_Z', 'PostDirection_X', 'PostDirection_Y', 'PostDirection_Z'
+        'PrePosition_X', 'PrePosition_Y', 'PrePosition_Z', 'PostPosition_X',
+        'PostPosition_Y', 'PostPosition_Z',
+        'PreDirection_X', 'PreDirection_Y', 'PreDirection_Z',
+        'PostDirection_X', 'PostDirection_Y', 'PostDirection_Z'
     ]].to_string(index=False))
 
 
 # Prints time info
 def print_hits_time(hits_df):
     print(hits_df[[
-        'EventID', 'TrackID', 'ParticleName', 'GlobalTime', 'PreGlobalTime', 'LocalTime', 'TimeFromBeginOfEvent',
+        'EventID', 'TrackID', 'ParticleName', 'GlobalTime', 'PreGlobalTime',
+        'LocalTime', 'TimeFromBeginOfEvent',
         'TrackProperTime',
     ]].to_string(index=False))
 
@@ -56,30 +66,37 @@ def print_hits_time(hits_df):
 # Prints processes info
 def print_hits_processes(hits_df):
     print(hits_df[[
-        'EventID', 'TrackID', 'ParticleName', 'ProcessDefinedStep', 'TrackCreatorProcess', 'TrackCreatorModelName'
+        'EventID', 'TrackID', 'ParticleName', 'ProcessDefinedStep',
+        'TrackCreatorProcess', 'TrackCreatorModelName'
     ]].to_string(index=False))
 
 
 def print_hits_inG4format_sortedByGlobalTime(hits_df):
-    hits_df = hits_df.groupby('EventID').apply(lambda x: x.sort_values('GlobalTime'))
+    hits_df = hits_df.groupby('EventID').apply(
+        lambda x: x.sort_values('GlobalTime'))
     print_hits_inG4format(hits_df)
 
 
 def print_hits_long_sortedByGlobalTime(hits_df):
-    hits_df = hits_df.groupby('EventID').apply(lambda x: x.sort_values('GlobalTime'))
+    hits_df = hits_df.groupby('EventID').apply(
+        lambda x: x.sort_values('GlobalTime'))
     print_hits_long(hits_df)
 
 
-def get_pixID(x, y, n_pixels = 256):
+def get_pixID(x, y, n_pixels=256):
     return x * n_pixels + y
+
 
 def get_pixID_2D(pixel_id, n_pixels=256):
     x = pixel_id // n_pixels
     y = pixel_id % n_pixels
     return x, y
 
+
 def sum_time_intervals(time_intervals):
-    return sum([time_interval[1] - time_interval[0] for time_interval in time_intervals])
+    return sum([time_interval[1] - time_interval[0] for time_interval in
+                time_intervals])
+
 
 # Limit emission angle of source particles to the sensor area
 def theta_phi(sensor, source):
@@ -87,14 +104,34 @@ def theta_phi(sensor, source):
     sensor_position = np.array(sensor.translation)
     source_position = np.array(source.position.translation)
     sensor_size = np.max(sensor.size[0:1])
-    distance = np.linalg.norm(sensor_position - source_position)-sensor.size[2]/2
+    distance = np.linalg.norm(sensor_position - source_position) - sensor.size[
+        2] / 2
     phi_deg = 180 - np.degrees(np.arctan(sensor_size / (2 * distance)))
-    return [phi_deg * deg, 180 * deg],  [0, 360 * deg]
+    return [phi_deg * deg, 180 * deg], [0, 360 * deg]
 
-def get_worldSize(sensor, source, margin = 0.1):
+
+def get_worldSize(sensor, source, margin=0.1):
     stype = source.position.type
     if stype not in ["point", "sphere", "box"]:
-        raise ValueError("Function get_worldSize() is only implemented for point/sphere/box sources")
-    ssize = source.position.size if stype in ['point','box'] else [source.position.radius]*3
-    return [np.max([abs(st) + sz / 2, abs(sp) + ss / 2]) * (2+margin) for st, sz, sp, ss in
-            zip(sensor.translation, sensor.size, source.position.translation, ssize)]
+        raise ValueError(
+            "Function get_worldSize() is only implemented for point/sphere/box sources")
+    ssize = source.position.size if stype in ['point', 'box'] else [
+                                                                       source.position.radius] * 3
+    return [np.max([abs(st) + sz / 2, abs(sp) + ss / 2]) * (2 + margin) for
+            st, sz, sp, ss in
+            zip(sensor.translation, sensor.size, source.position.translation,
+                ssize)]
+
+
+def get_file_name(sim, doppler, fluo):
+    sources_dict = sim.source_manager.sources
+    if len(sources_dict) == 1:
+        source = next(iter(sources_dict.values()))
+    else:
+        raise NotImplementedError(
+            "Function get_file_name() is only implemented for one source")
+    events = (f'{source.n}events' if source.n else
+         f'{int(source.activity / Bq)}Bq_'
+         f'{int(sum_time_intervals(sim.run_timing_intervals)) / sec}sec')
+    energy = int(source.energy.mono / keV)
+    return f'source{energy}keV_{events}_doppler{doppler}_fluo{fluo}.root'
