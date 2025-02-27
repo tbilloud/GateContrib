@@ -58,7 +58,7 @@ def plot_pixelHits(pixelHits_df, n_pixels, log_scale=[False, False]):
     cb = fig.colorbar(hc[3], ax=ax[0], label='Count')
     cb.locator = MaxNLocator(integer=True)
     cb.update_ticks()
-    ax[0].set_title('Hit Count')
+    ax[0].set_title('Pixel Hit Count')
 
     he = ax[1].hist2d(x, y, bins=[np] * 2, weights=df[ENERGY], range=[[0, np]] * 2, norm=ne)
     fig.colorbar(he[3], ax=ax[1], label='Energy Sum')
@@ -71,6 +71,7 @@ def plot_pixelHits(pixelHits_df, n_pixels, log_scale=[False, False]):
 
     plt.tight_layout()
     plt.show()
+    return fig
 
 
 def pixelHits2burdaman(pixelHits_df, out_path):

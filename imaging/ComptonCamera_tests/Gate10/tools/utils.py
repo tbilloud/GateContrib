@@ -83,6 +83,7 @@ def sum_time_intervals(time_intervals):
 
 # Limit emission angle of source particles to the sensor area
 def theta_phi(sensor, source):
+    # TODO: only works if source and sensor have same x,y coordinates
     sensor_position = np.array(sensor.translation)
     source_position = np.array(source.position.translation)
     sensor_size = np.max(sensor.size[0:1])

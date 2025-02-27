@@ -1,13 +1,10 @@
-import sys
-import cupy as cp
 import opengate_core
-from opengate.utility import g4_units
 from opengate.managers import Simulation
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import *
 from imaging.ComptonCamera_tests.Gate10.allpix.allpix import *
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelClusters3 import *
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import *
-from imaging.ComptonCamera_tests.Gate10.tools.utils import *
+from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import *
 from imaging.ComptonCamera_tests.tools.point_source_validation import *
 from imaging.ComptonCamera_tests.tools.reconstruction import *
 from opengate.geometry.volumes import *
@@ -21,9 +18,9 @@ if __name__ == "__main__":
     sim, sim.output_dir = Simulation(), "output"
     um, mm, keV, MeV, deg, Bq, sec = g4_units.um, g4_units.mm, g4_units.keV, g4_units.MeV, g4_units.deg, g4_units.Bq, g4_units.s
     sim.volume_manager.add_material_database('../data/GateMaterials.db')
-    sim.random_engine, sim.random_seed = "MersenneTwister", 1
+    sim.random_engine, sim.random_seed = "MersenneTwister", 2
     # sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # useless if visu
-    sim.visu = True
+    sim.visu = False
 
     # ===========================
     # ==   GEOMETRY            ==
@@ -35,7 +32,7 @@ if __name__ == "__main__":
     sensor.material = "cadmium_telluride"
     sensor.size = [npix * pitch, npix * pitch, thickness]
     sensor.translation = [0 * mm, 0 * mm, 1 * mm]
-    sensor.rotation = R.from_euler('y', 45, degrees=True).as_matrix()
+    # sensor.rotation = R.from_euler('y', 45, degrees=True).as_matrix()
     # TODO: block below triggers 'WARNING Could not check overlap...' => problem?
     pixel = sim.add_volume("Box", "pixel")
     pixel.mother, pixel.size = sensor.name, [pitch, pitch, thickness]
@@ -73,20 +70,20 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
+    source.n = 2
+    # source.activity, sim.run_timing_intervals = 100 * Bq, [[0, 2 * sec]] #,[2 * sec, 3 * sec]]
     source.particle = "proton"
     source.energy.mono = 1000 * MeV
-    source.position.translation = [0 * mm, 0 * mm, -1 * mm]
+    source.position.translation = [0 * mm, 0 * mm, 0 * mm]
     # source.position.type, source.position.radius = "sphere", 5 * mm
     # source.position.type, source.position.size = "box", [5 * mm] * 3
-    # source.direction.theta, source.direction.phi = theta_phi(sensor, source)
-    source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
-    sim.world.size = get_worldSize(sensor, source, margin=2)
+    source.direction.theta, source.direction.phi = theta_phi(sensor, source)
+    # source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
+    sim.world.size = get_worldSize(sensor, source, margin=10)
 
     ##=====================================================
     ##   M E A S U R E M E N T
     ##=====================================================
-    source.n = 1
-    # source.activity, sim.run_timing_intervals = 100 * Bq, [[0, 2 * sec]] #,[2 * sec, 3 * sec]]
     events = f'{source.n}events' if source.n else f'{int(source.activity / Bq)}Bq_{int(sum_time_intervals(sim.run_timing_intervals)) / sec}sec'
     hits.output_filename = f'source{source.energy.mono}MeV_{events}_doppler{doppler}_fluo{fluo}.root'
     sim.run()
@@ -98,22 +95,26 @@ if __name__ == "__main__":
     singles_path = sim.output_dir + '/' + singles.output_filename
 
     # BASICS
-    analyse_hits(hits_path), sys.exit()
-    analyse_singles(singles_path)
+    # analyse_hits(hits_path)
+    # analyse_singles(singles_path)
     # plot_hits_TotalEnergyDeposit(hits_path)
     # plot_hits_TotalEnergyDeposit_sumPerEvent(hits_path)
 
     # PIXEL HITS
+    log_scale = [True, True]
     # 1) From singles
     pixelHits = singles2pixelHits(singles_path)  # Gate
     print(pixelHits.to_string(index=False))
-    # plot_pixelHits_byEventID(pixelHits, eventID=0, n_pixels=npix)
+    fig_gate = plot_pixelHits(pixelHits,n_pixels=npix, log_scale=log_scale)
     # # 2) From hits + allpix
-    # run_allpix(sim, output_dir='allpix/', log_level='FATAL') # log_level can be INFO, FATAL
-    # pixelHits = allpixTxt2pixelHit('allpix/data.txt')
-    # # save_pixelHits_burdaman_format(pixelHits, output_path=hits_path.replace(".root", ".txt"))
-    # print(pixelHits.to_string(index=False))
-    # # plot_pixelHits_byEventID(pixelHits, eventID=0, n_pixels=npix)
+    # TODO: not working for any geometry... test with MIPs and rotation
+    run_allpix(sim, output_dir='allpix/', log_level='FATAL') # INFO, FATAL, ...
+    pixelHits = allpixTxt2pixelHit('allpix/data.txt',n_pixels=npix)
+    print(pixelHits.to_string(index=False))
+    fig_allpix = plot_pixelHits(pixelHits,n_pixels=npix, log_scale=log_scale)
+    # merge figures and plot
+
+    sys.exit()
 
     # PIXEL CLUSTERING
     clusters = pixelHits2pixelClusters(pixelHits)
@@ -121,8 +122,6 @@ if __name__ == "__main__":
     # TODO pixelClusters = pixelHits2pixelClusters
     # TODO coincidences = pixelClusters2coincidences
     # TODO cones = coincidences2cones(pixel_hits)
-
-    sys.exit()
 
     # CONES
     # ### IDEAL ###

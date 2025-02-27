@@ -6,13 +6,14 @@ import uproot
 def run_allpix(sim, output_dir='allpix/', log_level='FATAL'):
     # TODO: simulate timewalk / fToA !
     # TODO: simulate ToT (DefaultDigitizer or CSADigitizer?)
+    # TODO: is DetectorHistogrammer necessary? slow?
     hits_actor = sim.actor_manager.get_actor("Hits")
-    hits_root_file = sim.output_dir + '/' + hits_actor.output_filename
-
+    hits_file = sim.output_dir + '/' + hits_actor.output_filename
+    gateHits_df = uproot.open(hits_file)['Hits'].arrays(library='pd')
     if sim.visu is True:
-        sys.exit("Allpix cannot be run with visualization enabled")
+        sys.exit("Allpix cannot be run with Gate visualization enabled")
     else:
-        print(f"Running Allpix2 with input {hits_root_file}")
+        print(f"Running Allpix2 with input {hits_file},{gateHits_df.size} hits")
 
     sensor = sim.volume_manager.get_volume("sensor")
     pixel = sim.volume_manager.get_volume("pixel_param")
@@ -21,8 +22,8 @@ def run_allpix(sim, output_dir='allpix/', log_level='FATAL'):
     # TODO deal with sensor rotation/orientation
     geometry_conf_content = f"""[0_0]
 type = "detector_model"
-position = {sensor.translation} # {sensor.translation[0]} {sensor.translation[1]} {sensor.translation[2]}
-orientation = 0 0 0 
+position = {sensor.translation}
+orientation = 0 0 0 # sensor.rotation not working
     """
 
     detector_model_conf_content = f"""type = "hybrid"
@@ -36,20 +37,17 @@ bump_cylinder_radius = 7.0um
 bump_height = 20.0um
     """
 
-    nevents = source.n if source.n else \
-        uproot.open(hits_root_file)['Hits'].arrays(library='pd')[
-            'EventID'].max()
     main_conf_content = f"""[Allpix]
 log_level = {log_level}
 log_format = "DEFAULT"
 detectors_file = "geometry.conf"
-number_of_events = {nevents + 1}
+number_of_events = {source.n if source.n else gateHits_df['EventID'].max() + 1}
 model_paths = ["."]
 output_directory = "."
 random_seed = 1
 [DepositionReader]
 model = "root"
-file_name = "../{hits_root_file}"
+file_name = "../{hits_file}"
 tree_name = "Hits"
 detector_name_chars = 3
 unit_length = "mm"
