@@ -1,11 +1,11 @@
+import os.path
+
 import opengate_core
 from opengate.managers import Simulation
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import *
 from imaging.ComptonCamera_tests.Gate10.allpix.allpix import *
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelClusters3 import *
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import *
-from imaging.ComptonCamera_tests.tools.point_source_validation import *
-from imaging.ComptonCamera_tests.tools.reconstruction import *
 from opengate.geometry.volumes import *
 from scipy.spatial.transform import Rotation as R
 
@@ -17,21 +17,21 @@ if __name__ == "__main__":
     sim, sim.output_dir = Simulation(), "output"
     um, mm, keV, MeV, deg, Bq, sec = g4_units.um, g4_units.mm, g4_units.keV, g4_units.MeV, g4_units.deg, g4_units.Bq, g4_units.s
     sim.volume_manager.add_material_database('../data/GateMaterials.db')
-    sim.random_engine, sim.random_seed = "MersenneTwister", 1
+    sim.random_engine, sim.random_seed = "MersenneTwister", 6
     # sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # useless if visu
     sim.visu = False
 
     # ===========================
     # ==   GEOMETRY            ==
     # ===========================
-    npix, pitch, thickness = 10, 55 * um, 1 * mm
+    npix, pitch, thickness = 256, 55 * um, 1 * mm
     sim.world.material = "Vacuum"
     # sim.world.color = [0] * 4
     sensor = sim.add_volume("Box", "sensor")
     sensor.material = "cadmium_telluride"
     sensor.size = [npix * pitch, npix * pitch, thickness]
-    sensor.translation = [0 * mm, 25 * um, 6 * mm]
-    sensor.rotation = R.from_euler('xyz', [0,90,0], degrees=True).as_matrix()
+    sensor.translation = [0 * um, 0 * um, 50 * mm]
+    # sensor.rotation = R.from_euler('xyz', [0,90,0], degrees=True).as_matrix()
     # TODO: block below triggers 'WARNING Could not check overlap...' => problem?
     pixel = sim.add_volume("Box", "pixel")
     pixel.mother, pixel.size = sensor.name, [pitch, pitch, thickness]
@@ -43,10 +43,12 @@ if __name__ == "__main__":
     ## ===========================
     ## ==  PHYSICS              ==
     ## ===========================
-    doppler = False
+    doppler = True
     fluo = True
     if doppler: sim.physics_manager.physics_list_name = 'G4EmLivermorePhysics'
-    if fluo: sim.physics_manager.global_production_cuts.all = 10 * um
+    if fluo:
+        sim.physics_manager.global_production_cuts.gamma = 10 * um
+        sim.physics_manager.global_production_cuts.electron = 10 * um
     sim.physics_manager.em_parameters.update(
         {'fluo': fluo, 'pixe': fluo, 'deexcitation_ignore_cut': False,
          'auger': fluo, 'auger_cascade': fluo})
@@ -59,6 +61,7 @@ if __name__ == "__main__":
     hits.attached_to = sensor.name
     hits.authorize_repeated_volumes = True
     hits.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvailableDigiAttributeNames()
+    # hits.keep_zero_edep = True # TODO compatible with gHits2cones_byEventID ?
     singles = sim.add_actor("DigitizerAdderActor", "Singles")
     singles.authorize_repeated_volumes = True
     singles.input_digi_collection = "Hits"
@@ -68,29 +71,31 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.n = 1
+    source.n = 300
     # source.activity, sim.run_timing_intervals = 100 * Bq, [[0, 2 * sec]] #,[2 * sec, 3 * sec]]
-    source.particle = "proton"
-    source.energy.mono = 1000 * MeV
+    source.particle = "gamma"
+    source.energy.mono = 140 * keV
     source.position.translation = [0 * mm, 0 * mm, 0 * mm]
     # source.position.type, source.position.radius = "sphere", 5 * mm
     # source.position.type, source.position.size = "box", [5 * mm] * 3
-    # source.direction.theta, source.direction.phi = theta_phi(sensor, source)
-    source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
+    source.direction.theta, source.direction.phi = theta_phi(sensor, source)
+    # source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
     sim.world.size = get_worldSize(sensor, source, margin=5)
 
     ##=====================================================
     ##   RUN
     ##=====================================================
+
     hits.output_filename = 'hits_' + get_file_name(sim, doppler, fluo)
     singles.output_filename = 'singles_' + get_file_name(sim, doppler, fluo)
-    sim.run()
+    sim.run(start_new_process=True)
 
     ##=====================================================
     ##   ANALYSIS
     ##=====================================================
     hits_path = sim.output_dir + '/' + hits.output_filename
     singles_path = sim.output_dir + '/' + singles.output_filename
+    if not os.path.isfile(hits_path): sys.exit(f"{hits_path} does not exist")
 
     # BASICS
     analyse_hits(hits_path)
@@ -98,32 +103,28 @@ if __name__ == "__main__":
     # plot_hits_TotalEnergyDeposit(hits_path)
     # plot_hits_TotalEnergyDeposit_sumPerEvent(hits_path)
 
-    # PIXEL HITS
-    # 1) From singles
-    pixelHits_singles = singles2pixelHits(singles_path)  # Gate
-    print(pixelHits_singles.to_string(index=False))
-    # 2) From hits + allpix
-    run_allpix(sim, output_dir='allpix/', log_level='FATAL') # INFO, FATAL, ...
-    pixelHits_allpix = allpixTxt2pixelHit('allpix/data.txt',n_pixels=npix)
-    print(pixelHits_allpix.to_string(index=False))
-    # Plot
-    fig, ax = plt.subplots(2, 3, figsize=(12, 6))
-    pixelHits_fig_ax(pixelHits_singles, npix, fig, ax[0], [False, False, False])
-    pixelHits_fig_ax(pixelHits_allpix, npix, fig, ax[1], [False, False, False])
-    plt.tight_layout()
-    plt.show()
-    sys.exit()
+    # # PIXEL HITS
+    # # 1) From singles
+    # pixelHits_singles = singles2pixelHits(singles_path)  # Gate
+    # print(pixelHits_singles.to_string(index=False))
+    # # 2) From hits + allpix
+    # run_allpix(sim, output_dir='allpix/', log_level='FATAL') # INFO, FATAL, ...
+    # pixelHits_allpix = allpixTxt2pixelHit('allpix/data.txt',n_pixels=npix)
+    # print(pixelHits_allpix.to_string(index=False))
+    # # plot_pixelHits_comparison(pixelHits_singles,pixelHits_allpix,n_pixels=npix)
+    # plot_pixelHits_comparison_perEventID(pixelHits_singles,pixelHits_allpix,n_pixels=npix,log_scale=[False, False, True])
 
     # PIXEL CLUSTERING
-    clusters = pixelHits2pixelClusters(pixelHits)
-    print(clusters)
+    # clusters = pixelHits2pixelClusters(pixelHits)
+    # print(clusters)
     # TODO pixelClusters = pixelHits2pixelClusters
     # TODO coincidences = pixelClusters2coincidences
     # TODO cones = coincidences2cones(pixel_hits)
 
     # CONES
     # ### IDEAL ###
-    # cones = gHits2cones_byEventID(hits_path, source.energy.mono, to_array=True) # TODO make it faster
+    from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import *
+    cones = gHits2cones_byEventID(hits_path, source.energy.mono, to_array=True) # TODO make it faster
     # print(c)
     print('=>', cones.shape[0] if cones.shape[0] else sys.exit('No cones'),
           'cones,', cp.isnan(cones).any(axis=1).sum(),
@@ -131,8 +132,9 @@ if __name__ == "__main__":
 
     # RECONSTRUCTION
     # Point source validation
+    from imaging.ComptonCamera_tests.tools.point_source_validation import *
     point_source_cone_validation(cones,
-                                 world_z=sim.world.size[2],
+                                 vpitch=1, #sim.world.size[2] / 256,
                                  source_pos=source.position.translation,
                                  plot_seq=False,
                                  plot_stack=True,
@@ -142,11 +144,12 @@ if __name__ == "__main__":
                                      ".root",
                                      f'\n{cones.shape[0]} cones'),
                                  )
-    # Image reconstruction
-    reconstruct(cones,
-                vsize=(256, 256, 256),
-                vpitch=sim.world.size[2] / 256,
-                output=hits_path.replace(".root", ".npy"),
-                napari=True,
-                detector={'size': sensor.size, 'position': sensor.translation}
-                )
+    # # Image reconstruction
+    # from imaging.ComptonCamera_tests.tools.reconstruction import *
+    # reconstruct(cones,
+    #             vsize=(256, 256, 256),
+    #             vpitch=sim.world.size[2] / 256,
+    #             output=hits_path.replace(".root", ".npy"),
+    #             napari=True,
+    #             detector={'size': sensor.size, 'position': sensor.translation}
+    #             )
