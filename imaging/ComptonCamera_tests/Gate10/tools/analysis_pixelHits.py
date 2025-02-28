@@ -47,13 +47,15 @@ def singles2pixelHits(file_path):
     singles.rename(columns={'Position_Y': POSITION_Y}, inplace=True)
     singles.rename(columns={'Position_Z': POSITION_Z}, inplace=True)
     singles[TOT] = singles[ENERGY] * 1e3  # TODO temporary
-    return singles[pixelHits_columns+simulation_columns]
+    return singles[pixelHits_columns + simulation_columns]
 
-def pixelHits_fig_ax(pixelHits_df, n_pixels, fig, ax, log_scale):
+
+def pixelHits_fig_ax(pixelHits_df, n_pixels, fig, ax,
+                     log_scale=[False, False, False]):
     df, np = pixelHits_df, n_pixels
     x, y = zip(*df[PIXEL_ID].apply(get_pixID_2D, args=(np,)))
 
-    nc, ne = [mcolors.LogNorm() if log else None for log in log_scale]
+    nc, ne, nt = [mcolors.LogNorm() if log else None for log in log_scale]
 
     hc = ax[0].hist2d(x, y, bins=[np] * 2, range=[[0, n_pixels]] * 2, norm=nc)
     cb = fig.colorbar(hc[3], ax=ax[0], label='Count')
@@ -61,9 +63,15 @@ def pixelHits_fig_ax(pixelHits_df, n_pixels, fig, ax, log_scale):
     cb.update_ticks()
     ax[0].set_title('Counts')
 
-    he = ax[1].hist2d(x, y, bins=[np] * 2, weights=df[ENERGY], range=[[0, np]] * 2, norm=ne)
+    he = ax[1].hist2d(x, y, bins=[np] * 2, weights=df[ENERGY],
+                      range=[[0, np]] * 2, norm=ne)
     fig.colorbar(he[3], ax=ax[1], label='Energy Sum (keV)')
     ax[1].set_title('Energy')
+
+    ht = ax[2].hist2d(x, y, bins=[np] * 2, weights=df[TOA],
+                      range=[[0, np]] * 2, norm=nt, vmin=0.02)
+    fig.colorbar(ht[3], ax=ax[2], label='ToA Sum (ns)')
+    ax[2].set_title('Time')
 
     for a in ax:
         a.set_aspect('equal')
@@ -72,6 +80,7 @@ def pixelHits_fig_ax(pixelHits_df, n_pixels, fig, ax, log_scale):
 
     plt.tight_layout()
     return fig, ax
+
 
 def pixelHits2burdaman(pixelHits_df, out_path):
     # TODO set types correctly (else visu with TrackLab will not work)
@@ -168,7 +177,7 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
                     PIXEL_ID: pixel_id,
                     TOT: tot,
                     ENERGY: tot,  # TODO: temporary
-                    TOA: global_time + toa, # ToA is measured from event start
+                    TOA: global_time + toa,  # ToA is measured from event start
                     POSITION_X: position_x,
                     POSITION_Y: position_y,
                     POSITION_Z: position_z
