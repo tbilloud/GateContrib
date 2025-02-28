@@ -49,10 +49,7 @@ model = "root"
 file_name = "../{hits_file}"
 tree_name = "Hits"
 detector_name_chars = 3
-unit_length = "mm"
-unit_time = {"s" if source.n else "ns"} # if source.n is used in Gate instead of source.activity, time is not simulated, but this allows for dummy non-zero values
 branch_names = ["EventID", "TotalEnergyDeposit", "GlobalTime", "Position_X", "Position_Y", "Position_Z", "HitUniqueVolumeID", "PDGCode", "TrackID", "ParentID"]
-output_plots = true
 {chain_simple}
 [TextWriter]
 include = "PixelHit"
@@ -83,9 +80,9 @@ include = "PixelHit"
 
 # For basic tests
 # => input hits do not always produce output pixel hits
-# TODO pixelID does not always match the pixelID in the output...
 chain_simple = """
 [GenericPropagation]
+charge_per_step = 10000
 [SimpleTransfer]
 max_depth_distance = 10m
 [DefaultDigitizer]
@@ -114,7 +111,6 @@ tdc_slope = 0 # Slope of the TDC calibration in nanoseconds per TDC unit (unit: 
 tdc_offset = 0 # Offset of the TDC calibration in nanoseconds. Defaults to 0.
 """
 
-# TODO
 chain_advanced_csa = """
 [TransientPropagation]
 [PulseTransfer]

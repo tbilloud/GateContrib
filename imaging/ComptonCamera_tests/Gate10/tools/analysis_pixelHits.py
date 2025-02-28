@@ -59,11 +59,11 @@ def pixelHits_fig_ax(pixelHits_df, n_pixels, fig, ax, log_scale):
     cb = fig.colorbar(hc[3], ax=ax[0], label='Count')
     cb.locator = MaxNLocator(integer=True)
     cb.update_ticks()
-    ax[0].set_title('Pixel Hit Count')
+    ax[0].set_title('Counts')
 
     he = ax[1].hist2d(x, y, bins=[np] * 2, weights=df[ENERGY], range=[[0, np]] * 2, norm=ne)
-    fig.colorbar(he[3], ax=ax[1], label='Energy Sum')
-    ax[1].set_title('Energy Sum')
+    fig.colorbar(he[3], ax=ax[1], label='Energy Sum (keV)')
+    ax[1].set_title('Energy')
 
     for a in ax:
         a.set_aspect('equal')

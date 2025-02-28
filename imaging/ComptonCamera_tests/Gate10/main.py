@@ -24,13 +24,13 @@ if __name__ == "__main__":
     # ===========================
     # ==   GEOMETRY            ==
     # ===========================
-    npix, pitch, thickness = 10, 1 * mm, 1 * mm
+    npix, pitch, thickness = 10, 0.1 * mm, 1 * mm
     sim.world.material = "Vacuum"
     # sim.world.color = [0] * 4
     sensor = sim.add_volume("Box", "sensor")
     sensor.material = "cadmium_telluride"
     sensor.size = [npix * pitch, npix * pitch, thickness]
-    sensor.translation = [0 * mm, 0 * um, 6 * mm]
+    sensor.translation = [0 * mm, 50 * um, 6 * mm]
     sensor.rotation = R.from_euler('y', 90, degrees=True).as_matrix()
     rotation_from_matrix = R.from_matrix(sensor.rotation)
     # TODO: block below triggers 'WARNING Could not check overlap...' => problem?
@@ -69,10 +69,10 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.n = 100
+    source.n = 1
     # source.activity, sim.run_timing_intervals = 100 * Bq, [[0, 2 * sec]] #,[2 * sec, 3 * sec]]
-    source.particle = "gamma"
-    source.energy.mono = 100 * keV
+    source.particle = "proton"
+    source.energy.mono = 1000 * MeV
     source.position.translation = [0 * mm, 0 * mm, 0 * mm]
     # source.position.type, source.position.radius = "sphere", 5 * mm
     # source.position.type, source.position.size = "box", [5 * mm] * 3
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     # plot_hits_TotalEnergyDeposit_sumPerEvent(hits_path)
 
     # PIXEL HITS
-    log_scale = [True, True]
+    log_scale = [False, False]
     # 1) From singles
     pixelHits_singles = singles2pixelHits(singles_path)  # Gate
     print(pixelHits_singles.to_string(index=False))
