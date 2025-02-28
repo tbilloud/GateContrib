@@ -64,28 +64,67 @@ def pixelHits_fig_ax(pixelHits_df, n_pixels, fig, ax,
     ax[0].set_title('Counts')
 
     he = ax[1].hist2d(x, y, bins=[np] * 2, weights=df[ENERGY],
-                      range=[[0, np]] * 2, norm=ne)
-    fig.colorbar(he[3], ax=ax[1], label='Energy Sum (keV)')
+                      range=[[0, np]] * 2, norm=ne,
+                      vmin=0.5 * df[ENERGY].min() if not ne else None)
+    fig.colorbar(he[3], ax=ax[1], label='Energy (keV)')
     ax[1].set_title('Energy')
 
     ht = ax[2].hist2d(x, y, bins=[np] * 2, weights=df[TOA],
-                      range=[[0, np]] * 2, norm=nt, vmin=0.02)
-    fig.colorbar(ht[3], ax=ax[2], label='ToA Sum (ns)')
+                      range=[[0, np]] * 2, norm=nt,
+                      vmin=0.9 * df[TOA].min() if not nt else None)
+    fig.colorbar(ht[3], ax=ax[2], label='ToA (ns)')
     ax[2].set_title('Time')
 
     for a in ax:
         a.set_aspect('equal')
         a.set_xlabel('Pixel x')
         a.set_ylabel('Pixel y')
+        a.xaxis.set_major_locator(MaxNLocator(integer=True))
+        a.yaxis.set_major_locator(MaxNLocator(integer=True))
 
-    plt.tight_layout()
     return fig, ax
+
+
+def plot_pixelHits_perEventID(pixelHits_df, n_pixels,
+                              log_scale=[False, False, False]):
+    unique_event_ids = pixelHits_df[EVENTID].unique()
+    for event_id in unique_event_ids:
+        df = pixelHits_df[pixelHits_df[EVENTID] == event_id]
+        fig, ax = pixelHits_fig_ax(df, n_pixels, log_scale)
+        pixelHits_fig_ax(df, n_pixels, fig, ax, log_scale)
+        plt.suptitle(f'Event ID: {event_id}')
+        plt.tight_layout()
+        plt.show()
+
+
+def plot_pixelHits_comparison(pixelHits_df1, pixelHits_df2, n_pixels,
+                              log_scale=[False, False, False]):
+    fig, ax = plt.subplots(2, 3, figsize=(12, 6))
+    pixelHits_fig_ax(pixelHits_df1, n_pixels, fig, ax[0], log_scale)
+    pixelHits_fig_ax(pixelHits_df2, n_pixels, fig, ax[1], log_scale)
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_pixelHits_comparison_perEventID(pixelHits_df1, pixelHits_df2,
+                                         n_pixels,
+                                         log_scale=[False, False, False]):
+    unique_event_ids = pixelHits_df1[EVENTID].unique()
+    assert (unique_event_ids == pixelHits_df2[EVENTID].unique()).all()
+    for event_id in unique_event_ids:
+        df1 = pixelHits_df1[pixelHits_df1[EVENTID] == event_id]
+        df2 = pixelHits_df2[pixelHits_df2[EVENTID] == event_id]
+        fig, ax = plt.subplots(2, 3, figsize=(11, 6))
+        pixelHits_fig_ax(df1, n_pixels, fig, ax[0], log_scale)
+        pixelHits_fig_ax(df2, n_pixels, fig, ax[1], log_scale)
+        plt.suptitle(f'Event ID: {event_id}')
+        plt.tight_layout()
+        plt.show()
 
 
 def pixelHits2burdaman(pixelHits_df, out_path):
     # TODO set types correctly (else visu with TrackLab will not work)
-    # TODO => https://software.utef.cvut.cz/tracklab/manual/a01627.html
-    # TODO: set dummy values
+    # => https://software.utef.cvut.cz/tracklab/manual/a01627.html
     # insert a column with 0s at the 3rd position
     pixelHits_df.insert(2, 'fTOA', 0)
     print(pixelHits_df)
@@ -176,7 +215,7 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
                     EVENTID: event_id,
                     PIXEL_ID: pixel_id,
                     TOT: tot,
-                    ENERGY: tot,  # TODO: temporary
+                    ENERGY: tot * 4.43 / 1000,  # TODO: temporary
                     TOA: global_time + toa,  # ToA is measured from event start
                     POSITION_X: position_x,
                     POSITION_Y: position_y,
