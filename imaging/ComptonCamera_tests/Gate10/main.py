@@ -17,7 +17,7 @@ if __name__ == "__main__":
     sim, sim.output_dir = Simulation(), "output"
     um, mm, keV, MeV, deg, Bq, sec = g4_units.um, g4_units.mm, g4_units.keV, g4_units.MeV, g4_units.deg, g4_units.Bq, g4_units.s
     sim.volume_manager.add_material_database('../data/GateMaterials.db')
-    sim.random_engine, sim.random_seed = "MersenneTwister", 2
+    sim.random_engine, sim.random_seed = "MersenneTwister", 1
     # sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # useless if visu
     sim.visu = False
 
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.n = 1
+    source.n = 100
     # source.activity, sim.run_timing_intervals = 100 * Bq, [[0, 2 * sec]] #,[2 * sec, 3 * sec]]
     source.particle = "proton"
     source.energy.mono = 1000 * MeV
@@ -106,7 +106,7 @@ if __name__ == "__main__":
     print(pixelHits_singles.to_string(index=False))
     # 2) From hits + allpix
     # # TODO: not working for any geometry... test with MIPs and rotation
-    run_allpix(sim, output_dir='allpix/', log_level='DEBUG') # INFO, FATAL, ...
+    run_allpix(sim, output_dir='allpix/', log_level='FATAL') # INFO, FATAL, ...
     pixelHits_allpix = allpixTxt2pixelHit('allpix/data.txt',n_pixels=npix)
     print(pixelHits_allpix.to_string(index=False))
     # Plot
