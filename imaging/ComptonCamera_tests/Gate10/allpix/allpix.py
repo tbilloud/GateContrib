@@ -2,6 +2,7 @@ import sys
 import subprocess
 import uproot
 from scipy.spatial.transform import Rotation as R
+import warnings
 
 
 def run_allpix(sim, output_dir='allpix/', log_level='FATAL'):
@@ -12,13 +13,16 @@ def run_allpix(sim, output_dir='allpix/', log_level='FATAL'):
     if sim.visu is True:
         sys.exit("Allpix cannot be run with Gate visualization enabled")
     else:
-        print(f"Running Allpix2 with input {hits_file},{gateHits_df.size} hits")
+        print(
+            f"Running Allpix2 with input {hits_file},{gateHits_df.size} hits")
 
     sensor = sim.volume_manager.get_volume("sensor")
     pixel = sim.volume_manager.get_volume("pixel_param")
     source = sim.source_manager.get_source("source")
 
-    angles = R.from_matrix(sensor.rotation).as_euler('xyz', degrees=True)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        angles = R.from_matrix(sensor.rotation).as_euler('xyz', degrees=True)
     geometry_conf_content = f"""[0_0]
 type = "detector_model"
 position = {" ".join([f"{sensor.translation[i]}mm" for i in range(3)])}
@@ -88,6 +92,7 @@ max_depth_distance = {sensor.size[2]}mm
 [DefaultDigitizer]
 threshold = 0e
 """
+
 
 chain_advanced = """
 [ElectricFieldReader]
