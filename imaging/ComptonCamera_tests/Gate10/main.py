@@ -31,8 +31,7 @@ if __name__ == "__main__":
     sensor.material = "cadmium_telluride"
     sensor.size = [npix * pitch, npix * pitch, thickness]
     sensor.translation = [0 * mm, 25 * um, 6 * mm]
-    sensor.rotation = R.from_euler('y', 90, degrees=True).as_matrix()
-    rotation_from_matrix = R.from_matrix(sensor.rotation)
+    sensor.rotation = R.from_euler('xyz', [0,90,0], degrees=True).as_matrix()
     # TODO: block below triggers 'WARNING Could not check overlap...' => problem?
     pixel = sim.add_volume("Box", "pixel")
     pixel.mother, pixel.size = sensor.name, [pitch, pitch, thickness]
@@ -58,10 +57,10 @@ if __name__ == "__main__":
     ## =============================
     hits = sim.add_actor('DigitizerHitsCollectionActor', 'Hits')
     hits.attached_to = sensor.name
-    hits.authorize_repeated_volumes = True  # TODO required (doc), but useless
+    hits.authorize_repeated_volumes = True
     hits.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvailableDigiAttributeNames()
     singles = sim.add_actor("DigitizerAdderActor", "Singles")
-    singles.authorize_repeated_volumes = True  # TODO required (doc), but useless
+    singles.authorize_repeated_volumes = True
     singles.input_digi_collection = "Hits"
     singles.policy = "EnergyWeightedCentroidPosition"
 
@@ -69,7 +68,7 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.n = 100
+    source.n = 1
     # source.activity, sim.run_timing_intervals = 100 * Bq, [[0, 2 * sec]] #,[2 * sec, 3 * sec]]
     source.particle = "proton"
     source.energy.mono = 1000 * MeV
@@ -100,19 +99,17 @@ if __name__ == "__main__":
     # plot_hits_TotalEnergyDeposit_sumPerEvent(hits_path)
 
     # PIXEL HITS
-    log_scale = [False, False]
     # 1) From singles
     pixelHits_singles = singles2pixelHits(singles_path)  # Gate
     print(pixelHits_singles.to_string(index=False))
     # 2) From hits + allpix
-    # # TODO: not working for any geometry... test with MIPs and rotation
     run_allpix(sim, output_dir='allpix/', log_level='FATAL') # INFO, FATAL, ...
     pixelHits_allpix = allpixTxt2pixelHit('allpix/data.txt',n_pixels=npix)
     print(pixelHits_allpix.to_string(index=False))
     # Plot
-    fig, ax = plt.subplots(2, 2, figsize=(12, 6))
-    pixelHits_fig_ax(pixelHits_singles, npix, fig, ax[0], log_scale)
-    pixelHits_fig_ax(pixelHits_allpix, npix, fig, ax[1], log_scale)
+    fig, ax = plt.subplots(2, 3, figsize=(12, 6))
+    pixelHits_fig_ax(pixelHits_singles, npix, fig, ax[0], [False, False, False])
+    pixelHits_fig_ax(pixelHits_allpix, npix, fig, ax[1], [False, False, False])
     plt.tight_layout()
     plt.show()
     sys.exit()
