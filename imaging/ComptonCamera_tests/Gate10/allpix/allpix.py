@@ -54,7 +54,7 @@ file_name = "../{hits_file}"
 tree_name = "Hits"
 detector_name_chars = 3
 branch_names = ["EventID", "TotalEnergyDeposit", "GlobalTime", "Position_X", "Position_Y", "Position_Z", "HitUniqueVolumeID", "PDGCode", "TrackID", "ParentID"]
-{get_chain_simple(sensor)}
+{get_chain_simple_with_toa(sensor)}
 [TextWriter]
 include = "PixelHit"
     """
@@ -93,6 +93,14 @@ max_depth_distance = {sensor.size[2]}mm
 threshold = 0e
 """
 
+def get_chain_simple_with_toa(sensor):
+    return f"""
+[GenericPropagation]
+[PulseTransfer]
+max_depth_distance = {sensor.size[2]}mm
+[DefaultDigitizer]
+threshold = 0e
+"""
 
 chain_advanced = """
 [ElectricFieldReader]
