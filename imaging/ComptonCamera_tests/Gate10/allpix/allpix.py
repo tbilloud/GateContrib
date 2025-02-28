@@ -50,7 +50,7 @@ file_name = "../{hits_file}"
 tree_name = "Hits"
 detector_name_chars = 3
 branch_names = ["EventID", "TotalEnergyDeposit", "GlobalTime", "Position_X", "Position_Y", "Position_Z", "HitUniqueVolumeID", "PDGCode", "TrackID", "ParentID"]
-{chain_simple}
+{get_chain_simple(sensor)}
 [TextWriter]
 include = "PixelHit"
     """
@@ -80,11 +80,11 @@ include = "PixelHit"
 
 # For basic tests
 # => input hits do not always produce output pixel hits
-chain_simple = """
+def get_chain_simple(sensor):
+    return f"""
 [GenericPropagation]
-charge_per_step = 10000
 [SimpleTransfer]
-max_depth_distance = 10m
+max_depth_distance = {sensor.size[2]}mm
 [DefaultDigitizer]
 threshold = 0e
 """

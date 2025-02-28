@@ -24,13 +24,13 @@ if __name__ == "__main__":
     # ===========================
     # ==   GEOMETRY            ==
     # ===========================
-    npix, pitch, thickness = 10, 0.1 * mm, 1 * mm
+    npix, pitch, thickness = 10, 55 * um, 1 * mm
     sim.world.material = "Vacuum"
     # sim.world.color = [0] * 4
     sensor = sim.add_volume("Box", "sensor")
     sensor.material = "cadmium_telluride"
     sensor.size = [npix * pitch, npix * pitch, thickness]
-    sensor.translation = [0 * mm, 50 * um, 6 * mm]
+    sensor.translation = [0 * mm, 25 * um, 6 * mm]
     sensor.rotation = R.from_euler('y', 90, degrees=True).as_matrix()
     rotation_from_matrix = R.from_matrix(sensor.rotation)
     # TODO: block below triggers 'WARNING Could not check overlap...' => problem?
