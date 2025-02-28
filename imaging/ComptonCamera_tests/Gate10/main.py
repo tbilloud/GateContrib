@@ -4,7 +4,6 @@ from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import *
 from imaging.ComptonCamera_tests.Gate10.allpix.allpix import *
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelClusters3 import *
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import *
-from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import *
 from imaging.ComptonCamera_tests.tools.point_source_validation import *
 from imaging.ComptonCamera_tests.tools.reconstruction import *
 from opengate.geometry.volumes import *
@@ -25,14 +24,15 @@ if __name__ == "__main__":
     # ===========================
     # ==   GEOMETRY            ==
     # ===========================
-    npix, pitch, thickness = 4, 1000 * um, 1 * mm
+    npix, pitch, thickness = 10, 1 * mm, 1 * mm
     sim.world.material = "Vacuum"
     # sim.world.color = [0] * 4
     sensor = sim.add_volume("Box", "sensor")
     sensor.material = "cadmium_telluride"
     sensor.size = [npix * pitch, npix * pitch, thickness]
-    sensor.translation = [0 * mm, 0 * mm, 1 * mm]
-    # sensor.rotation = R.from_euler('y', 45, degrees=True).as_matrix()
+    sensor.translation = [0 * mm, 0 * um, 6 * mm]
+    sensor.rotation = R.from_euler('y', 90, degrees=True).as_matrix()
+    rotation_from_matrix = R.from_matrix(sensor.rotation)
     # TODO: block below triggers 'WARNING Could not check overlap...' => problem?
     pixel = sim.add_volume("Box", "pixel")
     pixel.mother, pixel.size = sensor.name, [pitch, pitch, thickness]
@@ -69,16 +69,16 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.n = 1
+    source.n = 100
     # source.activity, sim.run_timing_intervals = 100 * Bq, [[0, 2 * sec]] #,[2 * sec, 3 * sec]]
-    source.particle = "proton"
-    source.energy.mono = 1 * MeV
+    source.particle = "gamma"
+    source.energy.mono = 100 * keV
     source.position.translation = [0 * mm, 0 * mm, 0 * mm]
     # source.position.type, source.position.radius = "sphere", 5 * mm
     # source.position.type, source.position.size = "box", [5 * mm] * 3
     # source.direction.theta, source.direction.phi = theta_phi(sensor, source)
     source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
-    sim.world.size = get_worldSize(sensor, source, margin=10)
+    sim.world.size = get_worldSize(sensor, source, margin=5)
 
     ##=====================================================
     ##   RUN
@@ -106,13 +106,14 @@ if __name__ == "__main__":
     print(pixelHits_singles.to_string(index=False))
     # 2) From hits + allpix
     # # TODO: not working for any geometry... test with MIPs and rotation
-    run_allpix(sim, output_dir='allpix/', log_level='FATAL') # INFO, FATAL, ...
+    run_allpix(sim, output_dir='allpix/', log_level='DEBUG') # INFO, FATAL, ...
     pixelHits_allpix = allpixTxt2pixelHit('allpix/data.txt',n_pixels=npix)
     print(pixelHits_allpix.to_string(index=False))
     # Plot
     fig, ax = plt.subplots(2, 2, figsize=(12, 6))
     pixelHits_fig_ax(pixelHits_singles, npix, fig, ax[0], log_scale)
     pixelHits_fig_ax(pixelHits_allpix, npix, fig, ax[1], log_scale)
+    plt.tight_layout()
     plt.show()
     sys.exit()
 

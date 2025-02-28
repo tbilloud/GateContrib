@@ -43,7 +43,11 @@ def singles2pixelHits(file_path):
     singles.rename(columns={'TotalEnergyDeposit': ENERGY}, inplace=True)
     singles[ENERGY] = singles[ENERGY] * 1e3  # Convert MeV to keV
     singles.rename(columns={'GlobalTime': TOA}, inplace=True)
-    return singles[pixelHits_columns]
+    singles.rename(columns={'Position_X': POSITION_X}, inplace=True)
+    singles.rename(columns={'Position_Y': POSITION_Y}, inplace=True)
+    singles.rename(columns={'Position_Z': POSITION_Z}, inplace=True)
+    singles[TOT] = singles[ENERGY] * 1e3  # TODO temporary
+    return singles[pixelHits_columns+simulation_columns]
 
 def pixelHits_fig_ax(pixelHits_df, n_pixels, fig, ax, log_scale):
     df, np = pixelHits_df, n_pixels
@@ -133,7 +137,6 @@ def pixelHits2burdaman(pixelHits_df, out_path):
 def allpixTxt2pixelHit(text_file, n_pixels=256):
     # TODO adapt to different simulation chains
 
-    df = pd.DataFrame(columns=pixelHits_columns + simulation_columns)
     rows = []
 
     with open(text_file, "r") as file:
@@ -165,12 +168,11 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
                     PIXEL_ID: pixel_id,
                     TOT: tot,
                     ENERGY: tot,  # TODO: temporary
-                    TOA: global_time + toa,
-                    # because ToA is measured from the beginning of the event
+                    TOA: global_time + toa, # ToA is measured from event start
                     POSITION_X: position_x,
                     POSITION_Y: position_y,
                     POSITION_Z: position_z
                 })
 
-    df = pd.concat([df, pd.DataFrame(rows)], ignore_index=True)
+    df = pd.DataFrame(rows, columns=pixelHits_columns + simulation_columns)
     return df

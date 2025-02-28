@@ -1,12 +1,11 @@
 import sys
 import subprocess
 import uproot
+from scipy.spatial.transform import Rotation as R
 
 
 def run_allpix(sim, output_dir='allpix/', log_level='FATAL'):
-    # TODO: simulate timewalk / fToA !
-    # TODO: simulate ToT (DefaultDigitizer or CSADigitizer?)
-    # TODO: is DetectorHistogrammer necessary? slow?
+    # TODO: sync different digitizer chains with output formats
     hits_actor = sim.actor_manager.get_actor("Hits")
     hits_file = sim.output_dir + '/' + hits_actor.output_filename
     gateHits_df = uproot.open(hits_file)['Hits'].arrays(library='pd')
@@ -19,11 +18,11 @@ def run_allpix(sim, output_dir='allpix/', log_level='FATAL'):
     pixel = sim.volume_manager.get_volume("pixel_param")
     source = sim.source_manager.get_source("source")
 
-    # TODO deal with sensor rotation/orientation
+    angles = R.from_matrix(sensor.rotation).as_euler('xyz', degrees=True)
     geometry_conf_content = f"""[0_0]
 type = "detector_model"
-position = {sensor.translation}
-orientation = 0 0 0 # sensor.rotation not working
+position = {" ".join([f"{sensor.translation[i]}mm" for i in range(3)])}
+orientation = {" ".join([f"{angles[i]}deg" for i in range(3)])}
     """
 
     detector_model_conf_content = f"""type = "hybrid"
@@ -55,8 +54,6 @@ unit_time = {"s" if source.n else "ns"} # if source.n is used in Gate instead of
 branch_names = ["EventID", "TotalEnergyDeposit", "GlobalTime", "Position_X", "Position_Y", "Position_Z", "HitUniqueVolumeID", "PDGCode", "TrackID", "ParentID"]
 output_plots = true
 {chain_simple}
-[DetectorHistogrammer]
-name = "0_0"
 [TextWriter]
 include = "PixelHit"
     """
@@ -90,7 +87,7 @@ include = "PixelHit"
 chain_simple = """
 [GenericPropagation]
 [SimpleTransfer]
-max_depth_distance = 1m
+max_depth_distance = 10m
 [DefaultDigitizer]
 threshold = 0e
 """
