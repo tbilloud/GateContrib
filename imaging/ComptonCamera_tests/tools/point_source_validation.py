@@ -26,11 +26,10 @@ cp.set_printoptions(linewidth=200)
 # - energy/spatial resolution
 
 # Units should be the same in cones_array, vpitch and source_pos
-def point_source_cone_validation(cones_array, world_z, source_pos, plot_seq = False, plot_stack = False, plot_seq_napari = False, legend = False):
+def point_source_cone_validation(cones_array, vpitch, source_pos, plot_seq = False, plot_stack = False, plot_seq_napari = False, legend = False):
 
     # Volume size and pitch
     vsize = (256, 256, 256)
-    vpitch = world_z / vsize[2]
     vol_init = cp.zeros(vsize, dtype=cp.float32)
 
     # Source position must be in units of voxels in vol
@@ -70,7 +69,7 @@ def point_source_cone_validation(cones_array, world_z, source_pos, plot_seq = Fa
     if plot_stack:
         fig, ax = plt.subplots()
         plt.title(legend if legend else f'{EventID.shape[0]} cones')
-        ax.imshow(np.sum(np.asarray(z_slice_stack), axis=0), cmap='gray')
+        ax.imshow(np.sum(np.asarray(z_slice_stack), axis=0), cmap='gray_r')
         ax.set_xlabel('X (pixels)')
         ax.set_ylabel('Y (pixels)')
         Xmm = ax.secondary_xaxis('top')
@@ -96,21 +95,21 @@ def point_source_cone_validation(cones_array, world_z, source_pos, plot_seq = Fa
 
 if __name__ == "__main__":
     # ###### READING Gate9.2 sequenceCoincidence.root files ##############
-    # fname, E0_MeV, world_z, source_pos = Path('../Gate9/output'), 0.140, 200, [0, 0, 0]
+    # fname, E0_MeV, vpitch, source_pos = Path('../Gate9/output'), 0.140, 200, [0, 0, 0]
     # nSingles_max = False  # maximum number of singles per coincidence, False to disable
     # true_coinc = False  # filter true coincidences (i.e. avoid singles from different events)
     # nentries = None  # None to read all entries
     # cones_array = seqCoin2ConesArray(fname / 'CC_sequenceCoincidence.root', E0_MeV, vsize, vpitch, er, nSingles_max, true_coinc, nentries)
 
     # ###### READING Gate9.2 CC_Cones.root files #########################
-    # fname, E0_MeV, world_z, source_pos = Path('../Gate9/output'), 0.140, 200, [0, 0, 0]
+    # fname, E0_MeV, vpitch, source_pos = Path('../Gate9/output'), 0.140, 200, [0, 0, 0]
     # nSingles_max = False  # maximum number of singles per coincidence, False to disable
     # true_coinc = False  # filter true coincidences (i.e. avoid singles from different events)
     # nentries = None  # None to read all entries
     # cones_array = conesTTree2conesArray(fname / 'CC_Cones.root', E0_MeV, er, nSingles_max, true_coinc, nentries)
 
     # ###### READING Gate10 hit root files ##############
-    fname, E0_MeV, world_z, source_pos = Path('../Gate10/output'), 1.0, 200, [0, 0, -50]
+    fname, E0_MeV, vpitch, source_pos = Path('../Gate10/output'), 1.0, 200, [0, 0, -50]
     cones_array = gHits2cones_byEventID(fname / 'CC_Hits.root', E0_MeV)
 
     # ###### Preprocessing #########
@@ -119,4 +118,4 @@ if __name__ == "__main__":
     # cones_array = remove_nans(cones_array)
     # print(len(cones_array), 'cones after removing nans')
 
-    point_source_cone_validation(cones_array, world_z, source_pos)
+    point_source_cone_validation(cones_array, vpitch, source_pos)
