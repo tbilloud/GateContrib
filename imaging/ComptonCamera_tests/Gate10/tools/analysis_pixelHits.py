@@ -89,8 +89,8 @@ def plot_pixelHits_perEventID(pixelHits_df, n_pixels,
                               log_scale=[False, False, False]):
     unique_event_ids = pixelHits_df[EVENTID].unique()
     for event_id in unique_event_ids:
+        fig, ax = plt.subplots(1, 3, figsize=(12, 6))
         df = pixelHits_df[pixelHits_df[EVENTID] == event_id]
-        fig, ax = pixelHits_fig_ax(df, n_pixels, log_scale)
         pixelHits_fig_ax(df, n_pixels, fig, ax, log_scale)
         plt.suptitle(f'Event ID: {event_id}')
         plt.tight_layout()
