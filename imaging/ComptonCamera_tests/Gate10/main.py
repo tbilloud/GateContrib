@@ -14,7 +14,7 @@ from imaging.ComptonCamera_tests.tools.point_source_validation import *
 from imaging.ComptonCamera_tests.tools.reconstruction import *
 
 # TODO: how to visualize volume sources?
-#  -> use mother volumes for box/sphere to help with visualization?
+#  -> use mother volumes for box/sphere?
 #  -> Or as in Gate9: /gate/source/source_name/visualize 1000 yellow 1
 
 if __name__ == "__main__":
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     sim.physics_manager.em_parameters.update(
         {'fluo': fluo, 'pixe': fluo, 'deexcitation_ignore_cut': False,
          'auger': fluo, 'auger_cascade': fluo})
-    # TODO: impacts number of hits greatly, and depends if cuts were set or not
+    # TODO: deexcitation_ignore_cut impacts number of hits, and depends on cuts
 
     ## =============================
     ## == ACTORS                  ==
@@ -90,7 +90,6 @@ if __name__ == "__main__":
     ##=====================================================
     ##   RUN
     ##=====================================================
-
     hits.output_filename = 'hits_' + get_file_name(sim, doppler, fluo)
     singles.output_filename = 'singles_' + get_file_name(sim, doppler, fluo)
     sim.run()
@@ -117,7 +116,6 @@ if __name__ == "__main__":
     # run_allpix(sim, output_dir='allpix/', log_level='FATAL') # INFO, FATAL, ...
     # pixelHits_allpix = allpixTxt2pixelHit('allpix/data.txt',n_pixels=npix)
     # print(pixelHits_allpix.to_string(index=False))
-    # # plot_pixelHits_comparison(pixelHits_singles,pixelHits_allpix,n_pixels=npix)
     # plot_pixelHits_comparison_perEventID(pixelHits_singles,pixelHits_allpix,n_pixels=npix,log_scale=[False, False, True])
 
     # PIXEL CLUSTERING
