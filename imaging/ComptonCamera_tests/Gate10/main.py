@@ -1,13 +1,17 @@
 import os.path
+import sys
 
 import opengate_core
 from opengate.managers import Simulation
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import *
 from imaging.ComptonCamera_tests.Gate10.allpix.allpix import *
-from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelClusters3 import *
+from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelClusters import *
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import *
 from opengate.geometry.volumes import *
 from scipy.spatial.transform import Rotation as R
+from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import *
+from imaging.ComptonCamera_tests.tools.point_source_validation import *
+from imaging.ComptonCamera_tests.tools.reconstruction import *
 
 # TODO: how to visualize volume sources?
 #  -> use mother volumes for box/sphere to help with visualization?
@@ -24,7 +28,7 @@ if __name__ == "__main__":
     # ===========================
     # ==   GEOMETRY            ==
     # ===========================
-    npix, pitch, thickness = 256, 55 * um, 1 * mm
+    npix, pitch, thickness = 6, 55 * um, 1 * mm
     sim.world.material = "Vacuum"
     # sim.world.color = [0] * 4
     sensor = sim.add_volume("Box", "sensor")
@@ -71,15 +75,16 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.n = 300
-    # source.activity, sim.run_timing_intervals = 100 * Bq, [[0, 2 * sec]] #,[2 * sec, 3 * sec]]
+    # source.n = 8
+    source.activity, sim.run_timing_intervals = 10000 * Bq, [
+        [0, 1 * sec]]  # ,[2 * sec, 3 * sec]]
     source.particle = "gamma"
     source.energy.mono = 140 * keV
     source.position.translation = [0 * mm, 0 * mm, 0 * mm]
     # source.position.type, source.position.radius = "sphere", 5 * mm
     # source.position.type, source.position.size = "box", [5 * mm] * 3
-    source.direction.theta, source.direction.phi = theta_phi(sensor, source)
-    # source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
+    # source.direction.theta, source.direction.phi = theta_phi(sensor, source)
+    source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
     sim.world.size = get_worldSize(sensor, source, margin=5)
 
     ##=====================================================
@@ -98,16 +103,17 @@ if __name__ == "__main__":
     if not os.path.isfile(hits_path): sys.exit(f"{hits_path} does not exist")
 
     # BASICS
-    analyse_hits(hits_path)
+    # analyse_hits(hits_path)
     # analyse_singles(singles_path)
     # plot_hits_TotalEnergyDeposit(hits_path)
     # plot_hits_TotalEnergyDeposit_sumPerEvent(hits_path)
 
-    # # PIXEL HITS
-    # # 1) From singles
-    # pixelHits_singles = singles2pixelHits(singles_path)  # Gate
+    # PIXEL HITS
+    # 1) From singles
+    pixelHits_singles = singles2pixelHits(singles_path)
     # print(pixelHits_singles.to_string(index=False))
-    # # 2) From hits + allpix
+    # plot_pixelHits_perEventID(pixelHits_singles, n_pixels=npix, log_scale=[False, False, False])
+    # 2) From hits + allpix
     # run_allpix(sim, output_dir='allpix/', log_level='FATAL') # INFO, FATAL, ...
     # pixelHits_allpix = allpixTxt2pixelHit('allpix/data.txt',n_pixels=npix)
     # print(pixelHits_allpix.to_string(index=False))
@@ -115,37 +121,25 @@ if __name__ == "__main__":
     # plot_pixelHits_comparison_perEventID(pixelHits_singles,pixelHits_allpix,n_pixels=npix,log_scale=[False, False, True])
 
     # PIXEL CLUSTERING
-    # clusters = pixelHits2pixelClusters(pixelHits)
-    # print(clusters)
-    # TODO pixelClusters = pixelHits2pixelClusters
-    # TODO coincidences = pixelClusters2coincidences
-    # TODO cones = coincidences2cones(pixel_hits)
+    clusters = pixelHits2pixelClusters(pixelHits_singles, npix)
+    # print(clusters.to_string(index=False))
 
-    # CONES
-    # ### IDEAL ###
-    from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import *
-    cones = gHits2cones_byEventID(hits_path, source.energy.mono, to_array=True) # TODO make it faster
-    # print(c)
-    print('=>', cones.shape[0] if cones.shape[0] else sys.exit('No cones'),
-          'cones,', cp.isnan(cones).any(axis=1).sum(),
-          'with NaNs')
+    # CONES TODO make it faster?
+    # cones = gHits2cones_byEventID(hits_path, source.energy.mono, to_array=True)
+    # # TODO cones = pixelClusters2cones(pixel_hits)
 
     # RECONSTRUCTION
-    # Point source validation
-    from imaging.ComptonCamera_tests.tools.point_source_validation import *
-    point_source_cone_validation(cones,
-                                 vpitch=1, #sim.world.size[2] / 256,
-                                 source_pos=source.position.translation,
-                                 plot_seq=False,
-                                 plot_stack=True,
-                                 plot_seq_napari=False,
-                                 legend=hits.output_filename.replace("_",
-                                                                     "\n").replace(
-                                     ".root",
-                                     f'\n{cones.shape[0]} cones'),
-                                 )
-    # # Image reconstruction
-    # from imaging.ComptonCamera_tests.tools.reconstruction import *
+    # name = hits.output_filename # TODO replace with pathlib.Path
+    # l = name.replace("_", "\n").replace(".root",f'\n{cones.shape[0]} cones')
+    # point_source_cone_validation(
+    #     cones,
+    #     vpitch=1,  # sim.world.size[2] / 256,
+    #     source_pos=source.position.translation,
+    #     plot_seq=False,
+    #     plot_stack=True,
+    #     plot_seq_napari=False,
+    #     legend=l
+    # )
     # reconstruct(cones,
     #             vsize=(256, 256, 256),
     #             vpitch=sim.world.size[2] / 256,

@@ -90,6 +90,9 @@ def gHits2cones_byEventID(file_path, source_MeV, nentries=None, to_array=False):
     print(f"{n_events_full_energy_deposit} events with full energy deposit")
 
     if to_array:
+        print('=>', cones.shape[0] if cones.shape[0] else sys.exit('No cones'),
+              'cones,', cp.isnan(cones).any(axis=1).sum(),
+              'with NaNs')
         return cp.array(cones)
     else:
         return pandas.DataFrame(cones, columns=['EventID', 'Apex_X', 'Apex_Y', 'Apex_Z', 'Direction_X', 'Direction_Y',
