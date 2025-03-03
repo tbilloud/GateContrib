@@ -47,6 +47,7 @@ def singles2pixelHits(file_path):
     singles.rename(columns={'Position_Y': POSITION_Y}, inplace=True)
     singles.rename(columns={'Position_Z': POSITION_Z}, inplace=True)
     singles[TOT] = singles[ENERGY] * 1e3  # TODO temporary
+    print('Number of pixel hits:', len(singles))
     return singles[pixelHits_columns + simulation_columns]
 
 

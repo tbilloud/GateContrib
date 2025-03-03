@@ -1,70 +1,75 @@
 # Functions to process pixelClusters dataframes
+import time
 
-import os
-import sys
-import numpy as np
-import pandas
-import uproot
-import SimpleITK as sitk
-import matplotlib.pyplot as plt
-import cupy as cp
-from pandas import Series
-import imaging.ComptonCamera_tests.Gate10.tools.analysis_basics as analysis_basics
-from imaging.ComptonCamera_tests.Gate10.tools.utils import *
-from imaging.ComptonCamera_tests.Gate10.tools.utils import print_hits_inG4format
+from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import *
+import pandas as pd
 
 pandas.set_option('display.max_columns', 100)
 pandas.set_option('display.width', 400)
 pandas.set_option('display.max_rows', 1000)
 pandas.set_option('display.float_format', lambda x: f'{x:.9}')  # G4 steps are logged with f'{x:.3}'
 
-pixelClusters_columns = ['PixelID', 'ToA', 'Energy']
+pixelClusters_columns = ['PixelID', TOA, ENERGY]
 
-import pandas as pd
-import numpy as np
+# TODO: if source.n was used in simulation, clustering with TOA does not work
+#  -> detect it ? send warning?
+def pixelHits2pixelClusters(pixelHits_df, n_pixels, time_window_ns=100):
 
+    pixelHits_df = pixelHits_df.sort_values(by='ToA_ns') # TODO: necessary?
 
-def pixelHits2pixelClusters(pixelHits_df, time_window_ns=100):
-
-    # TODO: necessary?
-    pixelHits_df = pixelHits_df.sort_values(by='ToA')
-
-    clusters = []
-    current_cluster = []
+    start_time = time.time()
+    clusters_list = []
+    current_cluster_df = pd.DataFrame()  # Initialize as an empty DataFrame
     current_time_window_start = None
 
     for index, hit in pixelHits_df.iterrows():
-        if not current_cluster:
+        if current_cluster_df.empty:
             # Start a new cluster
-            current_cluster.append(hit)
-            current_time_window_start = hit['ToA']
+            # print('Starting a new cluster')
+            current_cluster_df = pd.concat([current_cluster_df, hit.to_frame().T], ignore_index=True)
+            current_time_window_start = hit[TOA]
         else:
             # Check if the hit is within the time window
-            if hit['ToA'] - current_time_window_start <= time_window_ns:
-                # Check if the hit is adjacent to any hit in the current cluster
-                is_adjacent = any(
-                    abs(hit['PixelID'] - cluster_hit['PixelID']) == 1
-                    for cluster_hit in current_cluster
-                )
-                if is_adjacent:
-                    current_cluster.append(hit)
+            if hit[TOA] - current_time_window_start <= time_window_ns:
+                # print('Adding hit to current cluster')
+                if is_adjacent(hit, current_cluster_df, n_pixels):
+                    current_cluster_df = pd.concat([current_cluster_df, hit.to_frame().T], ignore_index=True)
                 else:
                     # Save the current cluster and start a new one
-                    clusters.append(current_cluster)
-                    current_cluster = [hit]
-                    current_time_window_start = hit['ToA']
+                    clusters_list.append(process_cluster_inputDF_outputDF(current_cluster_df))
+                    current_cluster_df = pd.DataFrame([hit])
+                    current_time_window_start = hit[TOA]
             else:
                 # Save the current cluster and start a new one
-                clusters.append(current_cluster)
-                current_cluster = [hit]
-                current_time_window_start = hit['ToA']
+                # print('Saving current cluster and starting a new one')
+                clusters_list.append(process_cluster_inputDF_outputDF(current_cluster_df))
+                current_cluster_df = pd.DataFrame([hit])
+                current_time_window_start = hit[TOA]
 
     # Add the last cluster
-    if current_cluster:
-        clusters.append(current_cluster)
+    if not current_cluster_df.empty:
+        # print('Adding last cluster')
+        clusters_list.append(process_cluster_inputDF_outputDF(current_cluster_df))
 
     # Convert clusters to DataFrame
-    cluster_dfs = [pd.DataFrame(cluster) for cluster in clusters]
-    pixelClusters_df = pd.concat(cluster_dfs, ignore_index=True)
+    pixelClusters_df = pd.concat(clusters_list, ignore_index=True)
 
+    print('Number of clusters:', len(pixelClusters_df))
+    print('Clustering time:', round(time.time() - start_time), 'seconds')
     return pixelClusters_df
+
+def is_adjacent(hit, current_cluster_df, n_pixels):
+    x1, y1 = get_pixID_2D(hit[PIXEL_ID], n_pixels)
+    return any(
+        abs(x1 - x2) <= 1 and abs(y1 - y2) <= 1
+        for x2, y2 in
+        (get_pixID_2D(cluster_hit[PIXEL_ID], n_pixels) for _, cluster_hit in current_cluster_df.iterrows())
+    )
+
+def process_cluster_inputDF_outputDF(cluster_df):
+    cluster_total_energy = cluster_df[ENERGY].sum()
+    cluster_first_TOA = cluster_df[TOA].min()
+    return pd.DataFrame({
+        'ClusterTotalEnergy': [cluster_total_energy],
+        'ClusterFirstTOA': [cluster_first_TOA]
+    })

@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
     hits.output_filename = 'hits_' + get_file_name(sim, doppler, fluo)
     singles.output_filename = 'singles_' + get_file_name(sim, doppler, fluo)
-    sim.run(start_new_process=True)
+    sim.run()
 
     ##=====================================================
     ##   ANALYSIS
