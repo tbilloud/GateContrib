@@ -13,6 +13,7 @@ from pandas import Series
 import imaging.ComptonCamera_tests.Gate10.tools.analysis_basics as analysis_basics
 from imaging.ComptonCamera_tests.Gate10.tools.utils import *
 from imaging.ComptonCamera_tests.Gate10.tools.utils import print_hits_inG4format
+from opengate.logger import global_log
 
 pandas.set_option('display.max_columns', 100)
 pandas.set_option('display.width', 400)
@@ -24,7 +25,8 @@ def gHits2cones_byEventID(file_path, source_MeV, nentries=None, to_array=False):
     if not os.path.isfile(file_path):
         sys.exit(f"File {file_path} does not exist, probably no hit produced...")
     else:
-        print(f"Reading {file_path} for cone analysis")
+        global_log.info(f"Running cone analysis with input {file_path}")
+
     hits = uproot.open(file_path)['Hits'].arrays(library='pd', entry_stop=nentries)  # None to read all entries
     n_events = hits['EventID'].nunique()
     print(f"{n_events} events interacted in the sensor")
@@ -36,15 +38,12 @@ def gHits2cones_byEventID(file_path, source_MeV, nentries=None, to_array=False):
     for eventid, group in grouped:
         apex, direction, E1 = False, False, False
         # Sensor received primary gamma and it interacted TODO: is this correct with radioisotope source?
-        # if eventid != 809: continue
         if 1 in group['TrackID'].values:
             n_events_primary += 1
             # All primary energy was deposited
             if round(group['TotalEnergyDeposit'].sum(), 6) == source_MeV:  # round to avoid float precision issues
                 n_events_full_energy_deposit += 1
-                # print_hits_inG4format(group)
                 group = group.sort_values('GlobalTime')  # IMPORTANT !
-                # print_hits_inG4format(group)
                 first_hit = group.iloc[0]
                 # Gamma interacts via Compton, step has dE !=0 and is stored (recoil e- not tracked)
                 if first_hit['TrackID'] == 1 and group['TrackID'].value_counts()[1] > 1:
@@ -71,7 +70,6 @@ def gHits2cones_byEventID(file_path, source_MeV, nentries=None, to_array=False):
 
                     descendants_of_2 = find_descendants(group, 2)
                     group = group[~group['TrackID'].isin(descendants_of_2.union({2}))]
-                    # print_hits_inG4format(group)
                     second_hit = group.iloc[0]
                     # if post-Compton step of TrackID 1 has dE != 0, it is stored and is the next one in the
                     # time-sorted group, and it gives the direction
@@ -89,10 +87,10 @@ def gHits2cones_byEventID(file_path, source_MeV, nentries=None, to_array=False):
     print(f"{n_events_primary} events with primary particles")
     print(f"{n_events_full_energy_deposit} events with full energy deposit")
 
+    print(len(cones) if len(cones) else sys.exit('No cones'),'cones')
+    print(cp.isnan(cp.array(cones)).any(axis=1).sum(), 'cones with NaNs')
+
     if to_array:
-        print('=>', cones.shape[0] if cones.shape[0] else sys.exit('No cones'),
-              'cones,', cp.isnan(cones).any(axis=1).sum(),
-              'with NaNs')
         return cp.array(cones)
     else:
         return pandas.DataFrame(cones, columns=['EventID', 'Apex_X', 'Apex_Y', 'Apex_Z', 'Direction_X', 'Direction_Y',
