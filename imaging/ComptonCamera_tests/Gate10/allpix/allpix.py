@@ -16,10 +16,15 @@ def run_allpix(sim, output_dir='allpix/', log_level='FATAL'):
         sys.exit("Allpix cannot be run with Gate visualization enabled")
     else:
         global_log.info(
-            f"Running Allpix2 with input {hits_file}, {gateHits_df.size} hits")
+            f"Running Allpix2 with input {hits_file}, {gateHits_df.size} gate hits")
+
+    try:
+        pixel = sim.volume_manager.get_volume("pixel_param")
+    except Exception:
+        sys.exit(f"Running Allpix2 this way requires pixels to be defined with"
+                 f" RepeatParametrisedVolume(repeated_volume=pixel)")
 
     sensor = sim.volume_manager.get_volume("sensor")
-    pixel = sim.volume_manager.get_volume("pixel_param")
     source = sim.source_manager.get_source("source")
 
     with warnings.catch_warnings():
@@ -95,6 +100,7 @@ max_depth_distance = {sensor.size[2]}mm
 threshold = 0e
 """
 
+
 def get_chain_simple_with_toa(sensor):
     return f"""
 [GenericPropagation]
@@ -103,6 +109,7 @@ max_depth_distance = {sensor.size[2]}mm
 [DefaultDigitizer]
 threshold = 0e
 """
+
 
 chain_advanced = """
 [ElectricFieldReader]
@@ -132,6 +139,8 @@ chain_advanced_csa = """
 [CSADigitizer]
 """
 
-def gHits2allpix2pixelHits(sim,npix):
-    run_allpix(sim, output_dir='allpix/', log_level='FATAL') # INFO, FATAL, ...
-    return allpixTxt2pixelHit('allpix/data.txt',n_pixels=npix)
+
+def gHits2allpix2pixelHits(sim, npix):
+    run_allpix(sim, output_dir='allpix/',
+               log_level='FATAL')  # INFO, FATAL, ...
+    return allpixTxt2pixelHit('allpix/data.txt', n_pixels=npix)
