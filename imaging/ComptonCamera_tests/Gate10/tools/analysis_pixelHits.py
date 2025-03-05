@@ -11,6 +11,7 @@ import matplotlib.colors as mcolors
 from matplotlib.ticker import MaxNLocator
 
 from imaging.ComptonCamera_tests.Gate10.tools.utils import get_pixID
+from opengate.logger import global_log
 
 pandas.set_option('display.max_columns', 100)
 pandas.set_option('display.width', 400)
@@ -33,7 +34,7 @@ def singles2pixelHits(file_path):
     if not os.path.isfile(file_path):
         sys.exit(f"{file_path} does not exist, probably no hit produced...")
     else:
-        print(f"Converting {file_path} to pixel hits")
+        global_log.info(f"Converting {file_path} to pixel hits")
 
     singles = uproot.open(file_path)['Singles'].arrays(library='pd')
     singles['HitUniqueVolumeID'] = singles['HitUniqueVolumeID'].astype(
@@ -90,7 +91,7 @@ def plot_pixelHits_perEventID(pixelHits_df, n_pixels,
                               log_scale=[False, False, False]):
     unique_event_ids = pixelHits_df[EVENTID].unique()
     for event_id in unique_event_ids:
-        fig, ax = plt.subplots(1, 3, figsize=(12, 6))
+        fig, ax = plt.subplots(1, 3, figsize=(16, 4))
         df = pixelHits_df[pixelHits_df[EVENTID] == event_id]
         pixelHits_fig_ax(df, n_pixels, fig, ax, log_scale)
         plt.suptitle(f'Event ID: {event_id}')
