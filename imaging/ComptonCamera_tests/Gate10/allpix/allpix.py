@@ -3,6 +3,8 @@ import subprocess
 import uproot
 from scipy.spatial.transform import Rotation as R
 import warnings
+from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import *
+from opengate.logger import global_log
 
 
 def run_allpix(sim, output_dir='allpix/', log_level='FATAL'):
@@ -13,8 +15,8 @@ def run_allpix(sim, output_dir='allpix/', log_level='FATAL'):
     if sim.visu is True:
         sys.exit("Allpix cannot be run with Gate visualization enabled")
     else:
-        print(
-            f"Running Allpix2 with input {hits_file},{gateHits_df.size} hits")
+        global_log.info(
+            f"Running Allpix2 with input {hits_file}, {gateHits_df.size} hits")
 
     sensor = sim.volume_manager.get_volume("sensor")
     pixel = sim.volume_manager.get_volume("pixel_param")
@@ -129,3 +131,7 @@ chain_advanced_csa = """
 [PulseTransfer]
 [CSADigitizer]
 """
+
+def gHits2allpix2pixelHits(sim,npix):
+    run_allpix(sim, output_dir='allpix/', log_level='FATAL') # INFO, FATAL, ...
+    return allpixTxt2pixelHit('allpix/data.txt',n_pixels=npix)
