@@ -30,10 +30,11 @@ pandas.set_option('display.float_format', lambda x: f'{x:.3}')  # G4 steps are l
 # Obtained with print(opengate_core.GateDigiAttributeManager.GetInstance().GetAvailableDigiAttributeNames())
 def analyse_hits(file_path):
     tree_hits = uproot.open(file_path)['Hits']
-    print('\n =>', tree_hits.num_entries, 'entries in tree Hits')
+    print(int(tree_hits.num_entries), 'entries in tree Hits')
     # print(tree.keys())
     hits = tree_hits.arrays(library='pd', entry_stop=None)  # None to read all entries
-    print_hits_short(hits)
+    print('Number of events', hits['EventID'].nunique())
+    # print_hits_short(hits)
     # print_hits_short_sortedByGlobalTime(hits)
     # print(hits.to_string(index=False))
     # print(hits.groupby('EventID').first().to_string(index=False))
@@ -53,9 +54,9 @@ def analyse_hits(file_path):
 #  PostPosition_Z GlobalTime
 def analyse_singles(file_path):
     tree_singles = uproot.open(file_path)['Singles']
-    print('\n =>', tree_singles.num_entries, 'entries in tree Singles')
+    print(int(tree_singles.num_entries), 'entries in tree Singles')
     singles = tree_singles.arrays(library='pd', entry_stop=None)  # None to read all entries
-    print(singles.to_string(index=False))
+    print(singles[['EventID','TotalEnergyDeposit','KineticEnergy','HitUniqueVolumeID']].to_string(index=False))
     # print(singles[singles['TrackCreatorProcess'] == 'compt'].to_string(index=False))
     # print(Series(singles['PreStepUniqueVolumeID'].to_numpy()).value_counts(normalize=True) * 100,'\n')  # !! entry_stop = None  !!
     # singles = singles.loc[:, ~singles.columns.str.contains('Position', case=False)]
