@@ -9,7 +9,8 @@ from imaging.ComptonCamera_tests.tools.display_reconstruction import display_rec
 # Script to reconstruct 3D image from cones
 
 # Units should be the same in cones_array and vpitch
-def reconstruct(cones_array, vsize, vpitch, output=False, napari=False, detector=False):
+def reconstruct(cones_array, vpitch, vsize=(256, 256, 256), output=False,
+                napari=False, detector=False):
     # Format cones array
     cones_array, EventID = cones_array[:, 1:], cones_array[:, 0]
 
@@ -49,8 +50,4 @@ if __name__ == "__main__":
     # cones_array = remove_nans(cones_array)
     # print(len(cones_array), 'cones after removing nans')
 
-    reconstruct(cones_array,
-                (256, 256, 256),
-                0.78515625,
-                output=False,
-                napari=True)
+    reconstruct(cones_array, vpitch=1, output=False, napari=True)

@@ -1,8 +1,10 @@
 # Functions to process pixelClusters dataframes
+import sys
 import time
 
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import *
 import pandas as pd
+from opengate.logger import global_log
 
 pandas.set_option('display.max_columns', 100)
 pandas.set_option('display.width', 400)
@@ -13,46 +15,44 @@ pixelClusters_columns = ['PixelID', TOA, ENERGY]
 
 # TODO: if source.n was used in simulation, clustering with TOA does not work
 #  -> detect it ? send warning?
-def pixelHits2pixelClusters(pixelHits_df, n_pixels, time_window_ns=100):
+import pandas as pd
 
-    pixelHits_df = pixelHits_df.sort_values(by='ToA_ns') # TODO: necessary?
+def new_cluster(clusters_list, cluster_df, hit):
+    clusters_list.append(process_cluster_inputDF_outputDF(cluster_df))
+    new_cluster_df = pd.DataFrame([hit])
+    new_time_window_start = hit[TOA]
+    return new_cluster_df, new_time_window_start
+
+# TODO speed -> https://pandas.pydata.org/docs/user_guide/basics.html#iteration
+def pixelHits2cones(pixelHits_df, n_pixels, time_window_ns=100):
+    global_log.info(f'Running cluster analysis, {len(pixelHits_df)} pixel hits')
+
+    pixelHits_df = pixelHits_df.sort_values(by='ToA_ns')
 
     start_time = time.time()
-    clusters_list = []
-    current_cluster_df = pd.DataFrame()  # Initialize as an empty DataFrame
-    current_time_window_start = None
+    clusters = []
+    cluster = pd.DataFrame()  # Initialize as an empty DataFrame
+    window_start = None
 
     for index, hit in pixelHits_df.iterrows():
-        if current_cluster_df.empty:
-            # Start a new cluster
-            # print('Starting a new cluster')
-            current_cluster_df = pd.concat([current_cluster_df, hit.to_frame().T], ignore_index=True)
-            current_time_window_start = hit[TOA]
+        if cluster.empty:
+            cluster = pd.concat([cluster, hit.to_frame().T], ignore_index=True)
+            window_start = hit[TOA]
         else:
-            # Check if the hit is within the time window
-            if hit[TOA] - current_time_window_start <= time_window_ns:
-                # print('Adding hit to current cluster')
-                if is_adjacent(hit, current_cluster_df, n_pixels):
-                    current_cluster_df = pd.concat([current_cluster_df, hit.to_frame().T], ignore_index=True)
+            if hit[TOA] - window_start <= time_window_ns:
+                if is_adjacent(hit, cluster, n_pixels):
+                    cluster = pd.concat([cluster, hit.to_frame().T], ignore_index=True)
                 else:
-                    # Save the current cluster and start a new one
-                    clusters_list.append(process_cluster_inputDF_outputDF(current_cluster_df))
-                    current_cluster_df = pd.DataFrame([hit])
-                    current_time_window_start = hit[TOA]
+                    cluster, window_start = new_cluster(clusters, cluster, hit)
             else:
-                # Save the current cluster and start a new one
-                # print('Saving current cluster and starting a new one')
-                clusters_list.append(process_cluster_inputDF_outputDF(current_cluster_df))
-                current_cluster_df = pd.DataFrame([hit])
-                current_time_window_start = hit[TOA]
+                cluster, window_start = new_cluster(clusters, cluster, hit)
 
     # Add the last cluster
-    if not current_cluster_df.empty:
-        # print('Adding last cluster')
-        clusters_list.append(process_cluster_inputDF_outputDF(current_cluster_df))
+    if not cluster.empty:
+        clusters.append(process_cluster_inputDF_outputDF(cluster))
 
     # Convert clusters to DataFrame
-    pixelClusters_df = pd.concat(clusters_list, ignore_index=True)
+    pixelClusters_df = pd.concat(clusters, ignore_index=True)
 
     print('Number of clusters:', len(pixelClusters_df))
     print('Clustering time:', round(time.time() - start_time), 'seconds')

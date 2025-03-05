@@ -56,7 +56,7 @@ def analyse_singles(file_path):
     tree_singles = uproot.open(file_path)['Singles']
     print(int(tree_singles.num_entries), 'entries in tree Singles')
     singles = tree_singles.arrays(library='pd', entry_stop=None)  # None to read all entries
-    print(singles[['EventID','TotalEnergyDeposit','KineticEnergy','HitUniqueVolumeID']].to_string(index=False))
+    # print(singles[['EventID','TotalEnergyDeposit','KineticEnergy','HitUniqueVolumeID']].to_string(index=False))
     # print(singles[singles['TrackCreatorProcess'] == 'compt'].to_string(index=False))
     # print(Series(singles['PreStepUniqueVolumeID'].to_numpy()).value_counts(normalize=True) * 100,'\n')  # !! entry_stop = None  !!
     # singles = singles.loc[:, ~singles.columns.str.contains('Position', case=False)]

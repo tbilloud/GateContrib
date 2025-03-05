@@ -1,9 +1,7 @@
 import matplotlib.pyplot as plt
 import napari
 from pathlib import Path
-
 import numpy as np
-
 from imaging.ComptonCamera_tests.Gate9.tools.seqCoinc2Cones import *
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import *
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
@@ -26,7 +24,7 @@ cp.set_printoptions(linewidth=200)
 # - energy/spatial resolution
 
 # Units should be the same in cones_array, vpitch and source_pos
-def point_source_cone_validation(cones_array, vpitch, source_pos, plot_seq = False, plot_stack = False, plot_seq_napari = False, legend = False):
+def validate_psource(cones_array, vpitch, source_pos, plot_seq = False, plot_stack = False, plot_seq_napari = False, legend = False):
 
     # Volume size and pitch
     vsize = (256, 256, 256)
@@ -59,9 +57,10 @@ def point_source_cone_validation(cones_array, vpitch, source_pos, plot_seq = Fal
         if plot_seq:
             plt.imshow(z_slice, cmap='gray')
             plt.scatter(source_pos_in_voxels[0], source_pos_in_voxels[1], c='r', s=10)
-            plt.scatter(vsize[0]//2,vsize[1]//2, c='b', s=10)
             plt.title(f'EventID: {int(event)}')
-            plt.colorbar()
+            add_secondary_axes(plt.gca(), vpitch)
+            cbar = plt.colorbar()
+            plt.tight_layout()
             plt.show()
 
     print(n_bad_cones, 'bad cones')
@@ -72,14 +71,7 @@ def point_source_cone_validation(cones_array, vpitch, source_pos, plot_seq = Fal
         ax.imshow(np.sum(np.asarray(z_slice_stack), axis=0), cmap='gray_r')
         ax.set_xlabel('X (pixels)')
         ax.set_ylabel('Y (pixels)')
-        Xmm = ax.secondary_xaxis('top')
-        Xmm.set_xlabel('X (mm)', color='red')
-        Xmm.set_xticks(ax.get_xticks())
-        Xmm.set_xticklabels(np.round(ax.get_xticks() * vpitch, 2), color='red')
-        Ymm = ax.secondary_yaxis('right', color='red')
-        Ymm.set_ylabel('Y (mm)', color='red')
-        Ymm.set_yticks(ax.get_yticks())
-        Ymm.set_yticklabels(np.round(ax.get_yticks() * vpitch, 2), color='red')
+        add_secondary_axes(ax, vpitch)
         plt.tight_layout()
         plt.show()
 
@@ -92,6 +84,15 @@ def point_source_cone_validation(cones_array, vpitch, source_pos, plot_seq = Fal
         viewer.axes.visible = True
         napari.run()
 
+def add_secondary_axes(ax, vpitch):
+    Xmm = ax.secondary_xaxis('top')
+    Xmm.set_xlabel('X (mm)', color='red')
+    Xmm.set_xticks(ax.get_xticks())
+    Xmm.set_xticklabels(np.round(ax.get_xticks() * vpitch, 2), color='red')
+    Ymm = ax.secondary_yaxis('right', color='red')
+    Ymm.set_ylabel('Y (mm)', color='red')
+    Ymm.set_yticks(ax.get_yticks())
+    Ymm.set_yticklabels(np.round(ax.get_yticks() * vpitch, 2), color='red')
 
 if __name__ == "__main__":
     # ###### READING Gate9.2 sequenceCoincidence.root files ##############
@@ -118,4 +119,4 @@ if __name__ == "__main__":
     # cones_array = remove_nans(cones_array)
     # print(len(cones_array), 'cones after removing nans')
 
-    point_source_cone_validation(cones_array, vpitch, source_pos)
+    validate_psource(cones_array, vpitch, source_pos)
