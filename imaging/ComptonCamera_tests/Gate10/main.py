@@ -1,24 +1,15 @@
-import os.path
-import sys
 import opengate_core
 from opengate.managers import Simulation
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import *
-from imaging.ComptonCamera_tests.Gate10.allpix.allpix import *
-from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelClusters import *
-from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import *
 from opengate.geometry.volumes import *
-from scipy.spatial.transform import Rotation as R
-from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import *
 from imaging.ComptonCamera_tests.tools.point_source_validation import *
 from imaging.ComptonCamera_tests.tools.reco_backprojection_cupy import *
-from imaging.ComptonCamera_tests.tools.utils import *
 
 if __name__ == "__main__":
     sim, sim.output_dir = Simulation(), "output"
     um, mm, keV, MeV, deg, Bq, sec = g4_units.um, g4_units.mm, g4_units.keV, g4_units.MeV, g4_units.deg, g4_units.Bq, g4_units.s
     sim.volume_manager.add_material_database('../data/GateMaterials.db')
     sim.random_engine, sim.random_seed = "MersenneTwister", 1
-    # sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # useless if visu
     sim.visu = False
 
     # ===========================
@@ -26,12 +17,10 @@ if __name__ == "__main__":
     # ===========================
     npix, p, thickness = 256, 55 * um, 1 * mm
     sim.world.material = "Vacuum"
-    # sim.world.color = [0] * 4
     sensor = sim.add_volume("Box", "sensor")
     sensor.material = "cadmium_telluride"
     sensor.size = [npix * p, npix * p, thickness]
     sensor.translation = [0 * um, 0 * um, 5 * mm]
-    # sensor.rotation = R.from_euler('xyz', [0,90,0], degrees=True).as_matrix()
     pixel = sim.add_volume("Box", "pixel")
     pixel.mother, pixel.size = sensor.name, [p, p, thickness]
     pixel.material = sensor.material
@@ -42,15 +31,12 @@ if __name__ == "__main__":
     ## ===========================
     ## ==  PHYSICS              ==
     ## ===========================
-    doppler = False
-    fluo = False
-    if doppler: sim.physics_manager.physics_list_name = 'G4EmLivermorePhysics'
-    if fluo:
-        sim.physics_manager.global_production_cuts.gamma = 1 * um
-        sim.physics_manager.global_production_cuts.electron = 1 * um
+    # sim.physics_manager.physics_list_name = 'G4EmLivermorePhysics'
+    sim.physics_manager.global_production_cuts.gamma = 1 * um
+    sim.physics_manager.global_production_cuts.electron = 1 * um
     sim.physics_manager.em_parameters.update(
-        {'fluo': fluo, 'pixe': fluo, 'deexcitation_ignore_cut': False,
-         'auger': fluo, 'auger_cascade': fluo})
+        {'fluo': True, 'pixe': True, 'deexcitation_ignore_cut': False,
+         'auger': True, 'auger_cascade': True})
 
     ## =============================
     ## == ACTORS                  ==
@@ -59,16 +45,18 @@ if __name__ == "__main__":
     hits.attached_to = sensor.name
     hits.authorize_repeated_volumes = True
     hits.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvailableDigiAttributeNames()
+    hits.output_filename = 'hits.root'
     singles = sim.add_actor("DigitizerAdderActor", "Singles")
     singles.authorize_repeated_volumes = True
     singles.input_digi_collection = "Hits"
     singles.policy = "EnergyWeightedCentroidPosition"
+    singles.output_filename = 'singles.root'
 
     ## ============================
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.activity, sim.run_timing_intervals = 100 * Bq, [[0, 1 * sec]]
+    source.activity, sim.run_timing_intervals = 1000 * Bq, [[0, 1 * sec]]
     source.particle = "gamma"
     source.energy.mono = 140 * keV
     source.position.translation = [0 * mm, 0 * mm, -5 * mm]
@@ -78,18 +66,15 @@ if __name__ == "__main__":
     ##=====================================================
     ##   RUN
     ##=====================================================
-    hits.output_filename = 'hits_' + get_file_name(sim, doppler, fluo)
-    singles.output_filename = 'singles_' + get_file_name(sim, doppler, fluo)
     sim.run()
 
     ##=====================================================
     ##   ANALYSIS AND RECONSTRUCTION
     ##=====================================================
-    hits_path = Path(sim.output_dir) / hits.output_filename
-    singles_path = sim.output_dir + '/' + singles.output_filename
-    if not os.path.isfile(hits_path): sys.exit(f"{hits_path} does not exist")
 
     # BASICS
+    hits_path = Path(sim.output_dir) / hits.output_filename
+    singles_path = Path(sim.output_dir) / singles.output_filename
     analyse_hits(hits_path)
     analyse_singles(singles_path)
 

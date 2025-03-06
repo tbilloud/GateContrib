@@ -1,4 +1,25 @@
-# Analysing hits
+# Script to run a simulation of a Timepix-based single layer Compton camera
+Uses Gate10 and (optionally) Allpix2  
+Requirements:
+- python3
+- Gate10
+Validated with Ubuntu 22.04 / Gate 10.0.1  
+
+## Installation
+### 1) Install Gate10
+```
+python -m venv opengate_env
+source opengate_env/bin/activate
+pip install --upgrade pip
+pip install opengate
+```
+### 2) Optional: Install Allpix2
+...
+
+### 3) Python packages
+TODO
+
+## Analysing hits
 Geant4 steps can be logged in terminal with sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1 (EventIDs are not logged, hence better do that with small number of events)
 - ProcessDefinedStep (Gate) is pre-step, ProcName (G4) is post-step
   => thus when new track are generated in sensor, their ProcessDefinedStep is none.
@@ -6,7 +27,7 @@ Geant4 steps can be logged in terminal with sim.g4_verbose, sim.g4_verbose_level
 - StepLength (Gate) / StepLeng (G4) can be used to match hits (Gate) / steps (G4)
 
 
-# QT issues with Gate 10.0.1
+## QT issues with Gate 10.0.1
 When using Qt-based code (e.g. napari) after simulation, the main.py script fails with:
 ```
 WARNING: QObject::moveToThread: Current thread (0x57ad941535d0) is not the object's thread (0x57ad94c1ef50).
@@ -20,7 +41,7 @@ Solution:
 mv /home/billoud/PycharmProjects/GateContrib/venv/lib/python3.10/site-packages/opengate_core/plugins /home/billoud/PycharmProjects/GateContrib/venv/lib/python3.10/site-packages/opengate_core/plugins.bak`
 ```
 
-# Using the DigitizerProjectionActor
+## Using the DigitizerProjectionActor
 This actor could give an image with integrated sum of pixel hits over events. But using it gives:  
 `Exception: Sorry, cannot (yet) use ProjectionActor with repeated volumes, set 'authorize_repeated_volumes' to False`  
 When fixed, use plot_DigitizerProjectionActor(sim) from analysis_basics.py and:  
@@ -33,7 +54,7 @@ proj.size = [npix, npix]
 proj.output_filename = 'projection.mhd'
 ```
 
-# Allpix2
+## Allpix2
 
 Allpix2 is a C++ software for precise simulation of pixel detectors.
 It simulates the transport of charge carriers in semiconductor sensors and their signal induction.
