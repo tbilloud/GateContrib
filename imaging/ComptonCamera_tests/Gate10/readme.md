@@ -44,6 +44,7 @@ TODO
 
 ## Getting started
 Run a basic test:
+`python3 main.py`
 
 ## Analysing hits
 Geant4 steps can be logged in terminal with sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1 (EventIDs are not logged, hence better do that with small number of events)
