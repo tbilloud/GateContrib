@@ -40,8 +40,5 @@ def display_reconstruction(vol, vsize, vpitch, detector=False):
 
 
 if __name__ == "__main__":
-    # TODO: not displayed the same as by reconstruction.py with napari=True
-    # cones_array = coordinateOrigin2arrayCenter(cones_array, vpitch, vsize)
-
     vol = np.load(Path('../Gate10/output') / "reco_fluoTrue_dopplerFalse.npy")
     display_reconstruction(vol, (256, 256, 256))

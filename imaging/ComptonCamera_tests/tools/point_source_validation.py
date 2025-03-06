@@ -5,7 +5,8 @@ import numpy as np
 from imaging.ComptonCamera_tests.Gate9.tools.seqCoinc2Cones import *
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import *
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
-from imaging.ComptonCamera_tests.tools.utils import remove_nans, coordinateOrigin2arrayCenter
+from imaging.ComptonCamera_tests.tools.utils import remove_nans, \
+    coordinateOrigin2arrayCenter
 
 cp.set_printoptions(linewidth=200)
 
@@ -24,29 +25,29 @@ cp.set_printoptions(linewidth=200)
 # - energy/spatial resolution
 
 # Units should be the same in cones_array, vpitch and source_pos
-def validate_psource(cones_array, vpitch, source_pos, plot_seq = False, plot_stack = False, plot_seq_napari = False, legend = False):
-
+def validate_psource(cones_array, vpitch, source_pos, plot_seq=False,
+                     plot_stack=False, plot_seq_napari=False, legend=False):
     # Volume size and pitch
     vsize = (256, 256, 256)
     vol_init = cp.zeros(vsize, dtype=cp.float32)
 
     # Source position must be in units of voxels in vol
-    source_pos_in_voxels = [int(source_pos[i] / vpitch) + (vsize[i] // 2) for i in range(3)]
+    sp_vox = [int(source_pos[i] / vpitch) + (vsize[i] // 2) for i in range(3)]
 
     # Format cones array
-    cones_array, EventID = cones_array[:, 1:], cones_array[:, 0]
+    cones_noEvID, EventID = cones_array[:, 1:], cones_array[:, 0]
 
     # Coordinate system
-    cones_array = coordinateOrigin2arrayCenter(cones_array, vpitch, vsize)
+    cones_noEvID = coordinateOrigin2arrayCenter(cones_noEvID, vpitch, vsize)
 
     # ######## RECONSTRUCT CONE BY CONE #######################################
     z_slice_stack = list()
     n_bad_cones = 0
-    for cone,event in zip(cones_array,EventID):
+    for cone, event in zip(cones_noEvID, EventID):
         vol = compton_forward(volume=vol_init, cones=cone, volume_pitch=vpitch)
-        z_slice = vol[:, :, source_pos_in_voxels[2]].get()
+        z_slice = vol[:, :, sp_vox[2]].get()
         z_slice_stack.append(z_slice)
-        if z_slice[source_pos_in_voxels[0], source_pos_in_voxels[1]] == 0:
+        if z_slice[sp_vox[0], sp_vox[1]] == 0:
             # TODO sometime cone is bad but z_slice is not 0
             n_bad_cones += 1
             # print('bad cone in event',int(event))
@@ -56,10 +57,10 @@ def validate_psource(cones_array, vpitch, source_pos, plot_seq = False, plot_sta
         # ##############################################################
         if plot_seq:
             plt.imshow(z_slice, cmap='gray')
-            plt.scatter(source_pos_in_voxels[0], source_pos_in_voxels[1], c='r', s=10)
+            plt.scatter(sp_vox[0], sp_vox[1], c='r', s=10)
             plt.title(f'EventID: {int(event)}')
             add_secondary_axes(plt.gca(), vpitch)
-            cbar = plt.colorbar()
+            plt.colorbar()
             plt.tight_layout()
             plt.show()
 
@@ -79,10 +80,12 @@ def validate_psource(cones_array, vpitch, source_pos, plot_seq = False, plot_sta
         ##############################################################
         # Display stack with napari (scrolling)
         ##############################################################
-        vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2), axis_labels=["cone number", "x", "y"])
+        vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2),
+                     axis_labels=["cone number", "x", "y"])
         viewer = napari.view_image(np.asarray(z_slice_stack), **vargs)
         viewer.axes.visible = True
         napari.run()
+
 
 def add_secondary_axes(ax, vpitch):
     Xmm = ax.secondary_xaxis('top')
@@ -93,6 +96,7 @@ def add_secondary_axes(ax, vpitch):
     Ymm.set_ylabel('Y (mm)', color='red')
     Ymm.set_yticks(ax.get_yticks())
     Ymm.set_yticklabels(np.round(ax.get_yticks() * vpitch, 2), color='red')
+
 
 if __name__ == "__main__":
     # ###### READING Gate9.2 sequenceCoincidence.root files ##############
@@ -110,7 +114,9 @@ if __name__ == "__main__":
     # cones_array = conesTTree2conesArray(fname / 'CC_Cones.root', E0_MeV, er, nSingles_max, true_coinc, nentries)
 
     # ###### READING Gate10 hit root files ##############
-    fname, E0_MeV, vpitch, source_pos = Path('../Gate10/output'), 1.0, 200, [0, 0, -50]
+    fname, E0_MeV, vpitch, source_pos = Path('../Gate10/output'), 1.0, 200, [0,
+                                                                             0,
+                                                                             -50]
     cones_array = gHits2cones_byEventID(fname / 'CC_Hits.root', E0_MeV)
 
     # ###### Preprocessing #########
