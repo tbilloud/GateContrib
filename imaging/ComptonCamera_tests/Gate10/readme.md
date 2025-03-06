@@ -19,17 +19,23 @@ Validated with Ubuntu 22.04 / Gate 10.0.1
 
 ## Installation
 ### 1) Install Gate10
+https://opengate-python.readthedocs.io/en/master/user_guide/user_guide_installation.html#
 ```
 python -m venv opengate_env
 source opengate_env/bin/activate
 pip install --upgrade pip
 pip install opengate
 ```
+Test installation:  
+`opengate_tests`
+
+Note: either the installation or tests install geant4 datasets, this takes a while.
+
 ### 2) Optional: Install Allpix2
 https://allpix-squared.docs.cern.ch/docs/02_installation/  
-Install ROOT 6:
-https://root.cern/install/
-Install Allpix2 without Geant4:  
+Install ROOT 6:  
+https://root.cern/install/  
+Then install Allpix2 without Geant4:  
 ```
 git clone https://gitlab.cern.ch/allpix-squared/allpix-squared
 cd allpix-squared
