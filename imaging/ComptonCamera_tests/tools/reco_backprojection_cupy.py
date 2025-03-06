@@ -37,6 +37,6 @@ def reco_bp_cupy(cones_df, vpitch, vsize=(256, 256, 256),
 
     volume = cp.swapaxes(volume, 0, 1)
     if napari:
-        display_reconstruction(volume, vsize, vpitch, det)
+        display_reconstruction(volume.get(), vsize, vpitch, det)
 
     return volume

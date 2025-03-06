@@ -13,6 +13,10 @@ from imaging.ComptonCamera_tests.tools.point_source_validation import *
 from imaging.ComptonCamera_tests.tools.reco_backprojection_cupy import *
 from imaging.ComptonCamera_tests.tools.utils import *
 
+# TODO: how to visualize volume sources?
+#  -> use mother volumes for box/sphere?
+#  -> Or as in Gate9: /gate/source/source_name/visualize 1000 yellow 1
+
 if __name__ == "__main__":
     sim, sim.output_dir = Simulation(), "output"
     um, mm, keV, MeV, deg, Bq, sec = g4_units.um, g4_units.mm, g4_units.keV, g4_units.MeV, g4_units.deg, g4_units.Bq, g4_units.s
@@ -32,6 +36,7 @@ if __name__ == "__main__":
     sensor.size = [npix * p, npix * p, thickness]
     sensor.translation = [0 * um, 0 * um, 5 * mm]
     # sensor.rotation = R.from_euler('xyz', [0,90,0], degrees=True).as_matrix()
+    # TODO: block below triggers 'WARNING Could not check overlap...' => problem?
     pixel = sim.add_volume("Box", "pixel")
     pixel.mother, pixel.size = sensor.name, [p, p, thickness]
     pixel.material = sensor.material
@@ -51,6 +56,7 @@ if __name__ == "__main__":
     sim.physics_manager.em_parameters.update(
         {'fluo': fluo, 'pixe': fluo, 'deexcitation_ignore_cut': False,
          'auger': fluo, 'auger_cascade': fluo})
+    # TODO: deexcitation_ignore_cut impacts number of hits, and depends on cuts
 
     ## =============================
     ## == ACTORS                  ==
@@ -59,6 +65,7 @@ if __name__ == "__main__":
     hits.attached_to = sensor.name
     hits.authorize_repeated_volumes = True
     hits.attributes = opengate_core.GateDigiAttributeManager.GetInstance().GetAvailableDigiAttributeNames()
+    # hits.keep_zero_edep = True # TODO compatible with gHits2cones_byEventID ?
     singles = sim.add_actor("DigitizerAdderActor", "Singles")
     singles.authorize_repeated_volumes = True
     singles.input_digi_collection = "Hits"
@@ -68,11 +75,15 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
+    # source.n = 1000
     source.activity, sim.run_timing_intervals = 100 * Bq, [[0, 1 * sec]]
     source.particle = "gamma"
     source.energy.mono = 140 * keV
     source.position.translation = [0 * mm, 0 * mm, -5 * mm]
+    # source.position.type, source.position.radius = "sphere", 5 * mm
+    # source.position.type, source.position.size = "box", [5 * mm] * 3
     source.direction.theta, source.direction.phi = theta_phi(sensor, source)
+    # source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
     sim.world.size = get_worldSize(sensor, source, margin=0.1)
 
     ##=====================================================
@@ -83,7 +94,7 @@ if __name__ == "__main__":
     sim.run()
 
     ##=====================================================
-    ##   ANALYSIS AND RECONSTRUCTION
+    ##   ANALYSIS
     ##=====================================================
     hits_path = Path(sim.output_dir) / hits.output_filename
     singles_path = sim.output_dir + '/' + singles.output_filename
@@ -99,9 +110,13 @@ if __name__ == "__main__":
     # print(pixelHits.to_string(index=False))
     # plot_pixelHits_perEventID(pixelHits,n_pixels=npix,log_scale=[False, False, True])
 
+    # PIXEL CLUSTERING
+    # clusters = pixelHits2cones(pixelHits, npix)
+    # print(clusters)
+
     # CONES
     cones_df = gHits2cones_byEvtID(hits_path, source.energy.mono, to_np=False)
-    # TODO: cones = pixelHits2cones(pixelHits, npix)
+    # TODO: cones = pixelClusters2cones(pixel_hits)
 
     # RECONSTRUCTION
     p = 0.1  # sim.world.size[2] / 256
