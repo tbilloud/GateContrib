@@ -12,10 +12,9 @@ Features:
 - Reconstruct 3D image with basic backprojection
 - WIP: reconstruct 3D image with advanced algorithms (e.g. Coresi)
 
-Requirements:
-- python3
-- Gate10
-Validated with Ubuntu 22.04 / Gate 10.0.1  
+Validated with:
+- Ubuntu 22.04 and 24.04
+- Gate 10.0.1  
 
 ## Installation
 ### 1) Install Gate10
@@ -45,8 +44,8 @@ cmake -DCMAKE_INSTALL_PREFIX=../install-noG4 -DBUILD_GeometryBuilderGeant4=OFF -
 make -j4
 make install
 ```
-### 3) Python packages
-TODO
+### 3) Install the required python packages
+`pip install -r requirements.txt`
 
 ## Getting started
 Run a basic test:
