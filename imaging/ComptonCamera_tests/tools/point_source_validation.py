@@ -35,7 +35,7 @@ def validate_psource(cones_array, vpitch, source_pos, plot_seq=False,
     sp_vox = [int(source_pos[i] / vpitch) + (vsize[i] // 2) for i in range(3)]
 
     # Format cones array
-    cones_noEvID, EventID = cones_array[:, 1:], cones_array[:, 0]
+    cones_noEvID, EventID = cones_array[:, 1:].copy(), cones_array[:, 0]
 
     # Coordinate system
     cones_noEvID = coordinateOrigin2arrayCenter(cones_noEvID, vpitch, vsize)
