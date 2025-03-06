@@ -26,7 +26,9 @@ pip install --upgrade pip
 pip install opengate
 ```
 ### 2) Optional: Install Allpix2
-...
+https://allpix-squared.docs.cern.ch/docs/02_installation/
+Install without Geant4:
+`cmake -DCMAKE_INSTALL_PREFIX=../install-noG4 -DBUILD_GeometryBuilderGeant4=OFF -DBUILD_DepositionCosmics=OFF -DBUILD_DepositionGeant4=OFF -DBUILD_DepositionGenerator=OFF -DBUILD_GDMLOutputWriter=OFF -DBUILD_VisualizationGeant4=OFF ..`
 
 ### 3) Python packages
 TODO
