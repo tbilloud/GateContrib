@@ -1,4 +1,5 @@
-# Script to run a simulation of a Timepix-based single layer Compton camera
+# Simulating a Timepix3 single layer Compton camera
+
 Uses Gate10 and (optionally) Allpix2  
 Requirements:
 - python3
