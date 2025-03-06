@@ -11,7 +11,8 @@ from scipy.spatial.transform import Rotation as R
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import *
 from imaging.ComptonCamera_tests.tools.point_source_validation import *
 from imaging.ComptonCamera_tests.tools.reconstruction_moritz import *
-from imaging.ComptonCamera_tests.tools.reconstruction_basic import *
+from imaging.ComptonCamera_tests.tools.reco_backprojection import *
+from imaging.ComptonCamera_tests.tools.reco_backprojection_cupy import *
 from imaging.ComptonCamera_tests.tools.utils import *
 
 # TODO: how to visualize volume sources?
@@ -76,11 +77,11 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    # source.n = 100
-    source.activity, sim.run_timing_intervals = 10 * Bq, [[0, 1 * sec]]
+    source.n = 1000
+    # source.activity, sim.run_timing_intervals = 10 * Bq, [[0, 1 * sec]]
     source.particle = "gamma"
     source.energy.mono = 140 * keV
-    source.position.translation = [0.2 * mm, 0.2 * mm, -0.5 * mm]
+    source.position.translation = [0 * mm, 0 * mm, -0.5 * mm]
     # source.position.type, source.position.radius = "sphere", 5 * mm
     # source.position.type, source.position.size = "box", [5 * mm] * 3
     # source.direction.theta, source.direction.phi = theta_phi(sensor, source)
@@ -127,7 +128,7 @@ if __name__ == "__main__":
     cones_ar, evtID = cones_ar[:, 1:], cones_ar[:, 0]
     cones_ar = coordinateOrigin2arrayCenter(cones_ar, p, (256, 256, 256))
     sp, l = source.position.translation, hits_path.stem.replace("_", "\n")
-    validate_psource(cones_ar, evtID, source_pos=sp, vpitch=p, vsize=s,
-                     legend=l, plot_seq=False, plot_stack=True, napari=False)
-    reconstruct(cones_ar, vpitch=p, vsize=s, napari=True, output=False, det=d)
-    reconstruct_backprojection(cones_df, vpitch=p, vsize=s, napari=True, det=d)
+    # validate_psource(cones_ar, evtID, source_pos=sp, vpitch=p, vsize=s,
+    #                  legend=l, plot_seq=False, plot_stack=True, napari=False)
+    reconstruct(cones_ar, vpitch=p, vsize=s, napari=False, output=False, det=d)
+    reco_bp_cupy(cones_df, vpitch=p, vsize=s, napari=False, det=d)

@@ -1,11 +1,12 @@
-import numpy as np
-import pandas as pd
+# Basic backprojection reconstruction for Compton camera data
+# Very slow, ~1 sec per cone
+# Use cupy-based reconstruction if possible
+
 from imaging.ComptonCamera_tests.tools.display_reconstruction import *
 
+def reco_bp(cones_df, vpitch, vsize=(256, 256, 256),
+            napari=False, det=False):
 
-def reconstruct_backprojection(cones_df, vpitch, vsize=(256, 256, 256),
-                               napari=False, det=False):
-    # Define the reconstruction volume
     volume = np.zeros(vsize, dtype=np.float32)
     grid_x = np.linspace(-vsize[0] // 2, vsize[0] // 2, vsize[0]) * vpitch
     grid_y = np.linspace(-vsize[1] // 2, vsize[1] // 2, vsize[1]) * vpitch
@@ -13,6 +14,7 @@ def reconstruct_backprojection(cones_df, vpitch, vsize=(256, 256, 256),
     X, Y, Z = np.meshgrid(grid_x, grid_y, grid_z, indexing='ij')
 
     for _, c in cones_df.iterrows():
+
         apex = np.array([c['Apex_X'], c['Apex_Y'], c['Apex_Z']])
         d = np.array([c['Direction_X'], c['Direction_Y'], c['Direction_Z']])
         cosT = c['cosT']
