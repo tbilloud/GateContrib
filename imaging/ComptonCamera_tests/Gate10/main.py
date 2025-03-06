@@ -29,7 +29,7 @@ if __name__ == "__main__":
     # ===========================
     # ==   GEOMETRY            ==
     # ===========================
-    npix, p, thickness = 10, 55 * um, 1 * mm
+    npix, p, thickness = 256, 55 * um, 1 * mm
     sim.world.material = "Vacuum"
     # sim.world.color = [0] * 4
     sensor = sim.add_volume("Box", "sensor")
@@ -77,14 +77,14 @@ if __name__ == "__main__":
     ## ============================
     source = sim.add_source("GenericSource", "source")
     # source.n = 100
-    source.activity, sim.run_timing_intervals = 50 * Bq, [[0, 1 * sec]]
+    source.activity, sim.run_timing_intervals = 10 * Bq, [[0, 1 * sec]]
     source.particle = "gamma"
     source.energy.mono = 140 * keV
-    source.position.translation = [0 * mm, 0 * mm, -0.5 * mm]
+    source.position.translation = [0.2 * mm, 0.2 * mm, -0.5 * mm]
     # source.position.type, source.position.radius = "sphere", 5 * mm
     # source.position.type, source.position.size = "box", [5 * mm] * 3
-    source.direction.theta, source.direction.phi = theta_phi(sensor, source)
-    # source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
+    # source.direction.theta, source.direction.phi = theta_phi(sensor, source)
+    source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
     sim.world.size = get_worldSize(sensor, source, margin=0.1)
 
     ##=====================================================

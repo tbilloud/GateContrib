@@ -50,7 +50,7 @@ def validate_psource(cones_array, EventID, source_pos, vpitch, vsize = (256, 256
         # # Display stack with matplotlib (one by one)
         # ##############################################################
         if plot_seq:
-            plt.imshow(z_slice, cmap='gray')
+            plt.imshow(z_slice, cmap='gray', origin='lower')
             plt.scatter(sp_vox[0], sp_vox[1], c='r', s=10)
             plt.title(f'EventID: {int(event)}')
             add_secondary_axes(plt.gca(), vpitch)
@@ -63,7 +63,8 @@ def validate_psource(cones_array, EventID, source_pos, vpitch, vsize = (256, 256
     if plot_stack:
         fig, ax = plt.subplots()
         plt.title(legend if legend else f'{EventID.shape[0]} cones')
-        ax.imshow(np.sum(np.asarray(z_slice_stack), axis=0), cmap='gray_r')
+        stack = np.sum(np.asarray(z_slice_stack), axis=0)
+        ax.imshow(stack, cmap='gray_r', origin='lower')
         ax.set_xlabel('X (pixels)')
         ax.set_ylabel('Y (pixels)')
         add_secondary_axes(ax, vpitch)
