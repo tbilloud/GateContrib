@@ -7,7 +7,7 @@ from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import *
 from opengate.logger import global_log
 
 
-def run_allpix(sim, output_dir='allpix/', log_level='FATAL'):
+def run_allpix(sim, binary_path, output_dir='allpix/', log_level='FATAL'):
     # TODO: sync different digitizer chains with output formats
     hits_actor = sim.actor_manager.get_actor("Hits")
     hits_file = sim.output_dir + '/' + hits_actor.output_filename
@@ -76,10 +76,6 @@ include = "PixelHit"
     with open(output_dir + 'main.conf', 'w') as main_conf_file:
         main_conf_file.write(main_conf_content)
 
-    binary_path = '/home/billoud/workspace/allpix-squared/install-noG4/bin/allpix'
-
-    # os.system(f'{binary_path} -c {output_dir}main.conf')
-
     subprocess.run([binary_path, '-c', output_dir + 'main.conf'], check=True)
 
 
@@ -140,7 +136,7 @@ chain_advanced_csa = """
 """
 
 
-def gHits2allpix2pixelHits(sim, npix):
-    run_allpix(sim, output_dir='allpix/',
+def gHits2allpix2pixelHits(binary_path, sim, npix):
+    run_allpix(binary_path, sim, output_dir='allpix/',
                log_level='FATAL')  # INFO, FATAL, ...
     return allpixTxt2pixelHit('allpix/data.txt', n_pixels=npix)

@@ -106,7 +106,7 @@ if __name__ == "__main__":
 
     # PIXEL HITS
     # pixelHits = singles2pixelHits(singles_path)
-    # pixelHits = gHits2allpix2pixelHits(sim, npix)
+    # pixelHits = gHits2allpix2pixelHits('/home/billoud/workspace/allpix-squared/install-noG4/bin/allpix', sim, npix)
     # print(pixelHits.to_string(index=False))
     # plot_pixelHits_perEventID(pixelHits,n_pixels=npix,log_scale=[False, False, True])
 

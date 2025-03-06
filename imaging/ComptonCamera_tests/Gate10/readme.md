@@ -27,11 +27,23 @@ pip install opengate
 ```
 ### 2) Optional: Install Allpix2
 https://allpix-squared.docs.cern.ch/docs/02_installation/  
-Install without Geant4:  
-`cmake -DCMAKE_INSTALL_PREFIX=../install-noG4 -DBUILD_GeometryBuilderGeant4=OFF -DBUILD_DepositionCosmics=OFF -DBUILD_DepositionGeant4=OFF -DBUILD_DepositionGenerator=OFF -DBUILD_GDMLOutputWriter=OFF -DBUILD_VisualizationGeant4=OFF ..`
-
+Install ROOT 6:
+https://root.cern/install/
+Install Allpix2 without Geant4:  
+```
+git clone https://gitlab.cern.ch/allpix-squared/allpix-squared
+cd allpix-squared
+mkdir build
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=../install-noG4 -DBUILD_GeometryBuilderGeant4=OFF -DBUILD_DepositionCosmics=OFF -DBUILD_DepositionGeant4=OFF -DBUILD_DepositionGenerator=OFF -DBUILD_GDMLOutputWriter=OFF -DBUILD_VisualizationGeant4=OFF ..`
+make -j4
+make install
+```
 ### 3) Python packages
 TODO
+
+## Getting started
+Run a basic test:
 
 ## Analysing hits
 Geant4 steps can be logged in terminal with sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1 (EventIDs are not logged, hence better do that with small number of events)
