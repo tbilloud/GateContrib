@@ -3,8 +3,8 @@ import pandas as pd
 from imaging.ComptonCamera_tests.tools.display_reconstruction import *
 
 
-def backprojection_reconstruction(cones_df, vpitch, vsize=(256, 256, 256),
-                                  napari=False, detector=False):
+def reconstruct_backprojection(cones_df, vpitch, vsize=(256, 256, 256),
+                               napari=False, det=False):
     # Define the reconstruction volume
     volume = np.zeros(vsize, dtype=np.float32)
     grid_x = np.linspace(-vsize[0] // 2, vsize[0] // 2, vsize[0]) * vpitch
@@ -35,6 +35,6 @@ def backprojection_reconstruction(cones_df, vpitch, vsize=(256, 256, 256),
 
     volume = np.swapaxes(volume, 0, 1)
     if napari:
-        display_reconstruction(volume, vsize, vpitch, detector)
+        display_reconstruction(volume, vsize, vpitch, det)
 
     return volume

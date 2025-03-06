@@ -10,7 +10,7 @@ from imaging.ComptonCamera_tests.tools.display_reconstruction import display_rec
 
 # Units should be the same in cones_array and vpitch
 def reconstruct(cones_array, vpitch, vsize=(256, 256, 256), output=False,
-                napari=False, detector=False):
+                napari=False, det=False):
 
     vol = compton_forward(volume=cp.zeros(vsize, dtype=cp.float32), cones=cones_array, volume_pitch=vpitch)
     vol = (vol / vol.max())
@@ -19,7 +19,7 @@ def reconstruct(cones_array, vpitch, vsize=(256, 256, 256), output=False,
     if output:
         cp.save(output, vol)
     if napari:
-        display_reconstruction(vol, vsize, vpitch, detector)
+        display_reconstruction(vol, vsize, vpitch, det)
 
     return vol
 
@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     # ###### READING Gate10 hit root files ##############
     fname, E0_MeV = Path('../Gate10/output'), 1.0
-    cones_array = gHits2cones_byEventID(fname / 'CC_Hits.root', E0_MeV)
+    cones_array = gHits2cones_byEvtID(fname / 'CC_Hits.root', E0_MeV)
 
     # ###### Preprocessing #########
     print('number of cones with a nan value:', cp.isnan(cones_array).any(axis=1).sum())

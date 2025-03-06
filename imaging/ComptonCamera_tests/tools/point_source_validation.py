@@ -26,7 +26,7 @@ cp.set_printoptions(linewidth=200)
 
 # Units should be the same in cones_array, vpitch and source_pos
 def validate_psource(cones_array, EventID, source_pos, vpitch, vsize = (256, 256, 256), plot_seq=False,
-                     plot_stack=False, plot_seq_napari=False, legend=False):
+                     plot_stack=False, napari=False, legend=False):
     # Volume size and pitch
 
     vol_init = cp.zeros(vsize, dtype=cp.float32)
@@ -71,7 +71,7 @@ def validate_psource(cones_array, EventID, source_pos, vpitch, vsize = (256, 256
         plt.tight_layout()
         plt.show()
 
-    if plot_seq_napari:
+    if napari:
         ##############################################################
         # Display stack with napari (scrolling)
         ##############################################################
@@ -112,7 +112,7 @@ if __name__ == "__main__":
     fname, E0_MeV, vpitch, source_pos = Path('../Gate10/output'), 1.0, 200, [0,
                                                                              0,
                                                                              -50]
-    cones_array = gHits2cones_byEventID(fname / 'CC_Hits.root', E0_MeV)
+    cones_array = gHits2cones_byEvtID(fname / 'CC_Hits.root', E0_MeV)
 
     # ###### Preprocessing #########
     # print('number of cones with a nan value:', cp.isnan(cones_array).any(axis=1).sum())

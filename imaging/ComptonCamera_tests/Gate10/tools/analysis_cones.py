@@ -21,7 +21,7 @@ pandas.set_option('display.max_rows', 1000)
 pandas.set_option('display.float_format', lambda x: f'{x:.9}')  # G4 steps are logged with f'{x:.3}'
 
 # TODO: can be optimized using hits.keep_zero_edep = True in simulation settings
-def gHits2cones_byEventID(file_path, source_MeV, nentries=None, to_array=False):
+def gHits2cones_byEvtID(file_path, source_MeV, nentries=None, to_np=False):
     if not os.path.isfile(file_path):
         sys.exit(f"File {file_path} does not exist, probably no hit produced...")
     else:
@@ -88,7 +88,7 @@ def gHits2cones_byEventID(file_path, source_MeV, nentries=None, to_array=False):
     print(len(cones) if len(cones) else sys.exit('No cones'),'cones')
     print(cp.isnan(cp.array(cones)).any(axis=1).sum(), 'cones with NaNs')
 
-    if to_array:
+    if to_np:
         return cp.array(cones)
     else:
         return pandas.DataFrame(cones, columns=['EventID', 'Apex_X', 'Apex_Y', 'Apex_Z', 'Direction_X', 'Direction_Y',

@@ -116,18 +116,18 @@ if __name__ == "__main__":
     # print(clusters)
 
     # CONES
-    cones_ar = gHits2cones_byEventID(hits_path, source.energy.mono, to_array=True)
-    cones_df = gHits2cones_byEventID(hits_path, source.energy.mono, to_array=False)
+    cones_ar = gHits2cones_byEvtID(hits_path, source.energy.mono, to_np=True)
+    cones_df = gHits2cones_byEvtID(hits_path, source.energy.mono, to_np=False)
     # cones = pixelClusters2cones(pixel_hits)
 
     # RECONSTRUCTION
     p = 0.1  # sim.world.size[2] / 256
     s = (256, 256, 256)
     d = {'size': sensor.size, 'position': sensor.translation}
-    cones_ar, EventID = cones_ar[:, 1:], cones_ar[:, 0]
+    cones_ar, evtID = cones_ar[:, 1:], cones_ar[:, 0]
     cones_ar = coordinateOrigin2arrayCenter(cones_ar, p, (256, 256, 256))
-    validate_psource(cones_ar,EventID, source_pos=source.position.translation,
-                     vpitch=p, vsize=s,legend=hits_path.stem.replace("_", "\n"),
-                     plot_seq=False, plot_stack=True, plot_seq_napari=False)
-    reconstruct(cones_ar, vpitch=p, vsize=s, napari=True, output=False,detector=d)
-    backprojection_reconstruction(cones_df, vpitch=p, vsize=s, napari=True,detector=d)
+    sp, l = source.position.translation, hits_path.stem.replace("_", "\n")
+    validate_psource(cones_ar, evtID, source_pos=sp, vpitch=p, vsize=s,
+                     legend=l, plot_seq=False, plot_stack=True, napari=False)
+    reconstruct(cones_ar, vpitch=p, vsize=s, napari=True, output=False, det=d)
+    reconstruct_backprojection(cones_df, vpitch=p, vsize=s, napari=True, det=d)
