@@ -6,7 +6,7 @@ Features:
 - Reconstruct cones from:
   - Geant4 hits
   - Gate singles
-  - Allpix2 pixel hits 
+  - Allpix2 pixel hits (WIP)
   - pixel hits measured with a Timepix3 detector
 - Validate point source simulation/measurement
 - Reconstruct 3D image with basic backprojection
