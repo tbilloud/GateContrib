@@ -11,12 +11,10 @@ from imaging.ComptonCamera_tests.tools.display_reconstruction import display_rec
 # Units should be the same in cones_array and vpitch
 def reconstruct(cones_array, vpitch, vsize=(256, 256, 256), output=False,
                 napari=False, detector=False):
-    # Format cones array
-    cones_noEvID, EventID = cones_array[:, 1:].copy(), cones_array[:, 0]
-    cones_noEvID = coordinateOrigin2arrayCenter(cones_noEvID, vpitch, vsize)
 
-    vol = compton_forward(volume=cp.zeros(vsize, dtype=cp.float32), cones=cones_noEvID, volume_pitch=vpitch)
-    vol = (vol / vol.max()).get()
+    vol = compton_forward(volume=cp.zeros(vsize, dtype=cp.float32), cones=cones_array, volume_pitch=vpitch)
+    vol = (vol / vol.max())
+    vol = vol.get()
 
     if output:
         cp.save(output, vol)

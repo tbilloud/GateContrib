@@ -25,25 +25,19 @@ cp.set_printoptions(linewidth=200)
 # - energy/spatial resolution
 
 # Units should be the same in cones_array, vpitch and source_pos
-def validate_psource(cones_array, vpitch, source_pos, plot_seq=False,
+def validate_psource(cones_array, EventID, source_pos, vpitch, vsize = (256, 256, 256), plot_seq=False,
                      plot_stack=False, plot_seq_napari=False, legend=False):
     # Volume size and pitch
-    vsize = (256, 256, 256)
+
     vol_init = cp.zeros(vsize, dtype=cp.float32)
 
     # Source position must be in units of voxels in vol
     sp_vox = [int(source_pos[i] / vpitch) + (vsize[i] // 2) for i in range(3)]
 
-    # Format cones array
-    cones_noEvID, EventID = cones_array[:, 1:].copy(), cones_array[:, 0]
-
-    # Coordinate system
-    cones_noEvID = coordinateOrigin2arrayCenter(cones_noEvID, vpitch, vsize)
-
     # ######## RECONSTRUCT CONE BY CONE #######################################
     z_slice_stack = list()
     n_bad_cones = 0
-    for cone, event in zip(cones_noEvID, EventID):
+    for cone, event in zip(cones_array, EventID):
         vol = compton_forward(volume=vol_init, cones=cone, volume_pitch=vpitch)
         z_slice = vol[:, :, sp_vox[2]].get()
         z_slice_stack.append(z_slice)

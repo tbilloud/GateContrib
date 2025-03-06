@@ -2,9 +2,12 @@ from napari import view_image, run
 from pathlib import Path
 import numpy as np
 from napari_bbox import BoundingBoxLayer
-
+import matplotlib.pyplot as plt
 
 def display_reconstruction(vol, vsize, vpitch, detector=False):
+    # plt.imshow(vol[128,:,:])
+    # plt.show()
+    # return
     viewer = view_image(vol,
                         translate=tuple(-(v * vpitch) // 2 for v in vsize),
                         axis_labels=['y', 'x', 'z'],

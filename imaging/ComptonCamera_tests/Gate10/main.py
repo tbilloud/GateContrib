@@ -1,6 +1,5 @@
 import os.path
 import sys
-
 import opengate_core
 from opengate.managers import Simulation
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import *
@@ -11,7 +10,9 @@ from opengate.geometry.volumes import *
 from scipy.spatial.transform import Rotation as R
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import *
 from imaging.ComptonCamera_tests.tools.point_source_validation import *
-from imaging.ComptonCamera_tests.tools.reconstruction import *
+from imaging.ComptonCamera_tests.tools.reconstruction_moritz import *
+from imaging.ComptonCamera_tests.tools.reconstruction_basic import *
+from imaging.ComptonCamera_tests.tools.utils import *
 
 # TODO: how to visualize volume sources?
 #  -> use mother volumes for box/sphere?
@@ -76,14 +77,14 @@ if __name__ == "__main__":
     ## ============================
     source = sim.add_source("GenericSource", "source")
     # source.n = 100
-    source.activity, sim.run_timing_intervals = 100 * Bq, [[0, 1 * sec]]
+    source.activity, sim.run_timing_intervals = 50 * Bq, [[0, 1 * sec]]
     source.particle = "gamma"
     source.energy.mono = 140 * keV
     source.position.translation = [0 * mm, 0 * mm, -0.5 * mm]
     # source.position.type, source.position.radius = "sphere", 5 * mm
     # source.position.type, source.position.size = "box", [5 * mm] * 3
-    # source.direction.theta, source.direction.phi = theta_phi(sensor, source)
-    source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
+    source.direction.theta, source.direction.phi = theta_phi(sensor, source)
+    # source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
     sim.world.size = get_worldSize(sensor, source, margin=0.1)
 
     ##=====================================================
@@ -115,13 +116,18 @@ if __name__ == "__main__":
     # print(clusters)
 
     # CONES
-    cones = gHits2cones_byEventID(hits_path, source.energy.mono, to_array=True)
-    # # TODO cones = pixelClusters2cones(pixel_hits)
+    cones_ar = gHits2cones_byEventID(hits_path, source.energy.mono, to_array=True)
+    cones_df = gHits2cones_byEventID(hits_path, source.energy.mono, to_array=False)
+    # cones = pixelClusters2cones(pixel_hits)
 
     # RECONSTRUCTION
     p = 0.1  # sim.world.size[2] / 256
-    validate_psource(cones, vpitch=p, source_pos=source.position.translation,
-                     plot_seq=True, plot_stack=True, plot_seq_napari=False,
-                     legend=hits_path.stem.replace("_", "\n"))
-    reconstruct(cones, vpitch=p, napari=True, output=False,
-                detector={'size': sensor.size, 'position': sensor.translation})
+    s = (256, 256, 256)
+    d = {'size': sensor.size, 'position': sensor.translation}
+    cones_ar, EventID = cones_ar[:, 1:], cones_ar[:, 0]
+    cones_ar = coordinateOrigin2arrayCenter(cones_ar, p, (256, 256, 256))
+    validate_psource(cones_ar,EventID, source_pos=source.position.translation,
+                     vpitch=p, vsize=s,legend=hits_path.stem.replace("_", "\n"),
+                     plot_seq=False, plot_stack=True, plot_seq_napari=False)
+    reconstruct(cones_ar, vpitch=p, vsize=s, napari=True, output=False,detector=d)
+    backprojection_reconstruction(cones_df, vpitch=p, vsize=s, napari=True,detector=d)

@@ -28,8 +28,6 @@ def gHits2cones_byEventID(file_path, source_MeV, nentries=None, to_array=False):
         global_log.info(f"Running cone analysis with input {file_path}")
 
     hits = uproot.open(file_path)['Hits'].arrays(library='pd', entry_stop=nentries)  # None to read all entries
-    n_events = hits['EventID'].nunique()
-    print(f"{n_events} events interacted in the sensor")
     grouped = hits.groupby('EventID')
     cones = []
 
