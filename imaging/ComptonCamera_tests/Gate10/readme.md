@@ -1,6 +1,17 @@
-# Simulating a Timepix3 single layer Compton camera
+# Simulating a single layer Compton camera
 
-Uses Gate10 and (optionally) Allpix2  
+Features:
+- Use Gate10 to simulate a single layer Compton camera.
+- Optionally add Allpix2 to simulate detector response of a semiconductor pixels such as Timepix3.
+- Reconstruct cones from:
+  - Geant4 hits
+  - Gate singles
+  - Allpix2 pixel hits 
+  - pixel hits measured with a Timepix3 detector
+- Validate point source simulation/measurement
+- Reconstruct 3D image with basic backprojection
+- WIP: reconstruct 3D image with advanced algorithms (e.g. Coresi)
+
 Requirements:
 - python3
 - Gate10
