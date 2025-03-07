@@ -1,5 +1,7 @@
 # Simulate a single layer Compton camera
 
+![Screenshot of a reconstruction](doc/img.png)
+
 - Use Gate10 to simulate a single layer Compton camera.
 - Optionally add Allpix2 to simulate detector a semiconductor pixel detector response (e.g. Timepix3).
 - Reconstruct cones from:
