@@ -1,14 +1,9 @@
-from napari import view_image, run
-from pathlib import Path
-from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import *
-from imaging.ComptonCamera_tests.tools.compton import compton_forward
-from imaging.ComptonCamera_tests.tools.utils import remove_nans
-from imaging.ComptonCamera_tests.Gate10.tools.utils import \
-    coordinateOrigin2arrayCenter
-from imaging.ComptonCamera_tests.tools.display_reconstruction import display_reconstruction
-
-
 # Script to reconstruct 3D image from cones
+
+from pathlib import Path
+from tools.analysis_cones import *
+from imaging.ComptonCamera_tests.tools.compton import compton_forward
+from tools.display_reconstruction import display_reconstruction
 
 # Units should be the same in cones_array and vpitch
 def reconstruct(cones_array, vpitch, vsize=(256, 256, 256), output=False,

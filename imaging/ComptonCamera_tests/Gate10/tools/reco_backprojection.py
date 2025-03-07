@@ -2,7 +2,7 @@
 # Very slow, ~1 sec per cone
 # Use cupy-based reconstruction if possible
 
-from imaging.ComptonCamera_tests.tools.display_reconstruction import *
+from tools.display_reconstruction import *
 
 def reco_bp(cones_df, vpitch, vsize=(256, 256, 256),
             napari=False, det=False):

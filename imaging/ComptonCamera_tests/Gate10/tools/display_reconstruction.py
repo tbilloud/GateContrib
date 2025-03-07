@@ -43,5 +43,5 @@ def display_reconstruction(vol, vsize, vpitch, detector=False):
 
 
 if __name__ == "__main__":
-    vol = np.load(Path('../Gate10/output') / "reco_fluoTrue_dopplerFalse.npy")
+    vol = np.load(Path('../output') / "reco_fluoTrue_dopplerFalse.npy")
     display_reconstruction(vol, (256, 256, 256))

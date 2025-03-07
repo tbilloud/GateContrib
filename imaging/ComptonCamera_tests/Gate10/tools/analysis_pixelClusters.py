@@ -2,7 +2,7 @@
 import sys
 import time
 
-from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import *
+from tools.analysis_pixelHits import *
 import pandas as pd
 from opengate.logger import global_log
 

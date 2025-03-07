@@ -1,8 +1,12 @@
 import opengate_core
 from opengate.managers import Simulation
 from opengate.geometry.volumes import *
+
+from tools.utils import *
+from tools.analysis_cones import *
 from tools.analysis_basics import *
 from tools.point_source_validation import *
+from tools.reco_backprojection import *
 from tools.reco_backprojection_cupy import *
 
 if __name__ == "__main__":
@@ -56,7 +60,7 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.activity, sim.run_timing_intervals = 1000 * Bq, [[0, 1 * sec]]
+    source.activity, sim.run_timing_intervals = 100 * Bq, [[0, 1 * sec]]
     source.particle = "gamma"
     source.energy.mono = 140 * keV
     source.position.translation = [0 * mm, 0 * mm, -5 * mm]
@@ -95,4 +99,5 @@ if __name__ == "__main__":
     sp, l = source.position.translation, hits_path.stem.replace("_", "\n")
     validate_psource(cones_df, source_pos=sp, vpitch=p, vsize=s,
                      legend=l, plot_seq=False, plot_stack=True, napari=False)
-    reco_bp_cupy(cones_df, vpitch=p, vsize=s, napari=True, det=d)
+    reco_bp(cones_df, vpitch=p, vsize=s, napari=True, det=d)
+    # reco_bp_cupy(cones_df, vpitch=p, vsize=s, napari=True, det=d)

@@ -1,4 +1,4 @@
-# Simulating a single layer Compton camera
+# Simulate a single layer Compton camera
 
 - Use Gate10 to simulate a single layer Compton camera.
 - Optionally add Allpix2 to simulate detector a semiconductor pixel detector response (e.g. Timepix3).
@@ -33,18 +33,15 @@ cd imaging/ComptonCamera_tests/Gate10
 
 ### 2) Create a virtual environment
 ```
-python -m venv opengate_env
-source opengate_env/bin/activate
+python3 -m venv venv
+source venv/bin/activate
 pip install --upgrade pip
 ```
 
-### 3) Install Gate10
-https://opengate-python.readthedocs.io/en/master/user_guide/user_guide_installation.html#
-```
-pip install opengate
-opengate_tests
-```
-This downloads Geant4 datasets, which takes a while.
+### 3) Install required python packages
+`pip install -r requirements.txt`
+To use the GPU-based reconstruction, install cupy with your CUDA version, e.g.
+`pip install cupy-cuda115`
 
 ### 4) Optional: Install Allpix2
 https://allpix-squared.docs.cern.ch/docs/02_installation/  
@@ -60,14 +57,16 @@ cmake -DCMAKE_INSTALL_PREFIX=../install-noG4 -DBUILD_GeometryBuilderGeant4=OFF -
 make -j4
 make install
 ```
-### 3) Install the required python packages
-`pip install -r requirements.txt`
 
-### 4) Set environment:
-`export PYTHONPATH=/path/to/your/project:$PYTHONPATH`
+
+### 5) Set environment:
+```
+export GLIBC_TUNABLES=glibc.rtld.optional_static_tls=2000000
+export PYTHONPATH=/path/to/your/project:$PYTHONPATH
+```
 
 ## Getting started
-Run a basic test:
+Run the test:
 `python3 main.py`
 
 ## Analysing Gate hits

@@ -1,5 +1,5 @@
 from pathlib import Path
-from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import *
+from tools.analysis_cones import *
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
 
 cp.set_printoptions(linewidth=200)

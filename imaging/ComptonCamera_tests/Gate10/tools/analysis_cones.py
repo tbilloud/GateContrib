@@ -10,9 +10,9 @@ import SimpleITK as sitk
 import matplotlib.pyplot as plt
 import cupy as cp
 from pandas import Series
-import imaging.ComptonCamera_tests.Gate10.tools.analysis_basics as analysis_basics
-from imaging.ComptonCamera_tests.Gate10.tools.utils import *
-from imaging.ComptonCamera_tests.Gate10.tools.utils import print_hits_inG4format
+import tools.analysis_basics as analysis_basics
+from tools.utils import *
+from tools.utils import print_hits_inG4format
 from opengate.logger import global_log
 
 pandas.set_option('display.max_columns', 100)

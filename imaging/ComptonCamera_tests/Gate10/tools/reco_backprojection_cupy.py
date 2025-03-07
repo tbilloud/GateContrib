@@ -1,7 +1,7 @@
 # Basic backprojection reconstruction for Compton camera data
 # Cupy-based script, GPU needed, x100 faster than numpy-based version
 
-from imaging.ComptonCamera_tests.tools.display_reconstruction import *
+from tools.display_reconstruction import *
 import cupy as cp
 
 def reco_bp_cupy(cones_df, vpitch, vsize=(256, 256, 256),

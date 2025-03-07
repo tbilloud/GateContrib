@@ -1,9 +1,9 @@
 import opengate_core
 from opengate.managers import Simulation
-from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import *
+from tools.analysis_basics import *
 from opengate.geometry.volumes import *
-from imaging.ComptonCamera_tests.Gate10.tools.point_source_validation import *
-from imaging.ComptonCamera_tests.Gate10.tools.reco_backprojection_cupy import *
+from tools.point_source_validation import *
+from tools.reco_backprojection_cupy import *
 
 # TODO: how to visualize volume sources?
 #  -> use mother volumes for box/sphere?

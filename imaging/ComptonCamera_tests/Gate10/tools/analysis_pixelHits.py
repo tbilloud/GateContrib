@@ -6,11 +6,11 @@ import pandas
 import pandas as pd
 import uproot
 import matplotlib.pyplot as plt
-from imaging.ComptonCamera_tests.Gate10.tools.utils import *
+from tools.utils import *
 import matplotlib.colors as mcolors
 from matplotlib.ticker import MaxNLocator
 
-from imaging.ComptonCamera_tests.Gate10.tools.utils import get_pixID
+from tools.utils import get_pixID
 from opengate.logger import global_log
 
 pandas.set_option('display.max_columns', 100)

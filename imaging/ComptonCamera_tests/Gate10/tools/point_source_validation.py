@@ -1,7 +1,6 @@
 from pathlib import Path
-from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import *
-from imaging.ComptonCamera_tests.Gate10.tools.reco_backprojection_cupy import \
-    reco_bp_cupy
+from tools.analysis_cones import *
+from tools.reco_backprojection_cupy import *
 
 cp.set_printoptions(linewidth=200)
 
