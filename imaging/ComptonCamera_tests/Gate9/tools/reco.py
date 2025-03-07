@@ -5,7 +5,9 @@ import napari
 from pathlib import Path
 from imaging.ComptonCamera_tests.Gate9.tools.seqCoinc2Cones import *
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
-from imaging.ComptonCamera_tests.tools.utils import remove_nans, coordinateOrigin2arrayCenter
+from imaging.ComptonCamera_tests.tools.utils import remove_nans
+from imaging.ComptonCamera_tests.Gate10.tools.utils import \
+    coordinateOrigin2arrayCenter
 
 # Script to reconstruct the source from root files with a sequenceCoincidence tree
 

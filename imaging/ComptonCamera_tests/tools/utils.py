@@ -11,14 +11,3 @@ def remove_nans(cp_array):
     return cp_array
 
 
-def coordinateOrigin2arrayCenter(cp_array, vpitch, vsize):
-    cp_array[:, 0] = cp_array[:, 0] + vpitch * vsize[0] / 2
-    cp_array[:, 1] = cp_array[:, 1] + vpitch * vsize[1] / 2
-    cp_array[:, 2] = cp_array[:, 2] + vpitch * vsize[2] / 2
-    return cp_array
-
-def coordinateOrigin2arrayCenter_df(df, vpitch, vsize):
-    df['Apex_X'] = df['Apex_X'] + vpitch * vsize[0] / 2
-    df['Apex_Y'] = df['Apex_Y'] + vpitch * vsize[1] / 2
-    df['Apex_Z'] = df['Apex_Z'] + vpitch * vsize[2] / 2
-    return df

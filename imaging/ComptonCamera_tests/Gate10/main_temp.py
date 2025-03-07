@@ -1,17 +1,9 @@
-import os.path
-import sys
 import opengate_core
 from opengate.managers import Simulation
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import *
-from imaging.ComptonCamera_tests.Gate10.allpix.allpix import *
-from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelClusters import *
-from imaging.ComptonCamera_tests.Gate10.tools.analysis_pixelHits import *
 from opengate.geometry.volumes import *
-from scipy.spatial.transform import Rotation as R
-from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import *
-from imaging.ComptonCamera_tests.tools.point_source_validation import *
-from imaging.ComptonCamera_tests.tools.reco_backprojection_cupy import *
-from imaging.ComptonCamera_tests.tools.utils import *
+from imaging.ComptonCamera_tests.Gate10.tools.point_source_validation import *
+from imaging.ComptonCamera_tests.Gate10.tools.reco_backprojection_cupy import *
 
 # TODO: how to visualize volume sources?
 #  -> use mother volumes for box/sphere?

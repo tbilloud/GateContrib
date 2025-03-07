@@ -1,14 +1,6 @@
-import matplotlib.pyplot as plt
-import napari
 from pathlib import Path
-import numpy as np
-from imaging.ComptonCamera_tests.Gate9.tools.seqCoinc2Cones import *
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import *
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
-from imaging.ComptonCamera_tests.tools.reco_backprojection_cupy import \
-    reco_bp_cupy
-from imaging.ComptonCamera_tests.tools.utils import remove_nans, \
-    coordinateOrigin2arrayCenter
 
 cp.set_printoptions(linewidth=200)
 
@@ -26,8 +18,11 @@ cp.set_printoptions(linewidth=200)
 # - time resolution (pile-up, singles with different eventID, true_coinc)
 # - energy/spatial resolution
 
-def validate_psource(cones_df, source_pos, vpitch, vsize = (256, 256, 256), plot_seq=False,
+# Units should be the same in cones_array, vpitch and source_pos
+def validate_psource(cones_array, EventID, source_pos, vpitch,
+                     vsize=(256, 256, 256), plot_seq=False,
                      plot_stack=False, napari=False, legend=False):
+    vol_init = cp.zeros(vsize, dtype=cp.float32)
 
     # Source position must be in units of voxels in vol
     sp_vox = [int(source_pos[i] / vpitch) + (vsize[i] // 2) for i in range(3)]
@@ -35,8 +30,8 @@ def validate_psource(cones_df, source_pos, vpitch, vsize = (256, 256, 256), plot
     # ######## RECONSTRUCT CONE BY CONE #######################################
     z_slice_stack = list()
     n_bad_cones = 0
-    for _, cone in cones_df.iterrows():
-        vol = reco_bp_cupy(cone.to_frame().T, vpitch, vsize, napari=False)
+    for cone, event in zip(cones_array, EventID):
+        vol = compton_forward(volume=vol_init, cones=cone, volume_pitch=vpitch)
         z_slice = vol[:, :, sp_vox[2]].get()
         z_slice_stack.append(z_slice)
         if z_slice[sp_vox[0], sp_vox[1]] == 0:
@@ -50,7 +45,7 @@ def validate_psource(cones_df, source_pos, vpitch, vsize = (256, 256, 256), plot
         if plot_seq:
             plt.imshow(z_slice, cmap='gray', origin='lower')
             plt.scatter(sp_vox[0], sp_vox[1], c='r', s=10)
-            plt.title(f'EventID: {cone["EventID"]}')
+            plt.title(f'EventID: {int(event)}')
             add_secondary_axes(plt.gca(), vpitch)
             plt.colorbar()
             plt.tight_layout()
@@ -60,7 +55,7 @@ def validate_psource(cones_df, source_pos, vpitch, vsize = (256, 256, 256), plot
 
     if plot_stack:
         fig, ax = plt.subplots()
-        plt.title(legend if legend else f'{len(cones_df)} cones')
+        plt.title(legend if legend else f'{EventID.shape[0]} cones')
         stack = np.sum(np.asarray(z_slice_stack), axis=0)
         ax.imshow(stack, cmap='gray_r', origin='lower')
         ax.set_xlabel('X (pixels)')
@@ -107,9 +102,9 @@ if __name__ == "__main__":
     # cones_array = conesTTree2conesArray(fname / 'CC_Cones.root', E0_MeV, er, nSingles_max, true_coinc, nentries)
 
     # ###### READING Gate10 hit root files ##############
-    fname, E0_MeV, vpitch, source_pos = Path('../Gate10/output'), 1.0, 200, [0,
-                                                                             0,
-                                                                             -50]
+    fname, E0_MeV, vpitch, source_pos = Path('../output'), 1.0, 200, [0,
+                                                                      0,
+                                                                      -50]
     cones_array = gHits2cones_byEvtID(fname / 'CC_Hits.root', E0_MeV)
 
     # ###### Preprocessing #########

@@ -2,7 +2,10 @@ import napari
 from pathlib import Path
 from imaging.ComptonCamera_tests.Gate9.tools.seqCoinc2Cones import *
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
-from imaging.ComptonCamera_tests.tools.utils import remove_nans, coordinateOrigin2arrayCenter
+from imaging.ComptonCamera_tests.tools.utils import remove_nans
+from imaging.ComptonCamera_tests.Gate10.tools.utils import \
+    coordinateOrigin2arrayCenter
+
 cp.set_printoptions(linewidth=200)
 
 # Script to check the precision of Gate9 simulation with point source

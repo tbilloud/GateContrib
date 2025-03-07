@@ -1,36 +1,52 @@
 # Simulating a single layer Compton camera
 
-Features:
 - Use Gate10 to simulate a single layer Compton camera.
-- Optionally add Allpix2 to simulate detector response of a semiconductor pixels such as Timepix3.
+- Optionally add Allpix2 to simulate detector a semiconductor pixel detector response (e.g. Timepix3).
 - Reconstruct cones from:
-  - Geant4 hits
-  - Gate singles
-  - Allpix2 pixel hits (WIP)
-  - pixel hits measured with a Timepix3 detector
-- Validate point source simulation/measurement
+  - Geant4 'hits'
+  - Gate 'singles'
+  - Allpix2 'pixel hits' (WIP)
+  - measured data
+- Validate simulation/measurement of gamma point sources
 - Reconstruct 3D image with basic backprojection
-- WIP: reconstruct 3D image with advanced algorithms (e.g. Coresi)
+- WIP: reconstruct 3D image with advanced algorithms (e.g. CoReSi)
 
-Validated with:
+Requires:
+- git
+- python3
+- 10 GB of disk space
+
+Tested with:
 - Ubuntu 22.04 and 24.04
+- python 3.10
 - Gate 10.0.1  
 
 ## Installation
-### 1) Install Gate10
-https://opengate-python.readthedocs.io/en/master/user_guide/user_guide_installation.html#
+
+### 1) Get the code
+```
+git clone https://github.com/tbilloud/GateContrib
+cd GateContrib
+git checkout compton-camera-tests
+cd imaging/ComptonCamera_tests/Gate10
+```
+
+### 2) Create a virtual environment
 ```
 python -m venv opengate_env
 source opengate_env/bin/activate
 pip install --upgrade pip
-pip install opengate
 ```
-Test installation:  
-`opengate_tests`
 
-Note: either the installation or tests install geant4 datasets, this takes a while.
+### 3) Install Gate10
+https://opengate-python.readthedocs.io/en/master/user_guide/user_guide_installation.html#
+```
+pip install opengate
+opengate_tests
+```
+This downloads Geant4 datasets, which takes a while.
 
-### 2) Optional: Install Allpix2
+### 4) Optional: Install Allpix2
 https://allpix-squared.docs.cern.ch/docs/02_installation/  
 Install ROOT 6:  
 https://root.cern/install/  
@@ -46,6 +62,9 @@ make install
 ```
 ### 3) Install the required python packages
 `pip install -r requirements.txt`
+
+### 4) Set environment:
+`export PYTHONPATH=/path/to/your/project:$PYTHONPATH`
 
 ## Getting started
 Run a basic test:

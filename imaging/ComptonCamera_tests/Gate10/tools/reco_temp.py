@@ -2,7 +2,9 @@ from napari import view_image, run
 from pathlib import Path
 from imaging.ComptonCamera_tests.Gate10.tools.analysis_cones import *
 from imaging.ComptonCamera_tests.tools.compton import compton_forward
-from imaging.ComptonCamera_tests.tools.utils import remove_nans, coordinateOrigin2arrayCenter
+from imaging.ComptonCamera_tests.tools.utils import remove_nans
+from imaging.ComptonCamera_tests.Gate10.tools.utils import \
+    coordinateOrigin2arrayCenter
 from imaging.ComptonCamera_tests.tools.display_reconstruction import display_reconstruction
 
 
@@ -40,7 +42,7 @@ if __name__ == "__main__":
     # cones_array = conesTTree2conesArray(fname / 'CC_Cones.root', E0_MeV, er, nSingles_max, true_coinc, nentries)
 
     # ###### READING Gate10 hit root files ##############
-    fname, E0_MeV = Path('../Gate10/output'), 1.0
+    fname, E0_MeV = Path('../output'), 1.0
     cones_array = gHits2cones_byEvtID(fname / 'CC_Hits.root', E0_MeV)
 
     # ###### Preprocessing #########

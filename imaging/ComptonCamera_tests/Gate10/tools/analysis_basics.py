@@ -9,7 +9,7 @@ import SimpleITK as sitk
 import matplotlib.pyplot as plt
 import cupy as cp
 from pandas import Series
-from imaging.ComptonCamera_tests.Gate10.tools.utils import *
+from tools.utils import *
 from opengate.utility import g4_units
 
 pandas.set_option('display.max_columns', 100)

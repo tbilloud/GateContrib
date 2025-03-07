@@ -1,9 +1,9 @@
 import opengate_core
 from opengate.managers import Simulation
-from imaging.ComptonCamera_tests.Gate10.tools.analysis_basics import *
 from opengate.geometry.volumes import *
-from imaging.ComptonCamera_tests.tools.point_source_validation import *
-from imaging.ComptonCamera_tests.tools.reco_backprojection_cupy import *
+from tools.analysis_basics import *
+from tools.point_source_validation import *
+from tools.reco_backprojection_cupy import *
 
 if __name__ == "__main__":
     sim, sim.output_dir = Simulation(), "output"
