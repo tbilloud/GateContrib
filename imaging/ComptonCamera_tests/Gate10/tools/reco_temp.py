@@ -2,8 +2,8 @@
 
 from pathlib import Path
 from tools.analysis_cones import *
-from imaging.ComptonCamera_tests.tools.compton import compton_forward
 from tools.display_reconstruction import display_reconstruction
+from tools.compton import compton_forward
 
 # Units should be the same in cones_array and vpitch
 def reconstruct(cones_array, vpitch, vsize=(256, 256, 256), output=False,

@@ -10,7 +10,7 @@
   - Allpix2 'pixel hits' (WIP)
   - measured data (WIP)
 - Validate simulation/measurement of gamma point sources
-- Reconstruct 3D image with basic backprojection
+- Reconstruct 3D image with basic back-projection
 - Visualize 3D images with napari
 
 Requires:
@@ -22,9 +22,11 @@ Tested with:
 - Ubuntu 22.04 and 24.04
 - python 3.10, 3.11, 3.12
 - Gate 10.0.1  
+- Allpix2 3.1.0
+- cupy-cuda115 and GeForce RTX 2080 Ti
 
 Future work:
-- add advanced reconstruction algorithms, e.g. CoReSi
+- add advanced GPU-based reconstruction algorithms, e.g. CoReSi
 
 ## Installation
 

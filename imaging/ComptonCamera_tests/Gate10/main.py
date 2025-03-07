@@ -103,14 +103,14 @@ if __name__ == "__main__":
     size = (256, 256, 256)  # volume size (voxels)
     d = {'size': sensor.size, 'position': sensor.translation}
     sp, leg = source.position.translation, hits_path.stem.replace("_", "\n")
-    validate_psource(cones_df, source_pos=sp, vpitch=pitch, vsize=size,
-                     legend=leg, plot_seq=False, plot_stack=True, napari=False)
+    # validate_psource(cones_df, source_pos=sp, vpitch=pitch, vsize=size,
+    #                  legend=leg, plot_seq=False, plot_stack=True, napari=False)
 
     # If you installed Cupy, try this instead:
     # validate_psource_cupy(cones_df, source_pos=sp, vpitch=pitch, vsize=size,
     #                  legend=leg, plot_seq=False, plot_stack=True, napari=False)
 
     # RECONSTRUCTION
-    reco_bp(cones_df, vpitch=pitch, vsize=size, napari=True, det=d)
+    # reco_bp(cones_df, vpitch=pitch, vsize=size, napari=True, det=d)
     # If you installed Cupy, try this instead:
-    # reco_bp_cupy(cones_df, vpitch=pitch, vsize=size, napari=True, det=d)
+    reco_bp_cupy(cones_df, vpitch=pitch, vsize=size, napari=True, det=d)

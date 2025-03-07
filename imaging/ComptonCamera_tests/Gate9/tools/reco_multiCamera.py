@@ -1,6 +1,6 @@
 import cupy as cp
 import napari
-from imaging.ComptonCamera_tests.tools.compton import compton_forward
+from imaging.ComptonCamera_tests.Gate10.tools.compton import compton_forward
 from imaging.ComptonCamera_tests.ideal.tools.seqCoinc2Cones import seqCoin2ConesArray, conesTTree2conesArray
 from imaging.ComptonCamera_tests.tools.utils import remove_nans
 from pathlib import Path
