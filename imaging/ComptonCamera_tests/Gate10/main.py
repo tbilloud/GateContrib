@@ -3,11 +3,16 @@ from opengate.managers import Simulation
 from opengate.geometry.volumes import *
 
 from tools.utils import *
-from tools.analysis_cones import *
 from tools.analysis_basics import *
+from tools.analysis_cones import *
+from tools.analysis_pixelHits import *
 from tools.point_source_validation import *
+from tools.point_source_validation_cupy import *
 from tools.reco_backprojection import *
-# from tools.reco_backprojection_cupy import *
+from allpix.allpix import *
+from tools.reco_backprojection_cupy import *
+
+
 
 if __name__ == "__main__":
     sim, sim.output_dir = Simulation(), "output"
@@ -19,17 +24,17 @@ if __name__ == "__main__":
     # ===========================
     # ==   GEOMETRY            ==
     # ===========================
-    npix, p, thickness = 256, 55 * um, 1 * mm
+    npix, pitch, thickness = 256, 55 * um, 1 * mm
     sim.world.material = "Vacuum"
     sensor = sim.add_volume("Box", "sensor")
     sensor.material = "cadmium_telluride"
-    sensor.size = [npix * p, npix * p, thickness]
+    sensor.size = [npix * pitch, npix * pitch, thickness]
     sensor.translation = [0 * um, 0 * um, 5 * mm]
     pixel = sim.add_volume("Box", "pixel")
-    pixel.mother, pixel.size = sensor.name, [p, p, thickness]
+    pixel.mother, pixel.size = sensor.name, [pitch, pitch, thickness]
     pixel.material = sensor.material
     par = RepeatParametrisedVolume(repeated_volume=pixel)
-    par.linear_repeat, par.translation = [npix, npix, 1], [p, p, 0]
+    par.linear_repeat, par.translation = [npix, npix, 1], [pitch, pitch, 0]
     sim.volume_manager.add_volume(par)
 
     ## ===========================
@@ -60,7 +65,7 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.activity, sim.run_timing_intervals = 100 * Bq, [[0, 1 * sec]]
+    source.activity, sim.run_timing_intervals = 1000 * Bq, [[0, 1 * sec]]
     source.particle = "gamma"
     source.energy.mono = 140 * keV
     source.position.translation = [0 * mm, 0 * mm, -5 * mm]
@@ -82,10 +87,9 @@ if __name__ == "__main__":
     analyse_hits(hits_path)
     analyse_singles(singles_path)
 
-    # PIXEL HITS
+    # PIXEL HITS (optional)
     # pixelHits = singles2pixelHits(singles_path)
-    # pixelHits = gHits2allpix2pixelHits(binary_path, sim, npix)
-    # print(pixelHits.to_string(index=False))
+    # pixelHits = gHits2allpix2pixelHits(sim, allpix_path,  npix)
     # plot_pixelHits_perEventID(pixelHits,n_pixels=npix,log_scale=[False, False, True])
 
     # CONES
@@ -93,11 +97,15 @@ if __name__ == "__main__":
     # TODO: cones = pixelHits2cones(pixelHits, npix)
 
     # RECONSTRUCTION
-    p = 0.1  # sim.world.size[2] / 256
-    s = (256, 256, 256)
+    pitch = 0.1  # volume pitch (mm)
+    size = (256, 256, 256)  # volume size (voxels)
     d = {'size': sensor.size, 'position': sensor.translation}
-    sp, l = source.position.translation, hits_path.stem.replace("_", "\n")
-    validate_psource(cones_df, source_pos=sp, vpitch=p, vsize=s,
-                     legend=l, plot_seq=False, plot_stack=True, napari=False)
-    reco_bp(cones_df, vpitch=p, vsize=s, napari=True, det=d)
-    # reco_bp_cupy(cones_df, vpitch=p, vsize=s, napari=True, det=d)
+    sp, leg = source.position.translation, hits_path.stem.replace("_", "\n")
+    validate_psource(cones_df, source_pos=sp, vpitch=pitch, vsize=size,
+                     legend=leg, plot_seq=False, plot_stack=True, napari=False)
+
+    reco_bp(cones_df, vpitch=pitch, vsize=size, napari=True, det=d)
+    # If you installed Cupy, try this instead:
+    # validate_psource_cupy(cones_df, source_pos=sp, vpitch=pitch, vsize=size,
+    #                  legend=leg, plot_seq=False, plot_stack=True, napari=False)
+    # reco_bp_cupy(cones_df, vpitch=pitch, vsize=size, napari=True, det=d)

@@ -3,8 +3,9 @@ import subprocess
 import uproot
 from scipy.spatial.transform import Rotation as R
 import warnings
-from tools.analysis_pixelHits import *
 from opengate.logger import global_log
+from tools.analysis_pixelHits import *
+from tools.analysis_pixelHits import *
 
 
 def run_allpix(sim, binary_path, output_dir='allpix/', log_level='FATAL'):

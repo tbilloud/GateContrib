@@ -1,4 +1,6 @@
 from pathlib import Path
+
+from opengate.logger import global_log
 from tools.analysis_cones import *
 from tools.reco_backprojection import *
 
@@ -15,8 +17,9 @@ from tools.reco_backprojection import *
 # - time resolution (pile-up, singles with different eventID, true_coinc)
 # - energy/spatial resolution
 
-def validate_psource(cones_df, source_pos, vpitch, vsize = (256, 256, 256), plot_seq=False,
+def validate_psource(cones_df, source_pos, vpitch, vsize, plot_seq=False,
                      plot_stack=False, napari=False, legend=False):
+    global_log.info(f'Validating point source')
 
     # Source position must be in units of voxels in vol
     sp_vox = [int(source_pos[i] / vpitch) + (vsize[i] // 2) for i in range(3)]
@@ -45,7 +48,7 @@ def validate_psource(cones_df, source_pos, vpitch, vsize = (256, 256, 256), plot
             plt.tight_layout()
             plt.show()
 
-    print(n_bad_cones, 'bad cones')
+    print(n_bad_cones, 'cones not intersecting at the source point')
 
     if plot_stack:
         fig, ax = plt.subplots()

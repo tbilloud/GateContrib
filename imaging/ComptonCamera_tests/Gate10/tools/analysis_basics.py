@@ -31,7 +31,7 @@ def analyse_hits(file_path):
     print(int(tree_hits.num_entries), 'entries in tree Hits')
     # print(tree.keys())
     hits = tree_hits.arrays(library='pd', entry_stop=None)  # None to read all entries
-    print('Number of events', hits['EventID'].nunique())
+    # print('Number of events', hits['EventID'].nunique())
     # print_hits_short(hits)
     # print_hits_short_sortedByGlobalTime(hits)
     # print(hits.to_string(index=False))

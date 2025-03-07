@@ -1,11 +1,13 @@
 # Basic backprojection reconstruction for Compton camera data
 # Cupy-based script, GPU needed, x100 faster than numpy-based version
-
+from opengate.logger import global_log
 from tools.display_reconstruction import *
 import cupy as cp
 
-def reco_bp_cupy(cones_df, vpitch, vsize=(256, 256, 256),
-                 napari=False, det=False):
+def reco_bp_cupy(cones_df, vpitch, vsize, napari=False, det=False):
+    if len(cones_df) > 1: # avoid logging when used in point source validation
+        global_log.info(f'Reconstructing volume with backprojection')
+
     # Define the reconstruction volume
     volume = cp.zeros(vsize, dtype=cp.float32)
     grid_x = cp.linspace(-vsize[0] // 2, vsize[0] // 2, vsize[0]) * vpitch

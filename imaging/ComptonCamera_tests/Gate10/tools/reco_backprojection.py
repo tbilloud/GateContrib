@@ -1,11 +1,13 @@
 # Basic backprojection reconstruction for Compton camera data
 # Very slow, ~1 sec per cone
 # Use cupy-based reconstruction if possible
-
+from opengate.logger import global_log
 from tools.display_reconstruction import *
 
-def reco_bp(cones_df, vpitch, vsize=(256, 256, 256),
-            napari=False, det=False):
+
+def reco_bp(cones_df, vpitch, vsize, napari=False, det=False):
+    if len(cones_df) > 1:  # avoid logging when used in point source validation
+        global_log.info(f'Reconstructing volume with backprojection')
 
     volume = np.zeros(vsize, dtype=np.float32)
     grid_x = np.linspace(-vsize[0] // 2, vsize[0] // 2, vsize[0]) * vpitch
@@ -14,13 +16,12 @@ def reco_bp(cones_df, vpitch, vsize=(256, 256, 256),
     X, Y, Z = np.meshgrid(grid_x, grid_y, grid_z, indexing='ij')
 
     for _, c in cones_df.iterrows():
-
         apex = np.array([c['Apex_X'], c['Apex_Y'], c['Apex_Z']])
         d = np.array([c['Direction_X'], c['Direction_Y'], c['Direction_Z']])
         cosT = c['cosT']
 
         # Compute distance from apex to each voxel
-        voxel_vec = np.stack([X - apex[0], Y - apex[1], Z - apex[2]],axis=-1)
+        voxel_vec = np.stack([X - apex[0], Y - apex[1], Z - apex[2]], axis=-1)
         voxel_distances = np.linalg.norm(voxel_vec, axis=-1)
 
         # Compute angle with direction vector
@@ -33,7 +34,6 @@ def reco_bp(cones_df, vpitch, vsize=(256, 256, 256),
 
         # Accumulate contribution to the volume
         volume[cone_mask] += 1
-
 
     volume = np.swapaxes(volume, 0, 1)
     if napari:

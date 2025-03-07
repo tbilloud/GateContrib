@@ -20,7 +20,7 @@ Requires:
 
 Tested with:
 - Ubuntu 22.04 and 24.04
-- python 3.10
+- python 3.10, 3.11, 3.12
 - Gate 10.0.1  
 
 Future work:
@@ -28,7 +28,7 @@ Future work:
 
 ## Installation
 
-### 1) Download or clone and checkout branch compton-camera-tests: 
+### 1) Download or clone/checkout: 
 ```
 git clone -b compton-camera-tests https://github.com/tbilloud/GateContrib
 ```
@@ -46,16 +46,33 @@ To use the GPU-based functions (point source validation, reconstruction), instal
 `pip install cupy-cuda115`
 
 ### 4) Optional: Install Allpix2
-https://allpix-squared.docs.cern.ch/docs/02_installation/  
-Install ROOT 6:  
+
+Install BOOST:
+```
+sudo apt-get install libboost-all-dev
+```
+
+Install Eigen3:
+```
+sudo apt-get install libeigen3-dev
+```
+
+Install and source ROOT 6:  
 https://root.cern/install/  
+```
+wget https://root.cern/download/root_v6.32.10.Linux-ubuntu22.04-x86_64-gcc11.4.tar.gz
+tar -xzvf root_v6.32.10.Linux-ubuntu22.04-x86_64-gcc11.4.tar.gz
+source root/bin/thisroot.sh
+```
+
 Then install Allpix2 without Geant4:  
+https://allpix-squared.docs.cern.ch/docs/02_installation/  
 ```
 git clone https://gitlab.cern.ch/allpix-squared/allpix-squared
 cd allpix-squared
 mkdir build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX=../install-noG4 -DBUILD_GeometryBuilderGeant4=OFF -DBUILD_DepositionCosmics=OFF -DBUILD_DepositionGeant4=OFF -DBUILD_DepositionGenerator=OFF -DBUILD_GDMLOutputWriter=OFF -DBUILD_VisualizationGeant4=OFF ..`
+cmake -DCMAKE_INSTALL_PREFIX=../install-noG4 -DBUILD_GeometryBuilderGeant4=OFF -DBUILD_DepositionCosmics=OFF -DBUILD_DepositionGeant4=OFF -DBUILD_DepositionGenerator=OFF -DBUILD_GDMLOutputWriter=OFF -DBUILD_VisualizationGeant4=OFF ..
 make -j4
 make install
 ```
@@ -82,8 +99,9 @@ Cannot move to target thread (0x57ad941535d0)
 
 Solution:
 ```
-mv /path-to-virtual-environment/lib/python3.10/site-packages/opengate_core/plugins /path-to-virtual-environment/lib/python3.10/site-packages/opengate_core/plugins.bak`
+mv /path-to-virtual-environment/lib/python3.XX/site-packages/opengate_core/plugins /path-to-virtual-environment/lib/python3.XX/site-packages/opengate_core/plugins.bak`
 ```
+Replace XX with your python version, e.g. 10
 
 ### Allpix2
 
