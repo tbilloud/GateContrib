@@ -24,23 +24,21 @@ Tested with:
 ## Installation
 
 ### 1) Get the code
+Download or clone the git repository:
 ```
-git clone https://github.com/tbilloud/GateContrib
-cd GateContrib
-git checkout compton-camera-tests
-cd imaging/ComptonCamera_tests/Gate10
+git clone -b compton-camera-tests https://github.com/tbilloud/GateContrib
 ```
 
 ### 2) Create a virtual environment
 ```
+cd GateContrib/imaging/ComptonCamera_tests/Gate10
 python3 -m venv venv
 source venv/bin/activate
-pip install --upgrade pip
 ```
 
 ### 3) Install required python packages
 `pip install -r requirements.txt`  
-To use the GPU-based reconstruction, install the Cupy package suited to your CUDA version, e.g.
+To use the GPU-based functions (point source validation, reconstruction), install the Cupy package suited to your CUDA version, e.g.  
 `pip install cupy-cuda115`
 
 ### 4) Optional: Install Allpix2
@@ -62,23 +60,15 @@ make install
 ### 5) Set environment:
 ```
 export GLIBC_TUNABLES=glibc.rtld.optional_static_tls=2000000
-export PYTHONPATH=/path/to/your/project:$PYTHONPATH
 ```
 
 ## Getting started
-Run the test:
-`python3 main.py`
+Run the test:  
+`python3 main.py`  
 The 1st time you run a simulation, Gate10 will install Geant4 datasets, which can take a while. This is done only once.
 
-## Analysing Gate hits
-Geant4 steps can be logged in terminal with sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1 (EventIDs are not logged, hence better do that with small number of events)
-- ProcessDefinedStep (Gate) is pre-step, ProcName (G4) is post-step
-  => thus when new track are generated in sensor, their ProcessDefinedStep is none.
-- KineticEnergy (Gate) is pre-step, KinE (G4) is post-step
-- StepLength (Gate) / StepLeng (G4) can be used to match hits (Gate) / steps (G4)
 
-
-## QT issues with Gate 10.0.1
+### QT issues with Gate 10.0.1
 When using Qt-based code (e.g. napari) after simulation, the main.py script might fail with:
 ```
 WARNING: QObject::moveToThread: Current thread (0x57ad941535d0) is not the object's thread (0x57ad94c1ef50).
@@ -91,7 +81,7 @@ Solution:
 mv /path-to-virtual-environment/lib/python3.10/site-packages/opengate_core/plugins /path-to-virtual-environment/lib/python3.10/site-packages/opengate_core/plugins.bak`
 ```
 
-## Allpix2
+### Allpix2
 
 Allpix2 is a C++ software for precise simulation of pixel detectors.
 It simulates the transport of charge carriers in semiconductor sensors and their signal induction.
