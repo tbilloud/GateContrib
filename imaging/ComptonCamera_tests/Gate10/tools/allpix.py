@@ -5,10 +5,11 @@ from scipy.spatial.transform import Rotation as R
 import warnings
 from opengate.logger import global_log
 from tools.analysis_pixelHits import *
-from tools.analysis_pixelHits import *
 
 
-def run_allpix(sim, binary_path, output_dir='allpix/', log_level='FATAL'):
+def run_allpix(sim,
+               binary_path='allpix/allpix-squared/install-noG4/bin/allpix',
+               output_dir='allpix/', log_level='FATAL'):
     # TODO: sync different digitizer chains with output formats
     hits_actor = sim.actor_manager.get_actor("Hits")
     hits_file = sim.output_dir + '/' + hits_actor.output_filename
@@ -137,7 +138,8 @@ chain_advanced_csa = """
 """
 
 
-def gHits2allpix2pixelHits(binary_path, sim, npix):
-    run_allpix(binary_path, sim, output_dir='allpix/',
+def gHits2allpix2pixelHits(sim, npix,
+                           binary_path='allpix/allpix-squared/install-noG4/bin/allpix'):
+    run_allpix(sim, binary_path, output_dir='allpix/',
                log_level='FATAL')  # INFO, FATAL, ...
     return allpixTxt2pixelHit('allpix/data.txt', n_pixels=npix)

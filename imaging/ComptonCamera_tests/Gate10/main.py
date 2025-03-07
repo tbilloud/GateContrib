@@ -1,3 +1,5 @@
+import sys
+
 import opengate_core
 from opengate.managers import Simulation
 from opengate.geometry.volumes import *
@@ -9,7 +11,7 @@ from tools.analysis_pixelHits import *
 from tools.point_source_validation import *
 from tools.point_source_validation_cupy import *
 from tools.reco_backprojection import *
-from allpix.allpix import *
+from tools.allpix import *
 from tools.reco_backprojection_cupy import *
 
 
@@ -65,7 +67,7 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.activity, sim.run_timing_intervals = 1000 * Bq, [[0, 1 * sec]]
+    source.activity, sim.run_timing_intervals = 1000 * Bq, [[0, 10 * sec]]
     source.particle = "gamma"
     source.energy.mono = 140 * keV
     source.position.translation = [0 * mm, 0 * mm, -5 * mm]
@@ -89,14 +91,14 @@ if __name__ == "__main__":
 
     # PIXEL HITS (optional)
     # pixelHits = singles2pixelHits(singles_path)
-    # pixelHits = gHits2allpix2pixelHits(sim, allpix_path,  npix)
+    # pixelHits = gHits2allpix2pixelHits(sim, npix)
     # plot_pixelHits_perEventID(pixelHits,n_pixels=npix,log_scale=[False, False, True])
 
     # CONES
     cones_df = gHits2cones_byEvtID(hits_path, source.energy.mono, to_np=False)
     # TODO: cones = pixelHits2cones(pixelHits, npix)
 
-    # RECONSTRUCTION
+    # POINT SOURCE VALIDATION
     pitch = 0.1  # volume pitch (mm)
     size = (256, 256, 256)  # volume size (voxels)
     d = {'size': sensor.size, 'position': sensor.translation}
@@ -104,8 +106,11 @@ if __name__ == "__main__":
     validate_psource(cones_df, source_pos=sp, vpitch=pitch, vsize=size,
                      legend=leg, plot_seq=False, plot_stack=True, napari=False)
 
-    reco_bp(cones_df, vpitch=pitch, vsize=size, napari=True, det=d)
     # If you installed Cupy, try this instead:
     # validate_psource_cupy(cones_df, source_pos=sp, vpitch=pitch, vsize=size,
     #                  legend=leg, plot_seq=False, plot_stack=True, napari=False)
+
+    # RECONSTRUCTION
+    reco_bp(cones_df, vpitch=pitch, vsize=size, napari=True, det=d)
+    # If you installed Cupy, try this instead:
     # reco_bp_cupy(cones_df, vpitch=pitch, vsize=size, napari=True, det=d)

@@ -68,6 +68,7 @@ source root/bin/thisroot.sh
 Then install Allpix2 without Geant4:  
 https://allpix-squared.docs.cern.ch/docs/02_installation/  
 ```
+cd allpix
 git clone https://gitlab.cern.ch/allpix-squared/allpix-squared
 cd allpix-squared
 mkdir build
@@ -78,7 +79,7 @@ make install
 ```
 
 
-### 5) Set environment:
+### 5) Set environment
 ```
 export GLIBC_TUNABLES=glibc.rtld.optional_static_tls=2000000
 ```
@@ -88,6 +89,25 @@ Run the test:
 `python3 main.py`  
 The 1st time you run a simulation, Gate10 will install Geant4 datasets, which can take a while. This is done only once.
 
+In main.py, the 1st part (code until block 'ANALYSIS AND RECONSTRUCTION') is the Gate 10 simulation. See user manual:  
+https://opengate-python.readthedocs.io/en/master/user_guide/user_guide_intro.html
+
+Then, several functions are available. Step-by-step:
+1) Print basic info about Gate output files 
+- Gate hits with analyze_hits(). Gate hits are like Geant4 hits and are different from pixel hits.
+- singles, which are group of hits per pixel, with analyze_singles()
+2) Simulate pixel hits:
+- from Gate singles with gSingles2pixelHits()
+- from Allpix2 output with gHits2allpix2pixelHits()
+3) Reconsutruct cones:
+- from Gate4 hits with gHits2cones_byEvtID()
+- from pixel hits (WIP)
+4) Check cones from a point sources:
+- validate_psource() plots cone projections. It's slow, ~1 sec per cone.
+- with GPU acceleration with validate_psource_gpu()
+5) Reconstruct 3D image:
+- with backprojection with backprojection(). It's slow, ~1 sec per cone.
+- with GPU acceleration with backprojection_gpu()
 
 ### QT issues with Gate 10.0.1
 When using Qt-based code (e.g. napari) after simulation, the main.py script might fail with:
