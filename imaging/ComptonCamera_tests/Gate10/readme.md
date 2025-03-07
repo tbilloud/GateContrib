@@ -5,7 +5,7 @@
 - Use Gate10 to simulate a single layer Compton camera
 - Optionally add Allpix2 to simulate detector a semiconductor pixel detector response (e.g. Timepix3)
 - Reconstruct cones from:
-  - Geant4 'hits'
+  - Geant4/Gate 'hits'
   - Gate 'singles'
   - Allpix2 'pixel hits' (WIP)
   - measured data (WIP)
@@ -44,6 +44,7 @@ source venv/bin/activate
 
 ### 3) Install required python packages
 `pip install -r requirements.txt`  
+
 To use the GPU-based functions (point source validation, reconstruction), install CUDA and the Cupy package suited to your CUDA version, e.g.  
 `pip install cupy-cuda115`
 
