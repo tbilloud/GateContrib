@@ -8,7 +8,6 @@ import pandas
 import uproot
 import SimpleITK as sitk
 import matplotlib.pyplot as plt
-import cupy as cp
 from pandas import Series
 import tools.analysis_basics as analysis_basics
 from tools.utils import *
@@ -75,8 +74,8 @@ def gHits2cones_byEvtID(file_path, source_MeV, nentries=None, to_np=False):
                         direction = [-second_hit[f'PreDirection_{axis}'] for axis in 'XYZ']
                     # if not, there is a new track whose origin can be used to calculate the direction
                     else:
-                        prepos = cp.array([second_hit[f'PrePosition_{axis}'] for axis in 'XYZ'])
-                        direction = ((cp.array(apex) - prepos) / cp.linalg.norm(cp.array(apex) - prepos)).tolist()
+                        prepos = np.array([second_hit[f'PrePosition_{axis}'] for axis in 'XYZ'])
+                        direction = ((np.array(apex) - prepos) / np.linalg.norm(np.array(apex) - prepos)).tolist()
 
         if apex:
             cosT = 1 - (0.511 * E1) / (source_MeV * (source_MeV - E1))
@@ -84,12 +83,10 @@ def gHits2cones_byEvtID(file_path, source_MeV, nentries=None, to_np=False):
 
     print(f"{n_events_primary} events with primary particles")
     print(f"{n_events_full_energy_deposit} events with full energy deposit")
-
     print(len(cones) if len(cones) else sys.exit('No cones'),'cones')
-    print(cp.isnan(cp.array(cones)).any(axis=1).sum(), 'cones with NaNs')
 
     if to_np:
-        return cp.array(cones)
+        return np.array(cones)
     else:
         return pandas.DataFrame(cones, columns=['EventID', 'Apex_X', 'Apex_Y', 'Apex_Z', 'Direction_X', 'Direction_Y',
                                                 'Direction_Z', 'cosT', 'error'])

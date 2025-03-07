@@ -39,8 +39,8 @@ pip install --upgrade pip
 ```
 
 ### 3) Install required python packages
-`pip install -r requirements.txt`
-To use the GPU-based reconstruction, install cupy with your CUDA version, e.g.
+`pip install -r requirements.txt`  
+To use the GPU-based reconstruction, install the Cupy package suited to your CUDA version, e.g.
 `pip install cupy-cuda115`
 
 ### 4) Optional: Install Allpix2
@@ -68,6 +68,7 @@ export PYTHONPATH=/path/to/your/project:$PYTHONPATH
 ## Getting started
 Run the test:
 `python3 main.py`
+The 1st time you run a simulation, Gate10 will install Geant4 datasets, which can take a while. This is done only once.
 
 ## Analysing Gate hits
 Geant4 steps can be logged in terminal with sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1 (EventIDs are not logged, hence better do that with small number of events)

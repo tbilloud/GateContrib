@@ -7,7 +7,7 @@ from tools.analysis_cones import *
 from tools.analysis_basics import *
 from tools.point_source_validation import *
 from tools.reco_backprojection import *
-from tools.reco_backprojection_cupy import *
+# from tools.reco_backprojection_cupy import *
 
 if __name__ == "__main__":
     sim, sim.output_dir = Simulation(), "output"

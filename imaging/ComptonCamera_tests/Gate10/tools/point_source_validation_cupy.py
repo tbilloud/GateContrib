@@ -1,6 +1,9 @@
 from pathlib import Path
 from tools.analysis_cones import *
-from tools.reco_backprojection import *
+from tools.reco_backprojection_cupy import *
+
+cp.set_printoptions(linewidth=200)
+
 
 # Script to check the precision of Gate9 or Gate10 simulations with a point source
 # Can be run as a standalone script or (WIP) as a function in a Gate10 script
@@ -25,8 +28,8 @@ def validate_psource(cones_df, source_pos, vpitch, vsize = (256, 256, 256), plot
     z_slice_stack = list()
     n_bad_cones = 0
     for _, cone in cones_df.iterrows():
-        vol = reco_bp(cone.to_frame().T, vpitch, vsize, napari=False)
-        z_slice = vol[:, :, sp_vox[2]]
+        vol = reco_bp_cupy(cone.to_frame().T, vpitch, vsize, napari=False)
+        z_slice = vol[:, :, sp_vox[2]].get()
         z_slice_stack.append(z_slice)
         if z_slice[sp_vox[0], sp_vox[1]] == 0:
             # TODO sometime cone is bad but z_slice is not 0

@@ -2,12 +2,10 @@
 # Can be used in the main simulation script after sim.run() or offline (i.e. reading root files without simulation)
 import os
 import sys
-
 import pandas
 import uproot
 import SimpleITK as sitk
 import matplotlib.pyplot as plt
-import cupy as cp
 from pandas import Series
 from tools.utils import *
 from opengate.utility import g4_units
