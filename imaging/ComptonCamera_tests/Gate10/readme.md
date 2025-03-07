@@ -2,8 +2,8 @@
 
 ![Screenshot of a reconstruction](doc/img.png)
 
-- Use Gate10 to simulate a single layer Compton camera.
-- Optionally add Allpix2 to simulate detector a semiconductor pixel detector response (e.g. Timepix3).
+- Use Gate10 to simulate a single layer Compton camera
+- Optionally add Allpix2 to simulate detector a semiconductor pixel detector response (e.g. Timepix3)
 - Reconstruct cones from:
   - Geant4 'hits'
   - Gate 'singles'
@@ -11,7 +11,7 @@
   - measured data (WIP)
 - Validate simulation/measurement of gamma point sources
 - Reconstruct 3D image with basic backprojection
-- WIP: reconstruct 3D image with advanced algorithms (e.g. CoReSi)
+- Visualize 3D images with napari
 
 Requires:
 - python3
@@ -22,6 +22,9 @@ Tested with:
 - Ubuntu 22.04 and 24.04
 - python 3.10
 - Gate 10.0.1  
+
+Future work:
+- add advanced reconstruction algorithms, e.g. CoReSi
 
 ## Installation
 
