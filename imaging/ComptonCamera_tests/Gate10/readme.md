@@ -70,6 +70,7 @@ https://allpix-squared.docs.cern.ch/docs/02_installation/
 ```
 cd allpix
 git clone https://gitlab.cern.ch/allpix-squared/allpix-squared
+rm -rf .git # remove the git folder to avoid conflicts
 cd allpix-squared
 mkdir build
 cd build
