@@ -12,9 +12,9 @@
 - WIP: reconstruct 3D image with advanced algorithms (e.g. CoReSi)
 
 Requires:
-- git
 - python3
-- 10 GB of disk space
+- 20 GB of disk space
+- Optional: Allpix2, ROOT 6, CUDA
 
 Tested with:
 - Ubuntu 22.04 and 24.04
@@ -23,7 +23,7 @@ Tested with:
 
 ## Installation
 
-### 1) Download or clone
+### 1) Download or clone and checkout branch compton-camera-tests: 
 ```
 git clone -b compton-camera-tests https://github.com/tbilloud/GateContrib
 ```
@@ -37,7 +37,7 @@ source venv/bin/activate
 
 ### 3) Install required python packages
 `pip install -r requirements.txt`  
-To use the GPU-based functions (point source validation, reconstruction), install the Cupy package suited to your CUDA version, e.g.  
+To use the GPU-based functions (point source validation, reconstruction), install CUDA and the Cupy package suited to your CUDA version, e.g.  
 `pip install cupy-cuda115`
 
 ### 4) Optional: Install Allpix2
