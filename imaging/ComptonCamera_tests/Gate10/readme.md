@@ -6,7 +6,7 @@
   - Geant4 'hits'
   - Gate 'singles'
   - Allpix2 'pixel hits' (WIP)
-  - measured data
+  - measured data (WIP)
 - Validate simulation/measurement of gamma point sources
 - Reconstruct 3D image with basic backprojection
 - WIP: reconstruct 3D image with advanced algorithms (e.g. CoReSi)
@@ -23,8 +23,7 @@ Tested with:
 
 ## Installation
 
-### 1) Get the code
-Download or clone the git repository:
+### 1) Download or clone
 ```
 git clone -b compton-camera-tests https://github.com/tbilloud/GateContrib
 ```
