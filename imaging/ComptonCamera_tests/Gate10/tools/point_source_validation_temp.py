@@ -1,9 +1,7 @@
 from pathlib import Path
 from tools.analysis_cones import *
-from imaging.ComptonCamera_tests.Gate10.tools.compton import compton_forward
-
-cp.set_printoptions(linewidth=200)
-
+from tools.compton import compton_forward
+import cupy as cp
 
 # Script to check the precision of Gate9 or Gate10 simulations with a point source
 # Can be run as a standalone script or (WIP) as a function in a Gate10 script

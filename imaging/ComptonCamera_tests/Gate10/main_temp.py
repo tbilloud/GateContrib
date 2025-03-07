@@ -2,7 +2,7 @@ import opengate_core
 from opengate.managers import Simulation
 from tools.analysis_basics import *
 from opengate.geometry.volumes import *
-from tools.point_source_validation import *
+from tools.point_source_validation_cupy import *
 from tools.reco_backprojection_cupy import *
 
 # TODO: how to visualize volume sources?
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     ## ===========================
     ## ==  PHYSICS              ==
     ## ===========================
-    doppler = False
+    doppler = True
     fluo = False
     if doppler: sim.physics_manager.physics_list_name = 'G4EmLivermorePhysics'
     if fluo:
@@ -67,15 +67,15 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    # source.n = 1000
-    source.activity, sim.run_timing_intervals = 100 * Bq, [[0, 1 * sec]]
+    source.n = 1000
+    # source.activity, sim.run_timing_intervals = 1000 * Bq, [[0, 1 * sec]]
     source.particle = "gamma"
-    source.energy.mono = 140 * keV
+    source.energy.mono = 480 * keV
     source.position.translation = [0 * mm, 0 * mm, -5 * mm]
     # source.position.type, source.position.radius = "sphere", 5 * mm
     # source.position.type, source.position.size = "box", [5 * mm] * 3
-    source.direction.theta, source.direction.phi = theta_phi(sensor, source)
-    # source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
+    # source.direction.theta, source.direction.phi = theta_phi(sensor, source)
+    source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
     sim.world.size = get_worldSize(sensor, source, margin=0.1)
 
     ##=====================================================
@@ -111,10 +111,10 @@ if __name__ == "__main__":
     # TODO: cones = pixelClusters2cones(pixel_hits)
 
     # RECONSTRUCTION
-    p = 0.1  # sim.world.size[2] / 256
+    p = 1  # sim.world.size[2] / 256
     s = (256, 256, 256)
     d = {'size': sensor.size, 'position': sensor.translation}
     sp, l = source.position.translation, hits_path.stem.replace("_", "\n")
-    validate_psource(cones_df, source_pos=sp, vpitch=p, vsize=s,
+    validate_psource_cupy(cones_df, source_pos=sp, vpitch=p, vsize=s,
                      legend=l, plot_seq=False, plot_stack=True, napari=False)
     reco_bp_cupy(cones_df, vpitch=p, vsize=s, napari=True, det=d)
