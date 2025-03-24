@@ -23,7 +23,7 @@ Tested with:
 - python 3.10, 3.11, 3.12
 - Gate 10.0.1  
 - Allpix2 3.1.0
-- cupy-cuda115 and GeForce RTX 2080 Ti
+- cupy-cuda115 / cupy-cuda128 and GeForce RTX 2080 Ti
 
 Future work:
 - add advanced GPU-based reconstruction algorithms, e.g. CoReSi
