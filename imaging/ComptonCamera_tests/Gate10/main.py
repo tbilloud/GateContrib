@@ -95,12 +95,10 @@ if __name__ == "__main__":
     cones = gHits2cones_byEvtID(hits_path, source.energy.mono, to_np=False)
 
     # POINT SOURCE VALIDATION
-    pitch = 0.1  # volume pitch (mm)
-    size = (256, 256, 256)  # volume size (voxels)
-    d = {'size': sensor.size, 'position': sensor.translation}
-    sp, l = source.position.translation, hits_path.stem.replace("_", "\n")
-    validate_psource(cones, source_pos=sp, vpitch=pitch, vsize=size,
+    sp = source.position.translation
+    validate_psource(cones, source_pos=sp, vpitch=0.1, vsize=(256, 256, 256),
                      plot_seq=True, plot_stack=True, plot_napari=True)
 
     # RECONSTRUCTION
-    reco_bp(cones, vpitch=pitch, vsize=size, napari=True, det=d)
+    d = {'size': sensor.size, 'position': sensor.translation}
+    reco_bp(cones, vpitch=0.1, vsize=(256, 256, 256), napari=True, det=d)
