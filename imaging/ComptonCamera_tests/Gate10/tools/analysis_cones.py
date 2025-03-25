@@ -20,13 +20,14 @@ pandas.set_option('display.max_rows', 1000)
 pandas.set_option('display.float_format', lambda x: f'{x:.9}')  # G4 steps are logged with f'{x:.3}'
 
 # TODO: can be optimized using hits.keep_zero_edep = True in simulation settings
-def gHits2cones_byEvtID(file_path, source_MeV, nentries=None):
+# TODO: reformat and refactor
+def gHits2cones_byEvtID(file_path, source_MeV):
     if not os.path.isfile(file_path):
         sys.exit(f"File {file_path} does not exist, probably no hit produced...")
     else:
         global_log.info(f"Running cone analysis with input {file_path}")
 
-    hits = uproot.open(file_path)['Hits'].arrays(library='pd', entry_stop=nentries)  # None to read all entries
+    hits = uproot.open(file_path)['Hits'].arrays(library='pd')  # None to read all entries
     grouped = hits.groupby('EventID')
     cones = []
 
