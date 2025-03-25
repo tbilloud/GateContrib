@@ -85,7 +85,7 @@ if __name__ == "__main__":
     # plot_pixelHits_perEventID(pixelHits,n_pixels=npix,log_scale=[False, False, True])
 
     # CONES
-    cones = gHits2cones_byEvtID(hits_path, source.energy.mono, to_np=False)
+    cones = gHits2cones_byEvtID(hits_path, source.energy.mono)
 
     # POINT SOURCE VALIDATION
     sp = source.position.translation
