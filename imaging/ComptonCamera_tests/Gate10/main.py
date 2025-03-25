@@ -1,14 +1,7 @@
-import sys
-import time
-
 import opengate_core
 from opengate.managers import Simulation
 from opengate.geometry.volumes import *
-
-from tools.utils import *
 from tools.analysis_basics import *
-from tools.analysis_cones import *
-from tools.analysis_pixelHits import *
 from tools.point_source_validation import *
 from tools.reco_backprojection import *
 from tools.allpix import *
