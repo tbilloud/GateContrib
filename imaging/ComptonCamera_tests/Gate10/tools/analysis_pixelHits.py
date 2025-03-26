@@ -34,7 +34,7 @@ def singles2pixelHits(file_path):
     if not os.path.isfile(file_path):
         sys.exit(f"{file_path} does not exist, probably no hit produced...")
     else:
-        global_log.info(f"Converting {file_path} to pixel hits")
+        global_log.info(f"Offline: pixel hits analysis with input {file_path}")
 
     singles = uproot.open(file_path)['Singles'].arrays(library='pd')
     singles['HitUniqueVolumeID'] = singles['HitUniqueVolumeID'].astype(
@@ -48,7 +48,7 @@ def singles2pixelHits(file_path):
     singles.rename(columns={'Position_Y': POSITION_Y}, inplace=True)
     singles.rename(columns={'Position_Z': POSITION_Z}, inplace=True)
     singles[TOT] = singles[ENERGY] * 1e3  # TODO temporary
-    print('Number of pixel hits:', len(singles))
+    global_log.debug(f"Number of pixel hits: {len(singles)}")
     return singles[pixelHits_columns + simulation_columns]
 
 

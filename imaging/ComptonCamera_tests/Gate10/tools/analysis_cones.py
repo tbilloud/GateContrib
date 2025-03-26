@@ -25,7 +25,7 @@ def gHits2cones_byEvtID(file_path, source_MeV):
     if not os.path.isfile(file_path):
         sys.exit(f"File {file_path} does not exist, probably no hit produced...")
     else:
-        global_log.info(f"Running cone analysis with input {file_path}")
+        global_log.info(f"Offline: cone analysis with input {file_path}")
 
     hits = uproot.open(file_path)['Hits'].arrays(library='pd')  # None to read all entries
     grouped = hits.groupby('EventID')
@@ -82,9 +82,9 @@ def gHits2cones_byEvtID(file_path, source_MeV):
             cosT = 1 - (0.511 * E1) / (source_MeV * (source_MeV - E1))
             cones.append([eventid] + apex + direction + [cosT] + [200])
 
-    print(f"{n_events_primary} events with primary particles")
-    print(f"{n_events_full_energy_deposit} events with full energy deposit")
-    print(len(cones) if len(cones) else sys.exit('No cones'),'cones')
+    global_log.debug(f"{n_events_primary} events with primary particles")
+    global_log.debug(f"{n_events_full_energy_deposit} events with full energy deposit")
+    global_log.debug(f"{len(cones) if len(cones) else sys.exit('No cones')} cones")
 
     return pandas.DataFrame(cones, columns=['EventID', 'Apex_X', 'Apex_Y', 'Apex_Z', 'Direction_X', 'Direction_Y',
                                             'Direction_Z', 'cosT', 'error'])
