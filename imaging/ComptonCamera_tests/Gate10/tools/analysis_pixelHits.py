@@ -24,9 +24,9 @@ ENERGY = 'Energy_keV'
 pixelHits_columns = [PIXEL_ID, TOA, ENERGY]
 EVENTID = 'EventID'
 TOT = 'ToT'
-PHOTON_X = 'PositionX' # X coordinate of photon interaction, from Gate
-PHOTON_Y = 'PositionY' # Y coordinate of photon interaction, from Gate
-PHOTON_Z = 'PositionZ' # Z coordinate of photon interaction, from Gate
+PHOTON_X = 'PhotonPositionX' # X coordinate of photon interaction, from Gate
+PHOTON_Y = 'PhotonPositionY' # Y coordinate of photon interaction, from Gate
+PHOTON_Z = 'PhotonPositionZ' # Z coordinate of photon interaction, from Gate
 simulation_columns = [EVENTID, TOT, PHOTON_X, PHOTON_Y, PHOTON_Z] # Ground truth from Gate
 
 

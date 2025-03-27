@@ -46,16 +46,16 @@ def process_cluster_method2(cluster_df, n_pixels, pixel_pitch_um, thickness_um):
     cluster_first_TOA = cluster_df[analysis_pixelHits.TOA].min()
     cluster_first_eventID = int(cluster_df[analysis_pixelHits.EVENTID].min())
     pixX, pixY = zip(*cluster_df[PIXEL_ID].apply(get_pixID_2D, args=(n_pixels,)))
-    x = pixel_pitch_um * sum(pixX * cluster_df[analysis_pixelHits.ENERGY]) / cluster_total_energy
-    y = pixel_pitch_um * sum(pixY * cluster_df[analysis_pixelHits.ENERGY]) / cluster_total_energy
-    z = thickness_um / 2
+    x_um = pixel_pitch_um * sum(pixX * cluster_df[analysis_pixelHits.ENERGY]) / cluster_total_energy
+    y_um = pixel_pitch_um * sum(pixY * cluster_df[analysis_pixelHits.ENERGY]) / cluster_total_energy
+    z_um = None
     return pd.DataFrame({
         ENERGY: [cluster_total_energy],
         TOA: [cluster_first_TOA],
         EVENTID: [cluster_first_eventID],
-        PHOTON_X: [x / 1000],
-        PHOTON_Y: [y / 1000],
-        PHOTON_Z: [z / 1000]
+        POSITION_X: [x_um],
+        POSITION_Y: [y_um],
+        POSITION_Z: [z_um]
     })
 
 process_cluster_functions = {
