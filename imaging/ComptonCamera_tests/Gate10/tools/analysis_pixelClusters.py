@@ -1,16 +1,14 @@
 # Functions to process pixelClusters dataframes
 
-import time
-
 import analysis_pixelHits
 from tools.analysis_pixelHits import *
 from opengate.logger import global_log
 import pandas as pd
 
-pandas.set_option('display.max_columns', 100)
-pandas.set_option('display.width', 400)
-pandas.set_option('display.max_rows', 1000)
-pandas.set_option('display.float_format', lambda x: f'{x:.9}')  # G4 steps are logged with f'{x:.3}'
+pd.set_option('display.max_columns', 100)
+pd.set_option('display.width', 400)
+pd.set_option('display.max_rows', 1000)
+pd.set_option('display.float_format', lambda x: f'{x:.9}')  # G4 steps are logged with f'{x:.3}'
 
 PIXEL_ID = 'PixelID_int16'
 ENERGY = 'ClusterTotalEnergy'
@@ -33,7 +31,7 @@ def is_adjacent(hit, current_cluster_df, n_pixels):
         (get_pixID_2D(cluster_hit[PIXEL_ID], n_pixels) for _, cluster_hit in current_cluster_df.iterrows())
     )
 
-def process_cluster(cluster_df):
+def process_cluster_method1(cluster_df):
     cluster_total_energy = cluster_df[analysis_pixelHits.ENERGY].sum()
     cluster_first_TOA = cluster_df[analysis_pixelHits.TOA].min()
     cluster_first_eventID = int(cluster_df[analysis_pixelHits.EVENTID].min())
@@ -43,17 +41,41 @@ def process_cluster(cluster_df):
         EVENTID: [cluster_first_eventID]
     })
 
-def new_cluster(clusters_list, cluster_df, hit):
-    clusters_list.append(process_cluster(cluster_df))
+def process_cluster_method2(cluster_df, n_pixels, pixel_pitch_um, thickness_um):
+    cluster_total_energy = cluster_df[analysis_pixelHits.ENERGY].sum()
+    cluster_first_TOA = cluster_df[analysis_pixelHits.TOA].min()
+    cluster_first_eventID = int(cluster_df[analysis_pixelHits.EVENTID].min())
+    pixX, pixY = zip(*cluster_df[PIXEL_ID].apply(get_pixID_2D, args=(n_pixels,)))
+    x = pixel_pitch_um * sum(pixX * cluster_df[analysis_pixelHits.ENERGY]) / cluster_total_energy
+    y = pixel_pitch_um * sum(pixY * cluster_df[analysis_pixelHits.ENERGY]) / cluster_total_energy
+    z = thickness_um / 2
+    return pd.DataFrame({
+        ENERGY: [cluster_total_energy],
+        TOA: [cluster_first_TOA],
+        EVENTID: [cluster_first_eventID],
+        PHOTON_X: [x / 1000],
+        PHOTON_Y: [y / 1000],
+        PHOTON_Z: [z / 1000]
+    })
+
+process_cluster_functions = {
+    'method1': process_cluster_method1,
+    'method2': process_cluster_method2
+}
+
+def new_cluster(clusters_list, cluster_df, hit, n_pixels, process_cluster_func, **kwargs):
+    process_func = process_cluster_functions[process_cluster_func]
+    clusters_list.append(process_func(cluster_df, n_pixels, **kwargs))
     new_cluster_df = pd.DataFrame([hit])
     new_time_window_start = hit[analysis_pixelHits.TOA]
     return new_cluster_df, new_time_window_start
 
 # TODO speed -> https://pandas.pydata.org/docs/user_guide/basics.html#iteration
-def pixelHits2pixelClusters(pixelHits, n_pixels, time_window_ns=100):
-    global_log.info(f"Offline: cluster analysis with dataframe input")
+def pixelHits2pixelClusters(pixelHits, n_pixels, time_window_ns,
+                            cluster_func, **kwargs):
+    global_log.info(f"Offline: pixel cluster analysis with pixel hit df input")
 
-    pixelHits = pixelHits.sort_values(by='ToA_ns')
+    pixelHits = pixelHits.sort_values(by=analysis_pixelHits.TOA)
 
     # 1st cluster & initialization
     cluster = pd.DataFrame([pixelHits.iloc[0]])  # Initialize with the first hit
@@ -62,21 +84,14 @@ def pixelHits2pixelClusters(pixelHits, n_pixels, time_window_ns=100):
 
     # Loop over hits
     for index, hit in pixelHits.iterrows():
-        if hit[analysis_pixelHits.TOA] - window_start <= time_window_ns:
-            if is_adjacent(hit, cluster, n_pixels): # update cluster
-                cluster = pd.concat([cluster, hit.to_frame().T], ignore_index=True)
-            else: # new cluster
-                cluster, window_start = new_cluster(clusters, cluster, hit)
-        else: # new cluster
-            cluster, window_start = new_cluster(clusters, cluster, hit)
+        if hit[analysis_pixelHits.TOA] - window_start <= time_window_ns and is_adjacent(hit, cluster, n_pixels):
+            cluster = pd.concat([cluster, hit.to_frame().T], ignore_index=True)
+        else:
+            cluster, window_start = new_cluster(clusters, cluster, hit, n_pixels, cluster_func, **kwargs)
 
     # Last cluster
-    if not cluster.empty:
-        clusters.append(process_cluster(cluster))
+    new_cluster(clusters, cluster, hit, n_pixels, cluster_func, **kwargs)
 
-    # Convert clusters to DataFrame
-    pixelClusters_df = pd.concat(clusters, ignore_index=True)
-
-    global_log.debug(f"Number of clusters: {len(pixelClusters_df)}")
-    return pixelClusters_df
+    global_log.debug(f"Number of clusters: {len(clusters)}")
+    return pd.concat(clusters, ignore_index=True)
 
