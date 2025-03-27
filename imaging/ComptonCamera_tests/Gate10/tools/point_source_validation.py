@@ -26,7 +26,7 @@ except ImportError:
 
 def validate_psource(cones_df, source_pos, vpitch, vsize, plot_seq=False,
                      plot_stack=False, plot_napari=False):
-    global_log.info(f'Validating point source')
+    global_log.info(f'Offline: validating point source')
 
     # Source position must be in units of voxels in vol
     sp_vox = [int(source_pos[i] / vpitch) + (vsize[i] // 2) for i in range(3)]
