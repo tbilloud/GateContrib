@@ -24,10 +24,10 @@ ENERGY = 'Energy_keV'
 pixelHits_columns = [PIXEL_ID, TOA, ENERGY]
 EVENTID = 'EventID'
 TOT = 'ToT'
-POSITION_X = 'PositionX'
-POSITION_Y = 'PositionY'
-POSITION_Z = 'PositionZ'
-simulation_columns = [EVENTID, TOT, POSITION_X, POSITION_Y, POSITION_Z]
+PHOTON_X = 'PositionX' # X coordinate of photon interaction, from Gate
+PHOTON_Y = 'PositionY' # Y coordinate of photon interaction, from Gate
+PHOTON_Z = 'PositionZ' # Z coordinate of photon interaction, from Gate
+simulation_columns = [EVENTID, TOT, PHOTON_X, PHOTON_Y, PHOTON_Z] # Ground truth from Gate
 
 
 def singles2pixelHits(file_path):
@@ -44,9 +44,9 @@ def singles2pixelHits(file_path):
     singles.rename(columns={'TotalEnergyDeposit': ENERGY}, inplace=True)
     singles[ENERGY] = singles[ENERGY] * 1e3  # Convert MeV to keV
     singles.rename(columns={'GlobalTime': TOA}, inplace=True)
-    singles.rename(columns={'Position_X': POSITION_X}, inplace=True)
-    singles.rename(columns={'Position_Y': POSITION_Y}, inplace=True)
-    singles.rename(columns={'Position_Z': POSITION_Z}, inplace=True)
+    singles.rename(columns={'Position_X': PHOTON_X}, inplace=True)
+    singles.rename(columns={'Position_Y': PHOTON_Y}, inplace=True)
+    singles.rename(columns={'Position_Z': PHOTON_Z}, inplace=True)
     singles[TOT] = singles[ENERGY] * 1e3  # TODO temporary
     global_log.debug(f"Number of pixel hits: {len(singles)}")
     return singles[pixelHits_columns + simulation_columns]
@@ -220,9 +220,9 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
                     TOT: tot,
                     ENERGY: tot * 4.43 / 1000,  # TODO: temporary
                     TOA: global_time + toa,  # ToA is measured from event start
-                    POSITION_X: position_x,
-                    POSITION_Y: position_y,
-                    POSITION_Z: position_z
+                    PHOTON_X: position_x,
+                    PHOTON_Y: position_y,
+                    PHOTON_Z: position_z
                 })
 
     df = pd.DataFrame(rows, columns=pixelHits_columns + simulation_columns)
