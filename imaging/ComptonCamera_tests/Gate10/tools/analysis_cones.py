@@ -8,7 +8,9 @@ import pandas
 import uproot
 import SimpleITK as sitk
 import matplotlib.pyplot as plt
+import pandas as pd
 from pandas import Series
+import analysis_pixelClusters
 import tools.analysis_basics as analysis_basics
 from tools.utils import *
 from tools.utils import print_hits_inG4format
@@ -88,3 +90,46 @@ def gHits2cones_byEvtID(file_path, source_MeV):
 
     return pandas.DataFrame(cones, columns=['EventID', 'Apex_X', 'Apex_Y', 'Apex_Z', 'Direction_X', 'Direction_Y',
                                             'Direction_Z', 'cosT', 'error'])
+
+
+def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_um):
+    global_log.info(f"Offline: cones analysis with pixel cluster input")
+
+    grouped = pixelClusters.groupby(analysis_pixelClusters.EVENTID)
+    grouped = [group for group in grouped if len(group[1]) == 2]
+
+    cones = []
+
+    for eventid, group in grouped:
+        group = group.sort_values(analysis_pixelClusters.ENERGY)
+        # print(group)
+
+        photoelec_interaction = group.iloc[0]
+        compton_interaction = group.iloc[1]
+
+        apex = [compton_interaction[analysis_pixelClusters.POSITION_X], compton_interaction[analysis_pixelClusters.POSITION_Y],0]
+        photoelec_interaction_pos = [photoelec_interaction[analysis_pixelClusters.POSITION_X],photoelec_interaction[analysis_pixelClusters.POSITION_Y],thickness_um]
+
+        direction = np.array(apex) - np.array(photoelec_interaction_pos)
+        direction = (direction / np.linalg.norm(direction)).tolist()
+
+        E1_MeV = photoelec_interaction[analysis_pixelClusters.ENERGY] / 1000
+        cosT = 1 - (0.511 * E1_MeV) / (source_MeV * (source_MeV - E1_MeV))
+
+        apex_mm = [apex[0] / 1000, apex[1] / 1000, apex[2] / 1000]
+        cones.append([eventid] + apex_mm + direction + [cosT] + [200])
+
+    global_log.debug(f"{len(cones)} cones")
+
+    return pandas.DataFrame(cones, columns=['EventID', 'Apex_X', 'Apex_Y', 'Apex_Z', 'Direction_X', 'Direction_Y',
+                                            'Direction_Z', 'cosT', 'error'])
+
+def tpxCones2simuCoordinates(cones, sensor):
+    cones = cones.copy()
+    sensor_size = sensor.size
+    sensor_position = sensor.translation
+    sensor_rotation = sensor.rotation # TODO: to include
+    cones['Apex_X'] = cones['Apex_X'] + sensor_position[0] - sensor_size[0] / 2
+    cones['Apex_Y'] = cones['Apex_Y'] + sensor_position[1] - sensor_size[1] / 2
+    cones['Apex_Z'] = cones['Apex_Z'] + sensor_position[2] - sensor_size[2] / 2
+    return cones
