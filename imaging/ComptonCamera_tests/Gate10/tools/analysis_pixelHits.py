@@ -218,7 +218,7 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
                     EVENTID: event_id,
                     PIXEL_ID: pixel_id,
                     TOT: tot,
-                    ENERGY_keV: tot * 4.43 / 1000,  # TODO: temporary
+                    ENERGY_keV: tot * 4.43 / 1000,  # TODO: adapt to qdc_resolution (on/off) in DefaultDigitizer
                     TOA: global_time,
                     PHOTON_X: position_x,
                     PHOTON_Y: position_y,

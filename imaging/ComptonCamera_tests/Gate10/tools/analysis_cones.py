@@ -1,6 +1,7 @@
 # Utility functions to analyse output files
 # Can be used in the main simulation script after sim.run() or offline (i.e. reading root files without simulation)
 # Calling E1 the energy deposited in the Compton scattering, as in CCMod paper
+
 import os
 import sys
 import numpy as np
@@ -101,15 +102,16 @@ def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_um):
     cones = []
 
     for eventid, group in grouped:
+
+        # Distinguish compton vs photo-electric interaction
         group = group.sort_values(analysis_pixelClusters.ENERGY_keV)
         # print(group)
-
         photoelec_interaction = group.iloc[0]
         compton_interaction = group.iloc[1]
 
+        # TODO deal with z coordinate
         apex = [compton_interaction[analysis_pixelClusters.POSITION_X], compton_interaction[analysis_pixelClusters.POSITION_Y],0]
         photoelec_interaction_pos = [photoelec_interaction[analysis_pixelClusters.POSITION_X],photoelec_interaction[analysis_pixelClusters.POSITION_Y],thickness_um]
-        # TODO deal with z coordinate
 
         direction = np.array(apex) - np.array(photoelec_interaction_pos)
         direction = (direction / np.linalg.norm(direction)).tolist()
