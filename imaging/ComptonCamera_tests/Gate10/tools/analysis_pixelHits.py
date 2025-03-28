@@ -208,8 +208,8 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
                 x, y = int(parts[1].strip(',')), int(parts[2].strip(','))
                 pixel_id = get_pixID(x, y, n_pixels=n_pixels)
                 tot = float(parts[3].strip(','))
-                toa = float(parts[4].strip(','))
-                global_time = float(parts[5].strip(','))
+                toa = float(parts[4].strip(',')) # ToA from event start
+                global_time = float(parts[5].strip(',')) # ToA from simu start
                 position_x = float(parts[6].strip(','))
                 position_y = float(parts[7].strip(','))
                 position_z = float(parts[8].strip(','))
@@ -219,7 +219,7 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
                     PIXEL_ID: pixel_id,
                     TOT: tot,
                     ENERGY: tot * 4.43 / 1000,  # TODO: temporary
-                    TOA: global_time + toa,  # ToA is measured from event start
+                    TOA: global_time,
                     PHOTON_X: position_x,
                     PHOTON_Y: position_y,
                     PHOTON_Z: position_z
