@@ -63,16 +63,16 @@ file_name = "../{hits_file}"
 tree_name = "Hits"
 detector_name_chars = 3
 branch_names = ["EventID", "TotalEnergyDeposit", "GlobalTime", "Position_X", "Position_Y", "Position_Z", "HitUniqueVolumeID", "PDGCode", "TrackID", "ParentID"]
-charge_creation_energy = 1eV
 [ElectricFieldReader]
 model = "constant"
 bias_voltage = -1000V
 [GenericPropagation]
 mobility_model = "constant"
 mobility_electron = 1000cm*cm/V/s
-mobility_hole = 500cm*cm/V/s
+mobility_hole = 100cm*cm/V/s
 [PulseTransfer]
 max_depth_distance = {sensor.size[2]}mm
+timestep = 1.6ns
 [DefaultDigitizer]
 threshold = 1e
 threshold_smearing = 0
