@@ -101,7 +101,7 @@ def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_um):
     cones = []
 
     for eventid, group in grouped:
-        group = group.sort_values(analysis_pixelClusters.ENERGY)
+        group = group.sort_values(analysis_pixelClusters.ENERGY_keV)
         # print(group)
 
         photoelec_interaction = group.iloc[0]
@@ -109,11 +109,12 @@ def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_um):
 
         apex = [compton_interaction[analysis_pixelClusters.POSITION_X], compton_interaction[analysis_pixelClusters.POSITION_Y],0]
         photoelec_interaction_pos = [photoelec_interaction[analysis_pixelClusters.POSITION_X],photoelec_interaction[analysis_pixelClusters.POSITION_Y],thickness_um]
+        # TODO deal with z coordinate
 
         direction = np.array(apex) - np.array(photoelec_interaction_pos)
         direction = (direction / np.linalg.norm(direction)).tolist()
 
-        E1_MeV = photoelec_interaction[analysis_pixelClusters.ENERGY] / 1000
+        E1_MeV = photoelec_interaction[analysis_pixelClusters.ENERGY_keV] / 1000
         cosT = 1 - (0.511 * E1_MeV) / (source_MeV * (source_MeV - E1_MeV))
 
         apex_mm = [apex[0] / 1000, apex[1] / 1000, apex[2] / 1000]

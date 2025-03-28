@@ -32,25 +32,25 @@ def is_adjacent(hit, current_cluster_df, n_pixels):
     )
 
 def process_cluster_method1(cluster_df):
-    cluster_total_energy = cluster_df[analysis_pixelHits.ENERGY].sum()
+    cluster_total_energy = cluster_df[analysis_pixelHits.ENERGY_keV].sum()
     cluster_first_TOA = cluster_df[analysis_pixelHits.TOA].min()
     cluster_first_eventID = int(cluster_df[analysis_pixelHits.EVENTID].min())
     return pd.DataFrame({
-        ENERGY: [cluster_total_energy],
+        ENERGY_keV: [cluster_total_energy],
         TOA: [cluster_first_TOA],
         EVENTID: [cluster_first_eventID]
     })
 
 def process_cluster_method2(cluster_df, n_pixels, pixel_pitch_um, thickness_um):
-    cluster_total_energy = cluster_df[analysis_pixelHits.ENERGY].sum()
+    cluster_total_energy = cluster_df[analysis_pixelHits.ENERGY_keV].sum()
     cluster_first_TOA = cluster_df[analysis_pixelHits.TOA].min()
     cluster_first_eventID = int(cluster_df[analysis_pixelHits.EVENTID].min())
     pixX, pixY = zip(*cluster_df[PIXEL_ID].apply(get_pixID_2D, args=(n_pixels,)))
-    x_um = pixel_pitch_um * sum(pixX * cluster_df[analysis_pixelHits.ENERGY]) / cluster_total_energy
-    y_um = pixel_pitch_um * sum(pixY * cluster_df[analysis_pixelHits.ENERGY]) / cluster_total_energy
+    x_um = pixel_pitch_um * sum(pixX * cluster_df[analysis_pixelHits.ENERGY_keV]) / cluster_total_energy
+    y_um = pixel_pitch_um * sum(pixY * cluster_df[analysis_pixelHits.ENERGY_keV]) / cluster_total_energy
     z_um = None
     return pd.DataFrame({
-        ENERGY: [cluster_total_energy],
+        ENERGY_keV: [cluster_total_energy],
         TOA: [cluster_first_TOA],
         EVENTID: [cluster_first_eventID],
         POSITION_X: [x_um],

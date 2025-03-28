@@ -20,8 +20,8 @@ pandas.set_option('display.float_format', lambda x: f'{x:.9}')  # G4 steps x:.3
 
 PIXEL_ID = 'PixelID_int16'
 TOA = 'ToA_ns'
-ENERGY = 'Energy_keV'
-pixelHits_columns = [PIXEL_ID, TOA, ENERGY]
+ENERGY_keV = 'Energy_keV'
+pixelHits_columns = [PIXEL_ID, TOA, ENERGY_keV]
 EVENTID = 'EventID'
 TOT = 'ToT'
 PHOTON_X = 'PhotonPositionX' # X coordinate of photon interaction, from Gate
@@ -41,13 +41,13 @@ def singles2pixelHits(file_path):
         str).str.replace(r'0_', '', regex=True)
     singles.rename(columns={'HitUniqueVolumeID': PIXEL_ID}, inplace=True)
     singles[PIXEL_ID] = singles[PIXEL_ID].astype(int)
-    singles.rename(columns={'TotalEnergyDeposit': ENERGY}, inplace=True)
-    singles[ENERGY] = singles[ENERGY] * 1e3  # Convert MeV to keV
+    singles.rename(columns={'TotalEnergyDeposit': ENERGY_keV}, inplace=True)
+    singles[ENERGY_keV] = singles[ENERGY_keV] * 1e3  # Convert MeV to keV
     singles.rename(columns={'GlobalTime': TOA}, inplace=True)
     singles.rename(columns={'Position_X': PHOTON_X}, inplace=True)
     singles.rename(columns={'Position_Y': PHOTON_Y}, inplace=True)
     singles.rename(columns={'Position_Z': PHOTON_Z}, inplace=True)
-    singles[TOT] = singles[ENERGY] * 1e3  # TODO temporary
+    singles[TOT] = singles[ENERGY_keV] * 1e3  # TODO temporary
     global_log.debug(f"Number of pixel hits: {len(singles)}")
     return singles[pixelHits_columns + simulation_columns]
 
@@ -65,9 +65,9 @@ def pixelHits_fig_ax(pixelHits_df, n_pixels, fig, ax,
     cb.update_ticks()
     ax[0].set_title('Counts')
 
-    he = ax[1].hist2d(x, y, bins=[np] * 2, weights=df[ENERGY],
+    he = ax[1].hist2d(x, y, bins=[np] * 2, weights=df[ENERGY_keV],
                       range=[[0, np]] * 2, norm=ne,
-                      vmin=0.5 * df[ENERGY].min() if not ne else None)
+                      vmin=0.5 * df[ENERGY_keV].min() if not ne else None)
     fig.colorbar(he[3], ax=ax[1], label='Energy (keV)')
     ax[1].set_title('Energy')
 
@@ -218,7 +218,7 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
                     EVENTID: event_id,
                     PIXEL_ID: pixel_id,
                     TOT: tot,
-                    ENERGY: tot * 4.43 / 1000,  # TODO: temporary
+                    ENERGY_keV: tot * 4.43 / 1000,  # TODO: temporary
                     TOA: global_time,
                     PHOTON_X: position_x,
                     PHOTON_Y: position_y,
