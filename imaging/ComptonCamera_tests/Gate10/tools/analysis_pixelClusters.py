@@ -11,8 +11,8 @@ pd.set_option('display.max_rows', 1000)
 pd.set_option('display.float_format', lambda x: f'{x:.9}')  # G4 steps are logged with f'{x:.3}'
 
 PIXEL_ID = 'PixelID_int16'
-ENERGY = 'ClusterTotalEnergy'
-TOA = 'ClusterFirstTOA'
+ENERGY = 'Energy_keV'
+TOA = 'TOA_ns'
 pixelClusters_columns = [PIXEL_ID, TOA, ENERGY]
 EVENTID = 'EventID'
 POSITION_X = 'PositionX'
