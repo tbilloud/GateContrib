@@ -6,16 +6,22 @@ Geant4 steps can be logged in terminal with sim.g4_verbose, sim.g4_verbose_level
 - StepLength (Gate) / StepLeng (G4) can be used to match hits (Gate) / steps (G4)
 
 ## Clustering hits
-To reconstruct photon interactions in Timepix3 sensor, i.e. their 3D position, time and energy, different algorithms can be used.
+When using Allpix2, the output is in pixel hits, as when measuring with a Timepix3 detector. Those are different from gate hits (gHits).
+To reconstruct photon interactions in Timepix3 sensor from pixel hits, i.e. their 3D position, time and energy, different algorithms can be used.
+
+### Energy
+Timepix3 measures the energy deposited in individual pixels via TOT (Time-Over-Threshold).
+When a detector is calibrated with a per-pixel energy calibration procedure, TOT can be converted to energy.
 
 ### Time (TOA)
 Time-of-Arrival (TOA) is measured with Timepix3 with 1.6 ns granularity.
 
 A so-called time-walk correction can be applied to improve precision, since higher energy deposits induce faster pulses on pixel pre-amplifiers. Precision???
 
-Even though Compton, photo-electric and fluorescent events occur almost simultaneously (within few ps?), the time it takes for the charge carriers to drift to the pixel electrode can be long (depending on semiconductor and bias voltage) and it depends on the depth of interaction. This can be used to determine depths of interactions.
+Even though Compton, photo-electric and fluorescent events occur almost simultaneously (within few ps?), the time it takes for the charge carriers to drift to the pixel electrode can be long (depending on semiconductor and bias voltage) and it depends on the depth of interaction.
 
-Drift time = distance / (mobility * electric field)
+Drift time = distance / drift speed = distance / (mobility * electric field) 
+Drift time = (distance * thickness) / (mobility * voltage)
 
 Mobility in Silicon (wikipedia):
 - electrons: ~1000 cm^2/Vs
@@ -25,6 +31,8 @@ Mobility in CdTe (wikipedia):
 - electrons: ~1100 cm^2/Vs
 - holes: ~100 cm^2/Vs
 
-Drift time examples:
-1mm in a CdTe sensor with 100V bias: 1 us for electrons, 10 us for holes
-1mm in a CdTe sensor with 1000V bias: 100 ns for electrons, 1 us for holes
+Examples of drift time over full sensor thickness:
+1mm CdTe @ 1000V:
+  e-: 10 ns
+  holes: 100 ns
+
