@@ -185,7 +185,7 @@ def pixelHits2burdaman(pixelHits_df, out_path):
 
 
 def allpixTxt2pixelHit(text_file, n_pixels=256):
-    global_log.info(f"Running pixel hit analysis with input {text_file}")
+    global_log.info(f"Offline: pixel hit analysis with input {text_file}")
     # TODO adapt to different simulation chains
 
     rows = []

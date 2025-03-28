@@ -18,7 +18,7 @@ def run_allpix(sim,
         sys.exit("Allpix cannot be run with Gate visualization enabled")
     else:
         global_log.info(
-            f"Running Allpix2 with input {hits_file}, {gateHits_df.size} gate hits")
+            f"Offline: running Allpix2 with input {hits_file}, {gateHits_df.size} gate hits")
 
     try:
         pixel = sim.volume_manager.get_volume("pixel_param")
