@@ -74,7 +74,7 @@ mobility_hole = 100cm*cm/V/s
 max_depth_distance = {sensor.size[2]}mm
 timestep = 1.6ns
 [DefaultDigitizer]
-threshold = 1e
+threshold = 0e
 threshold_smearing = 0
 qdc_resolution = 0 # Resolution of the QDC in units of bits. Thus, a value of 8 would translate to a QDC range of 0 to 255. A value of 0bit switches off the QDC simulation and returns the actual charge in electrons. Defaults to 0.
 qdc_smearing = 0 # Standard deviation of the Gaussian noise in the ADC conversion (after applying the threshold). Defaults to 300 electrons.
