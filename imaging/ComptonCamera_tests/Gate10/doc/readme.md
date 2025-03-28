@@ -27,3 +27,4 @@ Mobility in CdTe (wikipedia):
 
 Drift time examples:
 1mm in a CdTe sensor with 100V bias: 1 us for electrons, 10 us for holes
+1mm in a CdTe sensor with 1000V bias: 100 ns for electrons, 1 us for holes
