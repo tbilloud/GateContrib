@@ -67,23 +67,20 @@ branch_names = ["EventID", "TotalEnergyDeposit", "GlobalTime", "Position_X", "Po
 model = "constant"
 bias_voltage = -1000V
 [GenericPropagation]
+integration_time = 1s # default 25ns stop charge propagation in some conditions
 mobility_model = "constant"
 mobility_electron = 1000cm*cm/V/s
 mobility_hole = 100cm*cm/V/s
+propagate_electrons = true
+propagate_holes = false
 [PulseTransfer]
-max_depth_distance = {sensor.size[2]}mm
-timestep = 1.6ns
+# timestep = 1.6ns # 0.01ns by default, but Timepix3 clock is 1.6ns
 [DefaultDigitizer]
-threshold = 0e
-threshold_smearing = 0
-qdc_resolution = 0 # Resolution of the QDC in units of bits. Thus, a value of 8 would translate to a QDC range of 0 to 255. A value of 0bit switches off the QDC simulation and returns the actual charge in electrons. Defaults to 0.
-qdc_smearing = 0 # Standard deviation of the Gaussian noise in the ADC conversion (after applying the threshold). Defaults to 300 electrons.
-qdc_slope = 10e # Slope of the QDC calibration in electrons per ADC unit (unit: e). Defaults to 10e.
-qdc_offset = -1 # Offset of the QDC calibration in electrons. In order to simulate a ToT (time-over-threshold) device, this offset should be configured to the negative value of the threshold. Defaults to 0.
-tdc_resolution = 0 # Resolution of the TDC in units of bits. Thus, a value of 8 would translate to a TDC range of 0 to 255. A value of 0bit switches off the TDC simulation and returns the actual time of arrival in nanoseconds. Defaults to 0.
-tdc_smearing = 0
-tdc_slope = 0 # Slope of the TDC calibration in nanoseconds per TDC unit (unit: ns). Defaults to 10ns.
-tdc_offset = 0 # Offset of the TDC calibration in nanoseconds. Defaults to 0.
+threshold = 1e # a value of 0e turns off ToA... 
+threshold_smearing = 0e
+electronics_noise = 0e
+# tdc_resolution = 0 # 0 by default, meaning TOT is in charge, not clock cycles
+# qdc_resolution = 0 # 0 by default, meaning ToA is in ns, not clock cycles
 [TextWriter]
 include = "PixelHit"
     """
