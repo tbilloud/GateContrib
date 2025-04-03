@@ -127,9 +127,9 @@ mv /path-to-virtual-environment/lib/python3.XX/site-packages/opengate_core/plugi
 ```
 Replace XX with your python version, e.g. 10
 
-### Allpix2
+## Allpix2
 
-Allpix2 is a C++ software for precise simulation of pixel detectors.
+Allpix2 is a C++ software for precise simulation of semiconductor pixel detectors.
 It simulates the transport of charge carriers in semiconductor sensors and their signal induction.
 It is used primarily for detector R&D in particle physics.  
 https://cern.ch/allpix-squared
@@ -142,3 +142,33 @@ gHits2allpix2pixelHits() after the sim.run() in the main.py script. It does the 
 2) generate the three .conf files needed by Allpix2
 3) run Allpix2 and creates the output files data.txt and modules.root in the sub-folder 'allpix'
 4) read data.txt and return a pandas dataframe with the pixel hits
+
+An Allpix2 simulation needs 3 configuration (.conf) files:
+- detector geometry
+- detector model
+- simulation parameters
+
+The main configuration file (simulation parameters) is a 'simulation chain' made of several components:
+- global parameters
+- electric field
+- charge deposition
+- charge propagation
+- charge transfer
+- digitization
+https://allpix-squared.docs.cern.ch/docs/03_getting_started/06_simulation_chain/
+
+For each component, several modules are available.
+- Charge propagation:
+  - ProjectionPropagation: fast but only silicon sensors, linear electric field, one carrier type at a time
+  - GenericPropagation
+  - TransientPropagation
+- Charge transfer:
+  - SimpleTransfer: no ToA (as of v3.1.0, 2025-01-08)
+  - CapacitiveTransfer
+  - PulseTransfer
+  - InducedTransfer
+- Digitization:
+  - DefaultDigitizer
+  - CSADigitizer
+
+
