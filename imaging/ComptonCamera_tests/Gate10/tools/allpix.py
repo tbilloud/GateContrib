@@ -1,5 +1,7 @@
 import sys
 import subprocess
+import time
+
 import uproot
 from scipy.spatial.transform import Rotation as R
 import warnings
@@ -9,7 +11,11 @@ from tools.analysis_pixelHits import *
 
 def run_allpix(sim,
                binary_path='allpix/allpix-squared/install-noG4/bin/allpix',
-               output_dir='allpix/', log_level='FATAL'):
+               output_dir='allpix/', log_level='FATAL',
+               config = 'default'):
+
+    stime = time.time()
+
     # TODO: sync different digitizer chains with output formats
     hits_actor = sim.actor_manager.get_actor("Hits")
     hits_file = sim.output_dir + '/' + hits_actor.output_filename
@@ -18,7 +24,7 @@ def run_allpix(sim,
         sys.exit("Allpix cannot be run with Gate visualization enabled")
     else:
         global_log.info(
-            f"Offline: running Allpix2 with input {hits_file}, {len(gateHits_df)} gHits")
+            f"Offline: START Allpix2 with input {hits_file}, {len(gateHits_df)} gHits")
 
     try:
         pixel = sim.volume_manager.get_volume("pixel_param")
@@ -63,24 +69,7 @@ file_name = "../{hits_file}"
 tree_name = "Hits"
 detector_name_chars = 3
 branch_names = ["EventID", "TotalEnergyDeposit", "GlobalTime", "Position_X", "Position_Y", "Position_Z", "HitUniqueVolumeID", "PDGCode", "TrackID", "ParentID"]
-[ElectricFieldReader]
-model = "constant"
-bias_voltage = -1000V
-[GenericPropagation]
-integration_time = 1s # default 25ns stop charge propagation in some conditions
-mobility_model = "constant"
-mobility_electron = 1000cm*cm/V/s
-mobility_hole = 100cm*cm/V/s
-propagate_electrons = true
-propagate_holes = false
-[PulseTransfer]
-# timestep = 1.6ns # 0.01ns by default, but Timepix3 clock is 1.6ns
-[DefaultDigitizer]
-threshold = 1e # a value of 0e turns off ToA... 
-threshold_smearing = 0e
-electronics_noise = 0e
-# tdc_resolution = 0 # 0 by default, meaning TOT is in charge, not clock cycles
-# qdc_resolution = 0 # 0 by default, meaning ToA is in ns, not clock cycles
+{configurations[config]}
 [TextWriter]
 include = "PixelHit"
     """
@@ -98,11 +87,67 @@ include = "PixelHit"
     subprocess.run([binary_path, '-c', output_dir + 'main.conf'], check=True)
 
 
+    global_log.info(
+        f"Offline: STOP. Time: {time.time() - stime:.1f} seconds.\n"+'-' * 80)
+
+
+configurations = {
+# TODO: is Jacoboni mobility model working with CdTe / GaAs ?
+"fast": """
+[ElectricFieldReader]
+model = "linear"
+bias_voltage = -1000V # pixel side, - to collect electrons, + to collect holes
+[ProjectionPropagation] 
+# mobility model is Jacoboni
+temperature = 293K
+integration_time = 1000s # default 25ns might stop charge propagation
+[PulseTransfer]
+# timestep = 1.6ns # 0.01ns by default, but Timepix3 clock is 1.6ns
+[DefaultDigitizer]
+threshold = 1e # 0e turns off ToA... 
+threshold_smearing = 0e
+electronics_noise = 0e
+""",
+# TODO: allow to set important parameters
+"default": """ 
+[ElectricFieldReader]
+model = "constant"
+bias_voltage = -1000V # pixel side, - to collect electrons, + to collect holes
+[GenericPropagation]
+integration_time = 1000s # default 25ns might stop charge propagation
+mobility_model = "constant"
+mobility_electron = 1000cm*cm/V/s
+mobility_hole = 100cm*cm/V/s
+propagate_electrons = true
+propagate_holes = false
+[PulseTransfer]
+timestep = 1.6ns # 0.01ns by default, but Timepix3 clock is 1.6ns
+[DefaultDigitizer]
+threshold = 1e # 0e turns off ToA... 
+threshold_smearing = 0e
+electronics_noise = 0e
+tdc_resolution = 16bit # if 0 (default) TOT is in charge, not clock cycles
+qdc_resolution = 16bit # if 0 (default) ToA is in ns, not clock cycles
+""",
+# TODO:
+"precise": """ 
+[ElectricFieldReader]
+[WeightingPotentialReader]
+[TransientPropagation]
+[InducedTransfer]
+[CSADigitizer]
+
+"""
+}
+
+
 # TODO: I've seen negative ToT values in data.txt
 def gHits2allpix2pixelHits(sim, npix,
-                           binary_path='allpix/allpix-squared/install-noG4/bin/allpix'):
+                           binary_path='allpix/allpix-squared/install-noG4/bin/allpix',
+                           config='default'):
     run_allpix(sim, binary_path, output_dir='allpix/',
-               log_level='FATAL')  # INFO, FATAL, ...
+               log_level='FATAL', config=config)  # INFO, FATAL, ...
     return allpixTxt2pixelHit('allpix/data.txt', n_pixels=npix)
     # Lines starting with PixelHit in data.txt have the following format:
     # PixelHit pixelX, pixelY, TOT, TOA, global_time, pos_x, pos_y, pos_z
+
