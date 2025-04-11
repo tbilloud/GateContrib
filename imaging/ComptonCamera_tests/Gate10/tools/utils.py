@@ -12,7 +12,7 @@ um, mm, keV, MeV, deg, Bq, sec = g4_units.um, g4_units.mm, g4_units.keV, g4_unit
 # If pandas.set_option('display.float_format'...) is used in script calling the function, remove it
 def print_hits_inG4format(hits_df):
     print(
-        hits_df[['PostPosition_X', 'PostPosition_Y', 'PostPosition_Z',
+        hits_df[['EventID','PostPosition_X', 'PostPosition_Y', 'PostPosition_Z',
                  'KineticEnergy', 'TotalEnergyDeposit',
                  'StepLength', 'TrackLength', 'HitUniqueVolumeID',
                  'ProcessDefinedStep', 'ParticleName', 'TrackID',
@@ -53,6 +53,14 @@ def print_hits_direction(hits_df):
         'PostDirection_X', 'PostDirection_Y', 'PostDirection_Z'
     ]].to_string(index=False))
 
+# Prints gamma interactions
+def print_hits_gammas(hits_df):
+    hits_df = hits_df[hits_df['ParticleName'] == 'gamma']
+    print(hits_df[[
+        'EventID', 'TrackID', 'ParentID', 'KineticEnergy',
+        'TotalEnergyDeposit', 'ProcessDefinedStep', 'TrackCreatorProcess',
+        'PostPosition_Z'
+    ]].to_string(index=False))
 
 # Prints time info
 def print_hits_time(hits_df):
@@ -81,7 +89,6 @@ def print_hits_long_sortedByGlobalTime(hits_df):
     hits_df = hits_df.groupby('EventID').apply(
         lambda x: x.sort_values('GlobalTime'))
     print_hits_long(hits_df)
-
 
 def get_pixID(x, y, n_pixels=256):
     return x * n_pixels + y
