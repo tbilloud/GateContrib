@@ -34,9 +34,9 @@ def process_cluster_method1(cluster_df):
     cluster_first_TOA = cluster_df[TOA].min()
     cluster_first_eventID = int(cluster_df[EVENTID].min())
     return pd.DataFrame({
+        EVENTID: [cluster_first_eventID],
         ENERGY_keV: [cluster_total_energy],
-        TOA: [cluster_first_TOA],
-        EVENTID: [cluster_first_eventID]
+        TOA: [cluster_first_TOA]
     })
 
 
@@ -48,11 +48,11 @@ def process_cluster_method2(cluster, n_pixels, pitch_um):
     x_um = pitch_um * sum(pixX * cluster[ENERGY_keV]) / cluster_total_energy
     y_um = pitch_um * sum(pixY * cluster[ENERGY_keV]) / cluster_total_energy
     return pd.DataFrame({
+        EVENTID: [cluster_first_eventID],
         ENERGY_keV: [cluster_total_energy],
         TOA: [cluster_first_TOA],
-        EVENTID: [cluster_first_eventID],
         X_um: [x_um],
-        Y_um: [y_um],
+        Y_um: [y_um]
     })
 
 
@@ -93,6 +93,8 @@ def pixelHits2pixelClusters(pixelHits, npix, window_ns, func, **kwargs):
     # Last cluster
     new_clust(clusters, clust, hit, npix, func, **kwargs)
 
+    df = pd.concat(clusters, ignore_index=True)
     global_log.debug(f"{len(clusters)} clusters")
+    global_log_debug_df(df)
     global_log.info(f"Offline [pixelClusters]: {get_stop_string(stime)}")
-    return pd.concat(clusters, ignore_index=True)
+    return df

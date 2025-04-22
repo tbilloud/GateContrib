@@ -85,11 +85,13 @@ def gHits2cones_byEvtID(file_path, source_MeV):
             cones.append([eventid] + apex + direction + [cosT] + [200])
             # TODO make order flexible
 
+    df = pandas.DataFrame(cones, columns=cones_columns)
     global_log.debug(f"{n_events_primary} events with primary particles")
     global_log.debug(f"{n_events_full_edep} events with full energy deposit")
-    global_log.debug(f"{len(cones) or sys.exit('No cones')} cones")
+    global_log.debug(f"{len(cones)} cones")
+    global_log_debug_df(df)
     global_log.info(f"Offline [cones ghits]: {get_stop_string(stime)}")
-    return pandas.DataFrame(cones, columns=cones_columns)
+    return df
 
 
 # Clusters have:
@@ -128,22 +130,22 @@ def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_um):
 
         # TODO: 4) Complete 3D positions
         pos_compton = [clust_compton[X_um], clust_compton[Y_um], z_compton_um]
-        pos_photoelec = [clust_photoel[X_um], clust_photoel[Y_um],
-                         thickness_um]
+        pos_photoel = [clust_photoel[X_um], clust_photoel[Y_um], thickness_um]
 
         # TODO: 5) Construct cone
-        apex = pos_compton
-        direction = np.array(apex) - np.array(pos_photoelec)
+        direction = np.array(pos_compton) - np.array(pos_photoel)
         direction = (direction / np.linalg.norm(direction)).tolist()
         E1_MeV = clust_photoel[ENERGY_keV] / 1000
         cosT = 1 - (0.511 * E1_MeV) / (source_MeV * (source_MeV - E1_MeV))
-        apex = [apex[0] / 1000, apex[1] / 1000, apex[2] / 1000]
+        apex = [pos / 1000 for pos in pos_compton]
         cones.append([eventid] + apex + direction + [cosT] + [200])
         # TODO make order flexible
 
+    df = pandas.DataFrame(cones, columns=cones_columns)
     global_log.debug(f"{len(cones)} cones")
+    global_log_debug_df(df)
     global_log.info(f"Offline [cones tpx]: {get_stop_string(stime)}")
-    return pandas.DataFrame(cones, columns=cones_columns)
+    return df
 
 
 def tpxCones2simuCoordinates(cones, sensor):
