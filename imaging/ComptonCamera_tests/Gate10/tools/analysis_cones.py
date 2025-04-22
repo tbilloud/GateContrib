@@ -4,8 +4,6 @@
 
 import os
 import sys
-import time
-
 import pandas
 import uproot
 from analysis_pixelClusters import X_um, Y_um, EVENTID, ENERGY_keV
@@ -17,12 +15,12 @@ pandas.set_option('display.width', 400)
 pandas.set_option('display.max_rows', 1000)
 pandas.set_option('display.float_format', lambda x: f'{x:.9}')  # G4 step: .3
 
+# TODO make order flexible (see below)
 cones_columns = ['EventID', 'Apex_X', 'Apex_Y', 'Apex_Z', 'Direction_X',
                  'Direction_Y', 'Direction_Z', 'cosT', 'error']
 
 
 # TODO: can be optimized using hits.keep_zero_edep = True in simulation settings
-# TODO: reformat and refactor
 def gHits2cones_byEvtID(file_path, source_MeV):
     if not os.path.isfile(file_path):
         sys.exit(f"File {file_path} does not exist, probably no hit produced.")
@@ -85,12 +83,12 @@ def gHits2cones_byEvtID(file_path, source_MeV):
         if apex:
             cosT = 1 - (0.511 * E1) / (source_MeV * (source_MeV - E1))
             cones.append([eventid] + apex + direction + [cosT] + [200])
+            # TODO make order flexible
 
     global_log.debug(f"{n_events_primary} events with primary particles")
     global_log.debug(f"{n_events_full_edep} events with full energy deposit")
     global_log.debug(f"{len(cones) or sys.exit('No cones')} cones")
-    global_log.info(
-        f"Offline [cones ghits]: {get_stop_string(stime)}")
+    global_log.info(f"Offline [cones ghits]: {get_stop_string(stime)}")
     return pandas.DataFrame(cones, columns=cones_columns)
 
 
@@ -141,10 +139,10 @@ def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_um):
         cosT = 1 - (0.511 * E1_MeV) / (source_MeV * (source_MeV - E1_MeV))
         apex = [apex[0] / 1000, apex[1] / 1000, apex[2] / 1000]
         cones.append([eventid] + apex + direction + [cosT] + [200])
+        # TODO make order flexible
 
     global_log.debug(f"{len(cones)} cones")
-    global_log.info(
-        f"Offline [cones tpx]: {get_stop_string(stime)}")
+    global_log.info(f"Offline [cones tpx]: {get_stop_string(stime)}")
     return pandas.DataFrame(cones, columns=cones_columns)
 
 
