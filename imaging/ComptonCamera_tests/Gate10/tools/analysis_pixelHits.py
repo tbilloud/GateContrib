@@ -52,7 +52,7 @@ def singles2pixelHits(file_path):
     singles.rename(columns={'Position_Z': PHOTON_Z}, inplace=True)
     singles[TOT] = singles[ENERGY_keV] * 1e3  # TODO temporary
     global_log.debug(f"Number of pixel hits: {len(singles)}")
-    return singles[pixelHits_columns + simulation_columns]
+    return singles[simulation_columns + pixelHits_columns]
 
 
 def pixelHits_fig_ax(pixelHits_df, n_pixels, fig, ax,
@@ -231,7 +231,7 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
                     PHOTON_Z: position_z
                 })
 
-    df = pd.DataFrame(rows, columns=pixelHits_columns + simulation_columns)
+    df = pd.DataFrame(rows, columns=simulation_columns + pixelHits_columns)
     global_log_debug_df(df)
     global_log.info(f"Offline [pixelHits]: {get_stop_string(stime)}")
     return df

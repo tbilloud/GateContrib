@@ -1,8 +1,7 @@
 # Some utility functions
-import time
-
 # WARNING: For print functions, make sure that dataframe columns are present in simulation settings (c.f. actor attribtues)
 
+import time
 import numpy as np
 from opengate.logger import global_log
 from opengate.utility import g4_units
@@ -163,6 +162,7 @@ def coordinateOrigin2arrayCenter_df(df, vpitch, vsize):
 def get_stop_string(stime):
     return f"STOP. Time: {time.time() - stime:.1f} seconds.\n" + '-' * 80
 
-def global_log_debug_df(df,max_size=10):
-    if not df.empty and len(df) < max_size:
-        global_log.debug(f"Output:\n{df.to_string(index=False)}")
+def global_log_debug_df(df):
+    if not df.empty:
+        global_log.debug(f"Output (head):\n{df.head().to_string(index=False)}")
+
