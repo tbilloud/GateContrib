@@ -2,6 +2,8 @@
 
 import os
 import sys
+import time
+
 import pandas
 import pandas as pd
 import uproot
@@ -34,7 +36,8 @@ def singles2pixelHits(file_path):
     if not os.path.isfile(file_path):
         sys.exit(f"{file_path} does not exist, probably no hit produced...")
     else:
-        global_log.info(f"Offline: pixel hits analysis with input {file_path}")
+        global_log.info(f"Offline [pixelHits]: START")
+        global_log.debug(f"Input {file_path}")
 
     singles = uproot.open(file_path)['Singles'].arrays(library='pd')
     singles['HitUniqueVolumeID'] = singles['HitUniqueVolumeID'].astype(
@@ -185,9 +188,11 @@ def pixelHits2burdaman(pixelHits_df, out_path):
 
 
 def allpixTxt2pixelHit(text_file, n_pixels=256):
-    global_log.info(f"Offline: processing pixel hit input {text_file}")
+    global_log.info(f"Offline [pixelHits]: START")
+    global_log.debug(f"Input {text_file}")
     # TODO adapt to different simulation chains
 
+    stime = time.time()
     rows = []
 
     with open(text_file, "r") as file:
@@ -226,4 +231,6 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
                 })
 
     df = pd.DataFrame(rows, columns=pixelHits_columns + simulation_columns)
+    global_log.info(
+        f"Offline [pixelHits]: STOP. Time: {time.time() - stime:.1f} seconds.\n" + '-' * 80)
     return df

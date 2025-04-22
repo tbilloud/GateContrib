@@ -12,8 +12,7 @@ from tools.analysis_pixelHits import *
 def run_allpix(sim,
                binary_path='allpix/allpix-squared/install-noG4/bin/allpix',
                output_dir='allpix/', log_level='FATAL',
-               config = 'default'):
-
+               config='default'):
     stime = time.time()
 
     # TODO: sync different digitizer chains with output formats
@@ -23,8 +22,9 @@ def run_allpix(sim,
     if sim.visu is True:
         sys.exit("Allpix cannot be run with Gate visualization enabled")
     else:
-        global_log.info(
-            f"Offline: START Allpix2 with input {hits_file}, {len(gateHits_df)} gHits")
+        global_log.info(f"Offline [Allpix2]: START")
+        global_log.debug(f"Input {hits_file}, {len(gateHits_df)} gHits")
+
 
     try:
         pixel = sim.volume_manager.get_volume("pixel_param")
@@ -86,14 +86,13 @@ include = "PixelHit"
 
     subprocess.run([binary_path, '-c', output_dir + 'main.conf'], check=True)
 
-
     global_log.info(
-        f"Offline: STOP. Time: {time.time() - stime:.1f} seconds.\n"+'-' * 80)
+        f"Offline [Allpix2]: STOP. Time: {time.time() - stime:.1f} seconds.\n" + '-' * 80)
 
 
 configurations = {
-# TODO: is Jacoboni mobility model working with CdTe / GaAs ?
-"fast": """
+    # TODO: is Jacoboni mobility model working with CdTe / GaAs ?
+    "fast": """
 [ElectricFieldReader]
 model = "linear"
 bias_voltage = -1000V # pixel side, - to collect electrons, + to collect holes
@@ -108,8 +107,8 @@ threshold = 1e # 0e turns off ToA...
 threshold_smearing = 0e
 electronics_noise = 0e
 """,
-# TODO: allow to set important parameters
-"default": """ 
+    # TODO: allow to set important parameters
+    "default": """ 
 [ElectricFieldReader]
 model = "constant"
 bias_voltage = -1000V # pixel side, - to collect electrons, + to collect holes
@@ -129,8 +128,8 @@ electronics_noise = 0e
 tdc_resolution = 16bit # if 0 (default) TOT is in charge, not clock cycles
 qdc_resolution = 16bit # if 0 (default) ToA is in ns, not clock cycles
 """,
-# TODO:
-"precise": """ 
+    # TODO:
+    "precise": """ 
 [ElectricFieldReader]
 [WeightingPotentialReader]
 [TransientPropagation]
@@ -150,4 +149,3 @@ def gHits2allpix2pixelHits(sim, npix,
     return allpixTxt2pixelHit('allpix/data.txt', n_pixels=npix)
     # Lines starting with PixelHit in data.txt have the following format:
     # PixelHit pixelX, pixelY, TOT, TOA, global_time, pos_x, pos_y, pos_z
-
