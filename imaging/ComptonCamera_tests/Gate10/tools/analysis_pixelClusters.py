@@ -15,10 +15,9 @@ ENERGY = 'Energy_keV'
 TOA = 'TOA_ns'
 pixelClusters_columns = [PIXEL_ID, TOA, ENERGY]
 EVENTID = 'EventID'
-POSITION_X = 'PositionX'
-POSITION_Y = 'PositionY'
-POSITION_Z = 'PositionZ'
-simulation_columns = [EVENTID, POSITION_X, POSITION_Y, POSITION_Z]
+X_um = 'PositionX'
+Y_um = 'PositionY'
+simulation_columns = [EVENTID, X_um, Y_um]
 
 # TODO: if source.n was used in simulation, clustering with TOA does not work
 #  -> detect it ? send warning?
@@ -48,14 +47,12 @@ def process_cluster_method2(cluster_df, n_pixels, pixel_pitch_um, thickness_um):
     pixX, pixY = zip(*cluster_df[PIXEL_ID].apply(get_pixID_2D, args=(n_pixels,)))
     x_um = pixel_pitch_um * sum(pixX * cluster_df[analysis_pixelHits.ENERGY_keV]) / cluster_total_energy
     y_um = pixel_pitch_um * sum(pixY * cluster_df[analysis_pixelHits.ENERGY_keV]) / cluster_total_energy
-    z_um = None
     return pd.DataFrame({
         ENERGY_keV: [cluster_total_energy],
         TOA: [cluster_first_TOA],
         EVENTID: [cluster_first_eventID],
-        POSITION_X: [x_um],
-        POSITION_Y: [y_um],
-        POSITION_Z: [z_um]
+        X_um: [x_um],
+        Y_um: [y_um],
     })
 
 process_cluster_functions = {
