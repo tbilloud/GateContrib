@@ -233,5 +233,5 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
 
     df = pd.DataFrame(rows, columns=pixelHits_columns + simulation_columns)
     global_log.info(
-        f"Offline [pixelHits]: STOP. Time: {time.time() - stime:.1f} seconds.\n" + '-' * 80)
+        f"Offline [pixelHits]: {get_stop_string(stime)}")
     return df

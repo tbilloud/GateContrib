@@ -27,7 +27,7 @@ def gHits2cones_byEvtID(file_path, source_MeV):
     if not os.path.isfile(file_path):
         sys.exit(f"File {file_path} does not exist, probably no hit produced.")
     else:
-        global_log.info(f"Offline [cones]: START")
+        global_log.info(f"Offline [cones ghits]: START")
         global_log.debug(f"Input {file_path}")
 
     stime = time.time()
@@ -89,7 +89,8 @@ def gHits2cones_byEvtID(file_path, source_MeV):
     global_log.debug(f"{n_events_primary} events with primary particles")
     global_log.debug(f"{n_events_full_edep} events with full energy deposit")
     global_log.debug(f"{len(cones) or sys.exit('No cones')} cones")
-    global_log.info(f"Offline [cones]: STOP. Time: {time.time() - stime:.1f} seconds.\n" + '-' * 80)
+    global_log.info(
+        f"Offline [cones ghits]: {get_stop_string(stime)}")
     return pandas.DataFrame(cones, columns=cones_columns)
 
 
@@ -103,7 +104,7 @@ def gHits2cones_byEvtID(file_path, source_MeV):
 # - cosT
 # - error
 def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_um):
-    global_log.info(f"Offline [cones]: START")
+    global_log.info(f"Offline [cones tpx]: START")
     global_log.debug(f"Input pixel clusters dataframe")
     stime = time.time()
 
@@ -142,7 +143,8 @@ def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_um):
         cones.append([eventid] + apex + direction + [cosT] + [200])
 
     global_log.debug(f"{len(cones)} cones")
-    global_log.info(f"Offline [cones]: STOP. Time: {time.time() - stime:.1f} seconds.\n" + '-' * 80)
+    global_log.info(
+        f"Offline [cones tpx]: {get_stop_string(stime)}")
     return pandas.DataFrame(cones, columns=cones_columns)
 
 

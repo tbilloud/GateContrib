@@ -86,7 +86,7 @@ include = "PixelHit"
     subprocess.run([binary_path, '-c', output_dir + 'main.conf'], check=True)
 
     global_log.info(
-        f"Offline [Allpix2]: STOP. Time: {time.time() - stime:.1f} seconds.\n" + '-' * 80)
+        f"Offline [Allpix2]: {get_stop_string(stime)}")
 
 
 configurations = {

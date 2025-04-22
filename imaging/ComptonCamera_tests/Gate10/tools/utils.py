@@ -1,4 +1,5 @@
 # Some utility functions
+import time
 
 # WARNING: For print functions, make sure that dataframe columns are present in simulation settings (c.f. actor attribtues)
 
@@ -156,3 +157,7 @@ def coordinateOrigin2arrayCenter_df(df, vpitch, vsize):
     df['Apex_Y'] = df['Apex_Y'] + vpitch * vsize[1] / 2
     df['Apex_Z'] = df['Apex_Z'] + vpitch * vsize[2] / 2
     return df
+
+
+def get_stop_string(stime):
+    return f"STOP. Time: {time.time() - stime:.1f} seconds.\n" + '-' * 80

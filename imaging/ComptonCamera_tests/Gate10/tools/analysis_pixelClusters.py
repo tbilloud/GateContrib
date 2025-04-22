@@ -94,5 +94,5 @@ def pixelHits2pixelClusters(pixelHits, npix, window_ns, func, **kwargs):
     new_clust(clusters, clust, hit, npix, func, **kwargs)
 
     global_log.debug(f"{len(clusters)} clusters")
-    global_log.info(f"Offline [pixelClusters]: STOP. Time: {time.time() - stime:.1f} seconds.\n" + '-' * 80)
+    global_log.info(f"Offline [pixelClusters]: {get_stop_string(stime)}")
     return pd.concat(clusters, ignore_index=True)
