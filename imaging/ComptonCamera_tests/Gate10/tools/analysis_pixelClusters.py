@@ -72,7 +72,7 @@ def new_clust(clust_list, cluster, hit, n_pixels, process_func, **kwargs):
 
 # TODO speed -> https://pandas.pydata.org/docs/user_guide/basics.html#iteration
 def pixelHits2pixelClusters(pixelHits, npix, window_ns, func, **kwargs):
-    global_log.info(f"Offline: pixel cluster analysis with pixel hit df input")
+    global_log.info(f"Offline: clustering pixel hits input")
 
     pixelHits = pixelHits.sort_values(by=TOA)
 
@@ -91,5 +91,5 @@ def pixelHits2pixelClusters(pixelHits, npix, window_ns, func, **kwargs):
     # Last cluster
     new_clust(clusters, clust, hit, npix, func, **kwargs)
 
-    global_log.debug(f"Number of clusters: {len(clusters)}")
+    global_log.debug(f"{len(clusters)} clusters")
     return pd.concat(clusters, ignore_index=True)
