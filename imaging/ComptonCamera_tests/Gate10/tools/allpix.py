@@ -25,7 +25,6 @@ def run_allpix(sim,
         global_log.info(f"Offline [Allpix2]: START")
         global_log.debug(f"Input {hits_file}, {len(gateHits_df)} gHits")
 
-
     try:
         pixel = sim.volume_manager.get_volume("pixel_param")
     except Exception:
