@@ -26,10 +26,10 @@ ENERGY_keV = 'Energy_keV'
 pixelHits_columns = [PIXEL_ID, TOA, ENERGY_keV]
 EVENTID = 'EventID'
 TOT = 'ToT'
-PHOTON_X = 'PhotonPositionX' # X coordinate of photon interaction, from Gate
-PHOTON_Y = 'PhotonPositionY' # Y coordinate of photon interaction, from Gate
-PHOTON_Z = 'PhotonPositionZ' # Z coordinate of photon interaction, from Gate
-simulation_columns = [EVENTID, TOT, PHOTON_X, PHOTON_Y, PHOTON_Z] # Ground truth from Gate
+PHOTON_X = 'PhotonPositionX'  # X coordinate of photon interaction, from Gate
+PHOTON_Y = 'PhotonPositionY'  # Y coordinate of photon interaction, from Gate
+PHOTON_Z = 'PhotonPositionZ'  # Z coordinate of photon interaction, from Gate
+simulation_columns = [EVENTID, TOT, PHOTON_X, PHOTON_Y, PHOTON_Z]  # from Gate
 
 
 def singles2pixelHits(file_path):
@@ -213,8 +213,8 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
                 x, y = int(parts[1].strip(',')), int(parts[2].strip(','))
                 pixel_id = get_pixID(x, y, n_pixels=n_pixels)
                 tot = float(parts[3].strip(','))
-                toa = float(parts[4].strip(',')) # ToA from event start
-                global_time = float(parts[5].strip(',')) # ToA from simu start
+                toa = float(parts[4].strip(','))  # ToA from event start
+                global_time = float(parts[5].strip(','))  # ToA from simu start
                 position_x = float(parts[6].strip(','))
                 position_y = float(parts[7].strip(','))
                 position_z = float(parts[8].strip(','))
@@ -223,7 +223,8 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
                     EVENTID: event_id,
                     PIXEL_ID: pixel_id,
                     TOT: tot,
-                    ENERGY_keV: tot * 4.43 / 1000,  # TODO: adapt to qdc_resolution (on/off) in DefaultDigitizer
+                    ENERGY_keV: tot * 4.43 / 1000,
+                    # TODO: adapt to qdc_resolution (on/off) in DefaultDigitizer
                     TOA: global_time,
                     PHOTON_X: position_x,
                     PHOTON_Y: position_y,
