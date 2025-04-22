@@ -3,6 +3,7 @@
 import analysis_pixelHits
 from tools.analysis_pixelHits import *
 from opengate.logger import global_log
+from analysis_pixelHits import PIXEL_ID, TOA, ENERGY_keV, EVENTID, PHOTON_X, PHOTON_Y, PHOTON_Z
 import pandas as pd
 
 pd.set_option('display.max_columns', 100)
@@ -10,14 +11,10 @@ pd.set_option('display.width', 400)
 pd.set_option('display.max_rows', 1000)
 pd.set_option('display.float_format', lambda x: f'{x:.9}')  # G4 steps are logged with f'{x:.3}'
 
-PIXEL_ID = 'PixelID_int16'
-ENERGY = 'Energy_keV'
-TOA = 'TOA_ns'
-pixelClusters_columns = [PIXEL_ID, TOA, ENERGY]
-EVENTID = 'EventID'
+pixelClusters_columns = [PIXEL_ID, TOA, ENERGY_keV] # TODO not used
 X_um = 'PositionX'
 Y_um = 'PositionY'
-simulation_columns = [EVENTID, X_um, Y_um]
+simulation_columns = [EVENTID, X_um, Y_um] # TODO not used
 
 # TODO: if source.n was used in simulation, clustering with TOA does not work
 #  -> detect it ? send warning?
@@ -31,9 +28,9 @@ def is_adjacent(hit, current_cluster_df, n_pixels):
     )
 
 def process_cluster_method1(cluster_df):
-    cluster_total_energy = cluster_df[analysis_pixelHits.ENERGY_keV].sum()
-    cluster_first_TOA = cluster_df[analysis_pixelHits.TOA].min()
-    cluster_first_eventID = int(cluster_df[analysis_pixelHits.EVENTID].min())
+    cluster_total_energy = cluster_df[ENERGY_keV].sum()
+    cluster_first_TOA = cluster_df[TOA].min()
+    cluster_first_eventID = int(cluster_df[EVENTID].min())
     return pd.DataFrame({
         ENERGY_keV: [cluster_total_energy],
         TOA: [cluster_first_TOA],
@@ -41,12 +38,12 @@ def process_cluster_method1(cluster_df):
     })
 
 def process_cluster_method2(cluster_df, n_pixels, pixel_pitch_um, thickness_um):
-    cluster_total_energy = cluster_df[analysis_pixelHits.ENERGY_keV].sum()
-    cluster_first_TOA = cluster_df[analysis_pixelHits.TOA].min()
-    cluster_first_eventID = int(cluster_df[analysis_pixelHits.EVENTID].min())
+    cluster_total_energy = cluster_df[ENERGY_keV].sum()
+    cluster_first_TOA = cluster_df[TOA].min()
+    cluster_first_eventID = int(cluster_df[EVENTID].min())
     pixX, pixY = zip(*cluster_df[PIXEL_ID].apply(get_pixID_2D, args=(n_pixels,)))
-    x_um = pixel_pitch_um * sum(pixX * cluster_df[analysis_pixelHits.ENERGY_keV]) / cluster_total_energy
-    y_um = pixel_pitch_um * sum(pixY * cluster_df[analysis_pixelHits.ENERGY_keV]) / cluster_total_energy
+    x_um = pixel_pitch_um * sum(pixX * cluster_df[ENERGY_keV]) / cluster_total_energy
+    y_um = pixel_pitch_um * sum(pixY * cluster_df[ENERGY_keV]) / cluster_total_energy
     return pd.DataFrame({
         ENERGY_keV: [cluster_total_energy],
         TOA: [cluster_first_TOA],
@@ -64,7 +61,7 @@ def new_cluster(clusters_list, cluster_df, hit, n_pixels, process_cluster_func, 
     process_func = process_cluster_functions[process_cluster_func]
     clusters_list.append(process_func(cluster_df, n_pixels, **kwargs))
     new_cluster_df = pd.DataFrame([hit])
-    new_time_window_start = hit[analysis_pixelHits.TOA]
+    new_time_window_start = hit[TOA]
     return new_cluster_df, new_time_window_start
 
 # TODO speed -> https://pandas.pydata.org/docs/user_guide/basics.html#iteration
@@ -72,16 +69,16 @@ def pixelHits2pixelClusters(pixelHits, n_pixels, time_window_ns,
                             cluster_func, **kwargs):
     global_log.info(f"Offline: pixel cluster analysis with pixel hit df input")
 
-    pixelHits = pixelHits.sort_values(by=analysis_pixelHits.TOA)
+    pixelHits = pixelHits.sort_values(by=TOA)
 
     # 1st cluster & initialization
     cluster = pd.DataFrame([pixelHits.iloc[0]])  # Initialize with the first hit
-    window_start = pixelHits.iloc[0][analysis_pixelHits.TOA]
+    window_start = pixelHits.iloc[0][TOA]
     clusters = []
 
     # Loop over hits
     for index, hit in pixelHits.iterrows():
-        if hit[analysis_pixelHits.TOA] - window_start <= time_window_ns and is_adjacent(hit, cluster, n_pixels):
+        if hit[TOA] - window_start <= time_window_ns and is_adjacent(hit, cluster, n_pixels):
             cluster = pd.concat([cluster, hit.to_frame().T], ignore_index=True)
         else:
             cluster, window_start = new_cluster(clusters, cluster, hit, n_pixels, cluster_func, **kwargs)
