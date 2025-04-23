@@ -14,7 +14,7 @@ if __name__ == "__main__":
     sim.random_engine, sim.random_seed = "MersenneTwister", 1
     sim.visu = False
     # sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # useless if visu
-    sim.verbose_level = 'DEBUG'
+    # sim.verbose_level = 'DEBUG'
 
     # ===========================
     # ==   GEOMETRY            ==
@@ -26,12 +26,13 @@ if __name__ == "__main__":
     sensor.size = [npix * pitch, npix * pitch, thickness]
     sensor.translation = [0 * mm, 0 * mm, 5 * mm]
     # sensor.rotation = R.from_euler('xyz', [0,45,0], degrees=True).as_matrix()
-    pixel = sim.add_volume("Box", "pixel")
-    pixel.mother, pixel.size = sensor.name, [pitch, pitch, thickness]
-    pixel.material = sensor.material
-    par = RepeatParametrisedVolume(repeated_volume=pixel)
-    par.linear_repeat, par.translation = [npix, npix, 1], [pitch, pitch, 0]
-    sim.volume_manager.add_volume(par)
+    if not sim.visu:
+        pixel = sim.add_volume("Box", "pixel")
+        pixel.mother, pixel.size = sensor.name, [pitch, pitch, thickness]
+        pixel.material = sensor.material
+        par = RepeatParametrisedVolume(repeated_volume=pixel)
+        par.linear_repeat, par.translation = [npix, npix, 1], [pitch, pitch, 0]
+        sim.volume_manager.add_volume(par)
 
     ## ===========================
     ## ==  PHYSICS              ==
@@ -61,7 +62,7 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.n = 1000
+    source.n = 100
     # source.activity, sim.run_timing_intervals = 100_000 * Bq, [[0, 2 * ms]]
     source.particle = "gamma"
     source.energy.mono = 100 * keV
@@ -81,31 +82,36 @@ if __name__ == "__main__":
     # TODO adapt to multiple sim runs
     hits_path = Path(sim.output_dir) / hits.output_filename
     hits_df = uproot.open(hits_path)['Hits'].arrays(library='pd')
+    print_hits_inG4format(hits_df[hits_df['EventID']==96])
 
     # ################# PIXEL HITS ########################
     pixelHits = gHits2allpix2pixelHits(sim, npix, config='fast')
     # pixelHits[TOA] = pixelHits.groupby(EVENTID)[TOA].transform(lambda x: x - x.min())
     if source.n: pixelHits[TOA] += pixelHits.groupby(EVENTID).ngroup() * 1000
     # TODO include above line in gHits2allpix2pixelHits or pixelHits2pixelClusters?
+    print(pixelHits[pixelHits['EventID'] == 96])
 
     # ################# PIXEL CLUSTERS ####################
     pixelClusters = pixelHits2pixelClusters(pixelHits, npix=npix,
                                             window_ns=100,
                                             func='method2',
                                             pitch_um=pitch * 1000)
+    print(pixelClusters[pixelClusters['EventID'] == 96])
 
     # #################### CONES ##########################
     # =======> GROUND TRUTH <=======
     cones_truth = gHits2cones_byEvtID(hits_path, source.energy.mono)
     # print_hits_gammas(hits_df[hits_df['EventID'].isin(eventIDs)])
     # print(pixelHits[pixelHits[id].isin(eventIDs)])
+    cones_truth = cones_truth[cones_truth['EventID'] != 91]
+    print(cones_truth)
     # =========> TIMEPIX <==========
     # eventIDs = cones_truth['EventID'].unique()
     cones_tpx = pixelClusters2cones_byEvtID(pixelClusters,
                                             source_MeV=source.energy.mono,
                                             thickness_um=thickness * 1000)
     cones_tpx_simuCoord = tpxCones2simuCoordinates(cones_tpx, sensor)
-    # print(cones_tpx_simuCoord)
+    print(cones_tpx_simuCoord)
 
     # ################## RECONSTRUCTION ####################
     sp, vp, vs = source.position.translation, 0.1, (256, 256, 256)
