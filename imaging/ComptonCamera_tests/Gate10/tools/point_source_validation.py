@@ -34,10 +34,11 @@ def validate_psource(cones_df, source_pos, vpitch, vsize, plot_seq=False,
     # ######## RECONSTRUCT CONE BY CONE #######################################
     z_slice_stack = xp.zeros((len(cones_df), vsize[0], vsize[1]), dtype=xp.float32)
     n_bad_cones = 0
-    for _, cone in cones_df.iterrows():
+    cones_df = cones_df.reset_index(drop=True)
+    for idx, cone in cones_df.iterrows():
         vol = reco_bp(cone.to_frame().T, vpitch, vsize, napari=False)
         z_slice = vol[:, :, sp_vox[2]]
-        z_slice_stack[_, :, :] = z_slice
+        z_slice_stack[idx, :, :] = z_slice
         if z_slice[sp_vox[0], sp_vox[1]] == 0:
             # TODO sometime cone is bad but z_slice is not 0
             n_bad_cones += 1
@@ -58,6 +59,9 @@ def validate_psource(cones_df, source_pos, vpitch, vsize, plot_seq=False,
 
     print(n_bad_cones, 'cones not intersecting at the source point')
 
+    # ##############################################################
+    # # Display stack with matplotlib (summed)
+    # ##############################################################
     if plot_stack:
         fig, ax = plt.subplots()
         stack = xp.sum(z_slice_stack, axis=0)
@@ -66,6 +70,7 @@ def validate_psource(cones_df, source_pos, vpitch, vsize, plot_seq=False,
         ax.set_xlabel('X (pixels)')
         ax.set_ylabel('Y (pixels)')
         add_secondary_axes(ax, vpitch)
+        plt.scatter(sp_vox[0], sp_vox[1], c='r', s=10)
         plt.tight_layout()
         plt.show()
 
