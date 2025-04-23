@@ -26,10 +26,10 @@ ENERGY_keV = 'Energy_keV'
 pixelHits_columns = [PIXEL_ID, TOA, ENERGY_keV]
 EVENTID = 'EventID'
 TOT = 'ToT'
-PHOTON_X = 'PhotonPositionX'  # X coordinate of photon interaction, from Gate
-PHOTON_Y = 'PhotonPositionY'  # Y coordinate of photon interaction, from Gate
-PHOTON_Z = 'PhotonPositionZ'  # Z coordinate of photon interaction, from Gate
-simulation_columns = [EVENTID, TOT, PHOTON_X, PHOTON_Y, PHOTON_Z]  # from Gate
+PIX_X = 'X (mm)'  # X coordinate
+PIX_Y = 'Y (mm)'  # Y coordinate
+PIX_Z = 'Z (mm)'  # Z coordinate
+simulation_columns = [EVENTID, TOT, PIX_X, PIX_Y, PIX_Z]  # from Gate
 
 
 def singles2pixelHits(file_path):
@@ -47,9 +47,9 @@ def singles2pixelHits(file_path):
     singles.rename(columns={'TotalEnergyDeposit': ENERGY_keV}, inplace=True)
     singles[ENERGY_keV] = singles[ENERGY_keV] * 1e3  # Convert MeV to keV
     singles.rename(columns={'GlobalTime': TOA}, inplace=True)
-    singles.rename(columns={'Position_X': PHOTON_X}, inplace=True)
-    singles.rename(columns={'Position_Y': PHOTON_Y}, inplace=True)
-    singles.rename(columns={'Position_Z': PHOTON_Z}, inplace=True)
+    singles.rename(columns={'Position_X': PIX_X}, inplace=True)
+    singles.rename(columns={'Position_Y': PIX_Y}, inplace=True)
+    singles.rename(columns={'Position_Z': PIX_Z}, inplace=True)
     singles[TOT] = singles[ENERGY_keV] * 1e3  # TODO temporary
     global_log.debug(f"Number of pixel hits: {len(singles)}")
     return singles[simulation_columns + pixelHits_columns]
@@ -226,9 +226,9 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
                     ENERGY_keV: tot * 4.43 / 1000,
                     # TODO: adapt to qdc_resolution (on/off) in DefaultDigitizer
                     TOA: global_time,
-                    PHOTON_X: position_x,
-                    PHOTON_Y: position_y,
-                    PHOTON_Z: position_z
+                    PIX_X: position_x,
+                    PIX_Y: position_y,
+                    PIX_Z: position_z
                 })
 
     df = pd.DataFrame(rows, columns=simulation_columns + pixelHits_columns)
