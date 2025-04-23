@@ -20,16 +20,18 @@ pandas.set_option('display.width', 400)
 pandas.set_option('display.max_rows', 1000)
 pandas.set_option('display.float_format', lambda x: f'{x:.9}')  # G4 steps x:.3
 
-PIXEL_ID = 'PixelID_int16'
-TOA = 'ToA_ns'
-ENERGY_keV = 'Energy_keV'
-pixelHits_columns = [PIXEL_ID, TOA, ENERGY_keV]
-EVENTID = 'EventID'
+PIXEL_ID = 'PixelID (int16)'
+TOA = 'ToA (ns)'
+ENERGY_keV = 'Energy (keV)'
+PIX_X_mm = 'X (mm)'  # X coordinate
+PIX_Y_mm = 'Y (mm)'  # Y coordinate
+PIX_Z_mm = 'Z (mm)'  # Z coordinate
+PIX_X_ID = 'Pix X'
+PIX_Y_ID = 'Pix Y'
 TOT = 'ToT'
-PIX_X = 'X (mm)'  # X coordinate
-PIX_Y = 'Y (mm)'  # Y coordinate
-PIX_Z = 'Z (mm)'  # Z coordinate
-simulation_columns = [EVENTID, TOT, PIX_X, PIX_Y, PIX_Z]  # from Gate
+pixelHits_columns = [PIX_X_ID, PIX_Y_ID, TOA, TOT, ENERGY_keV, PIXEL_ID]
+EVENTID = 'EventID'
+simulation_columns = [EVENTID]  # from Gate
 
 
 def singles2pixelHits(file_path):
@@ -47,9 +49,9 @@ def singles2pixelHits(file_path):
     singles.rename(columns={'TotalEnergyDeposit': ENERGY_keV}, inplace=True)
     singles[ENERGY_keV] = singles[ENERGY_keV] * 1e3  # Convert MeV to keV
     singles.rename(columns={'GlobalTime': TOA}, inplace=True)
-    singles.rename(columns={'Position_X': PIX_X}, inplace=True)
-    singles.rename(columns={'Position_Y': PIX_Y}, inplace=True)
-    singles.rename(columns={'Position_Z': PIX_Z}, inplace=True)
+    singles.rename(columns={'Position_X': PIX_X_mm}, inplace=True)
+    singles.rename(columns={'Position_Y': PIX_Y_mm}, inplace=True)
+    singles.rename(columns={'Position_Z': PIX_Z_mm}, inplace=True)
     singles[TOT] = singles[ENERGY_keV] * 1e3  # TODO temporary
     global_log.debug(f"Number of pixel hits: {len(singles)}")
     return singles[simulation_columns + pixelHits_columns]
@@ -221,14 +223,16 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
 
                 rows.append({
                     EVENTID: event_id,
+                    PIX_X_ID: x,
+                    PIX_Y_ID: y,
                     PIXEL_ID: pixel_id,
                     TOT: tot,
                     ENERGY_keV: tot * 4.43 / 1000,
                     # TODO: adapt to qdc_resolution (on/off) in DefaultDigitizer
                     TOA: global_time,
-                    PIX_X: position_x,
-                    PIX_Y: position_y,
-                    PIX_Z: position_z
+                    PIX_X_mm: position_x,
+                    PIX_Y_mm: position_y,
+                    PIX_Z_mm: position_z
                 })
 
     df = pd.DataFrame(rows, columns=simulation_columns + pixelHits_columns)
