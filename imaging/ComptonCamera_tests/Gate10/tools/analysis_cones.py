@@ -6,7 +6,7 @@ import os
 import sys
 import pandas
 import uproot
-from analysis_pixelClusters import X_um, Y_um, EVENTID, ENERGY_keV
+from analysis_pixelHits import PIX_X_ID, PIX_Y_ID, EVENTID, ENERGY_keV, TOA
 from tools.utils import *
 from opengate.logger import global_log
 
@@ -103,7 +103,8 @@ def gHits2cones_byEvtID(file_path, source_MeV):
 # - Direction (X,Y,Z)
 # - cosT
 # - error
-def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_um):
+def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_mm, npix=False,
+                                sensor=False):
     global_log.info(f"Offline [cones tpx]: START")
     global_log.debug(f"Input pixel clusters dataframe")
     stime = time.time()
@@ -116,28 +117,37 @@ def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_um):
     for eventid, group in grouped:
         # TODO: 1) Distinguish compton vs photo-electric interactions
         group = group.sort_values(ENERGY_keV)
-        # print(group)
         clust_photoel = group.iloc[0]
         clust_compton = group.iloc[1]
 
+
         # TODO: 2) Calculate depth difference
-        # delta_z = ... charge_carrier_speed * (TOA_photoelec - TOA_compton)
+        # delta_z = charge_carrier_speed * (TOA_photoelec - TOA_compton)
+        thickness_cm = thickness_mm / 10 # cm
+        bias_V = 1000 # V
+        E_field = bias_V / thickness_cm # [V/cm]
+        mobility = 1000 # [cm*cm/V/s]
+        elec_speed = mobility * E_field # [cm*cm/V/s] * [V/cm] => [cm/s]
+        delta_z_mm = elec_speed * (clust_compton[TOA] - clust_photoel[TOA]) * 1e-8
+        delta_z_fractional = delta_z_mm / thickness_mm
 
         # TODO: 3) Calculate absolute depth of Compton interaction (apex)
-        z_compton_um = thickness_um / 2
-        # OR
-        # use cluster size (and energy?)
+        z_compton = 0 # middle of sensor (in local fractional unit)
+        # OR use cluster size (and energy?)
 
         # TODO: 4) Complete 3D positions
-        pos_compton = [clust_compton[X_um], clust_compton[Y_um], z_compton_um]
-        pos_photoel = [clust_photoel[X_um], clust_photoel[Y_um], thickness_um]
+        pos_compton = [clust_compton[PIX_X_ID], clust_compton[PIX_Y_ID], z_compton]
+        pos_photoel = [clust_photoel[PIX_X_ID], clust_photoel[PIX_Y_ID], z_compton+delta_z_fractional]
 
         # TODO: 5) Construct cone
         direction = np.array(pos_compton) - np.array(pos_photoel)
         direction = (direction / np.linalg.norm(direction)).tolist()
-        E1_MeV = clust_photoel[ENERGY_keV] / 1000
+        E1_MeV = clust_compton[ENERGY_keV] / 1000
         cosT = 1 - (0.511 * E1_MeV) / (source_MeV * (source_MeV - E1_MeV))
-        apex = [pos / 1000 for pos in pos_compton]
+        apex = pos_compton
+        if npix and sensor:
+            apex = localFractional2globalCoordinates(apex, sensor, npix)
+            direction = np.dot(sensor.rotation, direction).tolist()
         cones.append([eventid] + apex + direction + [cosT] + [200])
         # TODO make order flexible
 
@@ -146,14 +156,3 @@ def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_um):
     global_log_debug_df(df)
     global_log.info(f"Offline [cones tpx]: {get_stop_string(stime)}")
     return df
-
-
-def tpxCones2simuCoordinates(cones, sensor):
-    cones = cones.copy()
-    sensor_size = sensor.size
-    sensor_position = sensor.translation
-    sensor_rotation = sensor.rotation  # TODO: to include
-    cones['Apex_X'] = cones['Apex_X'] + sensor_position[0] - sensor_size[0] / 2
-    cones['Apex_Y'] = cones['Apex_Y'] + sensor_position[1] - sensor_size[1] / 2
-    cones['Apex_Z'] = cones['Apex_Z'] + sensor_position[2] - sensor_size[2] / 2
-    return cones

@@ -23,13 +23,13 @@ pandas.set_option('display.float_format', lambda x: f'{x:.9}')  # G4 steps x:.3
 PIXEL_ID = 'PixelID (int16)'
 TOA = 'ToA (ns)'
 ENERGY_keV = 'Energy (keV)'
-PIX_X_mm = 'X (mm)'  # X coordinate
-PIX_Y_mm = 'Y (mm)'  # Y coordinate
-PIX_Z_mm = 'Z (mm)'  # Z coordinate
-PIX_X_ID = 'Pix X'
-PIX_Y_ID = 'Pix Y'
+PIX_X_ID = 'X' # pixel X index (starts from 0, bottom left)
+PIX_Y_ID = 'Y' # pixel Y index (starts from 0, bottom left)
+PIX_X_mm = 'X (mm)'  # global X coordinate of pixel (e.g. Allpix output text files)
+PIX_Y_mm = 'Y (mm)'  # global Y coordinate of pixel (e.g. Allpix output text files)
+PIX_Z_mm = 'Z (mm)'  # global Z coordinate of pixel (e.g. Allpix output text files)
 TOT = 'ToT'
-pixelHits_columns = [PIX_X_ID, PIX_Y_ID, TOA, TOT, ENERGY_keV, PIXEL_ID]
+pixelHits_columns = [PIX_X_ID, PIX_Y_ID, PIX_X_mm, PIX_Y_mm, PIX_Z_mm, TOA, TOT, ENERGY_keV, PIXEL_ID]
 EVENTID = 'EventID'
 simulation_columns = [EVENTID]  # from Gate
 

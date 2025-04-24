@@ -13,7 +13,7 @@ um, mm, keV, MeV, deg, Bq, sec = g4_units.um, g4_units.mm, g4_units.keV, g4_unit
 # If pandas.set_option('display.float_format'...) is used in script calling the function, remove it
 def print_hits_inG4format(hits_df):
     print(
-        hits_df[['EventID','PostPosition_X', 'PostPosition_Y', 'PostPosition_Z',
+        hits_df[['EventID', 'PostPosition_X', 'PostPosition_Y', 'PostPosition_Z',
                  'KineticEnergy', 'TotalEnergyDeposit',
                  'StepLength', 'TrackLength', 'HitUniqueVolumeID',
                  'ProcessDefinedStep', 'ParticleName', 'TrackID',
@@ -54,6 +54,7 @@ def print_hits_direction(hits_df):
         'PostDirection_X', 'PostDirection_Y', 'PostDirection_Z'
     ]].to_string(index=False))
 
+
 # Prints gamma interactions
 def print_hits_gammas(hits_df):
     hits_df = hits_df[hits_df['ParticleName'] == 'gamma']
@@ -62,6 +63,7 @@ def print_hits_gammas(hits_df):
         'TotalEnergyDeposit', 'ProcessDefinedStep', 'TrackCreatorProcess',
         'PostPosition_Z'
     ]].to_string(index=False))
+
 
 # Prints time info
 def print_hits_time(hits_df):
@@ -90,6 +92,7 @@ def print_hits_long_sortedByGlobalTime(hits_df):
     hits_df = hits_df.groupby('EventID').apply(
         lambda x: x.sort_values('GlobalTime'))
     print_hits_long(hits_df)
+
 
 def get_pixID(x, y, n_pixels=256):
     return x * n_pixels + y
@@ -139,8 +142,8 @@ def get_file_name(sim, doppler, fluo):
         raise NotImplementedError(
             "Function get_file_name() is only implemented for one source")
     events = (f'{source.n}events' if source.n else
-         f'{int(source.activity / Bq)}Bq_'
-         f'{int(sum_time_intervals(sim.run_timing_intervals)) / sec}sec')
+              f'{int(source.activity / Bq)}Bq_'
+              f'{int(sum_time_intervals(sim.run_timing_intervals)) / sec}sec')
     energy = int(source.energy.mono / keV)
     return f'source{energy}keV_{events}_doppler{doppler}_fluo{fluo}.root'
 
@@ -162,7 +165,39 @@ def coordinateOrigin2arrayCenter_df(df, vpitch, vsize):
 def get_stop_string(stime):
     return f"STOP. Time: {time.time() - stime:.1f} seconds.\n" + '-' * 80
 
+
 def global_log_debug_df(df):
     if not df.empty:
         global_log.debug(f"Output preview:\n{df.head().to_string(index=False)}")
 
+
+def localFractional2globalCoordinates(local_point, sensor, npix):
+    """
+    Transforms coordinates from sensor's (local) to world's coordinate system.
+    => local origin = center of the lower-left pixel (as in Allpix2)
+    Here local coordinate is in fractional pixel units
+    """
+
+    pitch = sensor.size[0] / npix # mm
+    local_sensor_center = [npix / 2 - 0.5] * 2 + [0]
+    local_point_centered = np.array(local_point) - np.array(local_sensor_center)
+    local_vector_centered_rotated = np.dot(sensor.rotation, local_point_centered)
+    local_vector_centered_rotated_absolute = local_vector_centered_rotated * [pitch, pitch, sensor.size[2]]
+    global_vector = sensor.translation + local_vector_centered_rotated_absolute
+
+    return global_vector.tolist()
+
+# def localFractional2globalCoordinates(c, sensor, npix):
+#     pitch = sensor.size[0] / npix  # mm
+#
+#     a = sensor.translation
+#     b = [npix / 2 - 0.5] * 2 + [0]
+#
+#     a, b, c = np.array(a), np.array(b), np.array(c)
+#
+#     b = np.dot(sensor.rotation, b) * [pitch, pitch, sensor.size[2]]
+#     c = np.dot(sensor.rotation, c) * [pitch, pitch, sensor.size[2]]
+#
+#     g = a - b + c
+#
+#     return g.tolist()

@@ -2,7 +2,7 @@
 
 from tools.analysis_pixelHits import *
 from opengate.logger import global_log
-from analysis_pixelHits import PIXEL_ID, TOA, ENERGY_keV, EVENTID
+from analysis_pixelHits import PIXEL_ID, TOA, ENERGY_keV, EVENTID, PIX_X_mm, PIX_Y_mm, PIX_Z_mm
 import pandas as pd
 
 pd.set_option('display.max_columns', 100)
@@ -11,11 +11,17 @@ pd.set_option('display.max_rows', 1000)
 pd.set_option('display.float_format',
               lambda x: f'{x:.9}')  # G4 steps are logged with f'{x:.3}'
 
-pixelClusters_columns = [PIXEL_ID, TOA, ENERGY_keV]  # TODO not used
-X_um = 'PositionX'
-Y_um = 'PositionY'
-simulation_columns = [EVENTID, X_um, Y_um]  # TODO not used
-
+# Cluster coordinates differ from pixel hit coordinates:
+# PIX_X_ID, PIX_Y_ID are also in pixel indices but result from some processing function
+# PIX_Z_ID result from another type of processing function, i.e. depth calculation
+# Indices are fractional:
+#  => 0 is center of lower left pixel (e.g. 0.5 is it's right edge)
+#  => z-axis points towards the readout connected to the sensor
+# PIX_X_mm, PIX_Y_mm, PIX_Z_mm are also global coordinates
+#  => helps to directly compare with Allpix2 output text files
+#  => fits Compton camera applications when detector position is used for reconstruction
+pixelClusters_columns = [PIX_X_ID, PIX_Y_ID, PIX_X_mm, PIX_Y_mm, PIX_Z_mm, PIXEL_ID, TOA, ENERGY_keV]  # TODO not used
+# TODO: not used
 
 # TODO: if source.n was used in simulation, clustering with TOA does not work
 #  -> detect it ? send warning?
@@ -41,18 +47,22 @@ def process_cluster_method1(cluster_df):
 
 
 def process_cluster_method2(cluster, n_pixels, pitch_um):
+    """
+    X and Y are in the sensor's local coordinates system, as in Allpix2
+    => origin = center of the lower-left pixel
+    """
     cluster_total_energy = cluster[ENERGY_keV].sum()
     cluster_first_TOA = cluster[TOA].min()
     cluster_first_eventID = int(cluster[EVENTID].min())
     pixX, pixY = zip(*cluster[PIXEL_ID].apply(get_pixID_2D, args=(n_pixels,)))
-    x_um = pitch_um * sum(pixX * cluster[ENERGY_keV]) / cluster_total_energy
-    y_um = pitch_um * sum(pixY * cluster[ENERGY_keV]) / cluster_total_energy
+    x = sum(pixX * cluster[ENERGY_keV]) / cluster_total_energy
+    y = sum(pixY * cluster[ENERGY_keV]) / cluster_total_energy
     return pd.DataFrame({
         EVENTID: [cluster_first_eventID],
+        PIX_X_ID: [x],
+        PIX_Y_ID: [y],
         ENERGY_keV: [cluster_total_energy],
-        TOA: [cluster_first_TOA],
-        X_um: [x_um],
-        Y_um: [y_um]
+        TOA: [cluster_first_TOA]
     })
 
 
