@@ -34,14 +34,14 @@ def validate_psource(cones_df, source_pos, vpitch, vsize, plot_seq=False,
 
     # ######## RECONSTRUCT CONE BY CONE #######################################
     z_slice_stack = xp.zeros((len(cones_df), vsize[0], vsize[1]), dtype=xp.float32)
-    nb = 0 # number of bad cones
+    nb = 0  # number of bad cones
     cones_df = cones_df.reset_index(drop=True)
     for idx, cone in cones_df.iterrows():
         vol = reco_bp(cone.to_frame().T, vpitch, vsize, napari=False)
         z_slice = vol[:, :, sp_vox[2]]
         z_slice_stack[idx, :, :] = z_slice
         if z_slice[sp_vox[0], sp_vox[1]] == 0:
-            nb += 1 # TODO: sometime cone is bad but z_slice is not 0 (due to error)
+            nb += 1  # TODO: sometime cone is bad but z_slice is not 0 (due to error)
 
         # ##############################################################
         # # Display stack with matplotlib (one by one)
@@ -77,7 +77,8 @@ def validate_psource(cones_df, source_pos, vpitch, vsize, plot_seq=False,
     # Display stack with napari (scrolling)
     ##############################################################
     if plot_napari:
-        vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2), axis_labels=["cone", "x", "y"])
+        vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2),
+                     axis_labels=["cone", "x", "y"])
         if xp.__name__ == 'cupy': z_slice_stack = xp.asnumpy(z_slice_stack)
         viewer = napari.view_image(z_slice_stack, **vargs)
         viewer.axes.visible = True
@@ -113,9 +114,7 @@ if __name__ == "__main__":
     # cones_array = conesTTree2conesArray(fname / 'CC_Cones.root', E0_MeV, er, nSingles_max, true_coinc, nentries)
 
     # ###### READING Gate10 hit root files ##############
-    fname, E0_MeV, vpitch, source_pos = Path('../output'), 1.0, 200, [0,
-                                                                      0,
-                                                                      -50]
+    fname, E0_MeV, vpitch, source_pos = Path('../output'), 1.0, 200, [0, 0, -50]
     cones_array = gHits2cones_byEvtID(fname / 'CC_Hits.root', E0_MeV)
 
     # ###### Preprocessing #########
