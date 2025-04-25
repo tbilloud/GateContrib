@@ -25,11 +25,8 @@ TOA = 'ToA (ns)'
 ENERGY_keV = 'Energy (keV)'
 PIX_X_ID = 'X' # pixel X index (starts from 0, bottom left)
 PIX_Y_ID = 'Y' # pixel Y index (starts from 0, bottom left)
-PIX_X_mm = 'X (mm)'  # global X coordinate of pixel (e.g. Allpix output text files)
-PIX_Y_mm = 'Y (mm)'  # global Y coordinate of pixel (e.g. Allpix output text files)
-PIX_Z_mm = 'Z (mm)'  # global Z coordinate of pixel (e.g. Allpix output text files)
 TOT = 'ToT'
-pixelHits_columns = [PIX_X_ID, PIX_Y_ID, PIX_X_mm, PIX_Y_mm, PIX_Z_mm, TOA, TOT, ENERGY_keV, PIXEL_ID]
+pixelHits_columns = [PIX_X_ID, PIX_Y_ID, TOA, TOT, ENERGY_keV, PIXEL_ID]
 EVENTID = 'EventID'
 simulation_columns = [EVENTID]  # from Gate
 
@@ -229,10 +226,7 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
                     TOT: tot,
                     ENERGY_keV: tot * 4.43 / 1000,
                     # TODO: adapt to qdc_resolution (on/off) in DefaultDigitizer
-                    TOA: global_time,
-                    PIX_X_mm: position_x,
-                    PIX_Y_mm: position_y,
-                    PIX_Z_mm: position_z
+                    TOA: global_time
                 })
 
     df = pd.DataFrame(rows, columns=simulation_columns + pixelHits_columns)

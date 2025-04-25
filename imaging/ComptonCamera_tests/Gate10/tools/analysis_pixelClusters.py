@@ -2,7 +2,7 @@
 
 from tools.analysis_pixelHits import *
 from opengate.logger import global_log
-from analysis_pixelHits import PIXEL_ID, TOA, ENERGY_keV, EVENTID, PIX_X_mm, PIX_Y_mm, PIX_Z_mm
+from analysis_pixelHits import PIXEL_ID, TOA, ENERGY_keV, EVENTID
 import pandas as pd
 
 pd.set_option('display.max_columns', 100)
@@ -20,8 +20,7 @@ pd.set_option('display.float_format',
 # PIX_X_mm, PIX_Y_mm, PIX_Z_mm are also global coordinates
 #  => helps to directly compare with Allpix2 output text files
 #  => fits Compton camera applications when detector position is used for reconstruction
-pixelClusters_columns = [PIX_X_ID, PIX_Y_ID, PIX_X_mm, PIX_Y_mm, PIX_Z_mm, PIXEL_ID, TOA, ENERGY_keV]  # TODO not used
-# TODO: not used
+pixelClusters_columns = [PIX_X_ID, PIX_Y_ID, PIXEL_ID, TOA, ENERGY_keV]  # TODO not used
 
 # TODO: if source.n was used in simulation, clustering with TOA does not work
 #  -> detect it ? send warning?

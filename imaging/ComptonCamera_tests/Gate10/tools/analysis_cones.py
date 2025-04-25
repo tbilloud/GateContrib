@@ -86,8 +86,9 @@ def gHits2cones_byEvtID(file_path, source_MeV):
             # TODO make order flexible
 
     df = pandas.DataFrame(cones, columns=cones_columns)
-    global_log.debug(f"{n_events_primary} events with primary particles")
-    global_log.debug(f"{n_events_full_edep} events with full energy deposit")
+    global_log.debug(f"{n_events_primary} events with primary particle hitting sensor")
+    global_log.debug(f"=> {n_events_full_edep} with full energy deposited in sensor")
+    global_log.debug(f"  => {len(cones)} with at least one Compton interaction")
     global_log.info(f"Offline [cones ghits]: {len(cones)} cones")
     global_log_debug_df(df)
     global_log.info(f"Offline [cones ghits]: {get_stop_string(stime)}")
