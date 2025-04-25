@@ -95,17 +95,29 @@ def gHits2cones_byEvtID(file_path, source_MeV):
     return df
 
 
-# Clusters have:
-# - X/Y coordinates
-# - ToA
-# - ToT
-# Cones need:
-# - Apex (X,Y,Z)
-# - Direction (X,Y,Z)
-# - cosT
-# - error
+
 def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_mm,
-                                charge_speed_mm_ns, to_global = False):
+                                charge_speed_mm_ns, to_global=False):
+    """
+    Clusters have:
+    - X/Y coordinates
+    - ToA
+    - ToT
+    Cones need:
+    - Apex (X,Y,Z)
+    - Direction (X,Y,Z)
+    - cosT
+    - error
+
+    to_global: use this to return cones in global coordinate system instead of local
+    It is a list with [npix, sensor]:
+     - npix is the number of pixels in one side of the sensor (256 for Timepix3)
+     - sensor is an object with:
+        sensor.size = list with x,y,z lengths in mm
+        sensor.translation = list with x,y,z positions of the sensor's center in mm
+        sensor.rotation = 3D rotation matrix
+    """
+
     global_log.info(f"Offline [cones tpx]: START")
     global_log.debug(f"Input pixel clusters dataframe")
     stime = time.time()
@@ -128,7 +140,7 @@ def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_mm,
 
         # 3) Calculate absolute depth of Compton interaction (apex)
         z_compton = 0  # middle of sensor (in local fractional unit)
-        # OR use cluster size (and energy?)
+        # TODO or use cluster size/energy ?
 
         # 4) Complete 3D positions
         pos_compton = [cl_compton[PIX_X_ID], cl_compton[PIX_Y_ID], z_compton]

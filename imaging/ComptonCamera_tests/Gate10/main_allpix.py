@@ -93,7 +93,6 @@ if __name__ == "__main__":
     # #################### CONES ##########################
     # =======> GROUND TRUTH <=======
     cones_truth = gHits2cones_byEvtID(hits_path, source.energy.mono)
-    # eventIDs = cones_truth['EventID'].unique()
     # # =========> TIMEPIX <==========
     sp = charge_speed_mm_ns(mobility_cm2_Vs=1000, bias_V=1000, thick_mm=sensor.size[2])
     cones_tpx = pixelClusters2cones_byEvtID(pixelClusters,
