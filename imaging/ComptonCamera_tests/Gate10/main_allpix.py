@@ -88,9 +88,7 @@ if __name__ == "__main__":
     pixelHits = gHits2allpix2pixelHits(sim, npix, config='fast')
 
     # ################# PIXEL CLUSTERS ####################
-    pixelClusters = pixelHits2pixelClusters(pixelHits, npix=npix,
-                                            window_ns=100,
-                                            func='method2')
+    pixelClusters = pixelHits2pixelClusters(pixelHits, npix=npix, window_ns=100, f='m2')
 
     # #################### CONES ##########################
     # =======> GROUND TRUTH <=======

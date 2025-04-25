@@ -66,8 +66,8 @@ def process_cluster_method2(cluster, n_pixels):
 
 
 process_cluster_functions = {
-    'method1': process_cluster_method1,
-    'method2': process_cluster_method2
+    'm1': process_cluster_method1,
+    'm2': process_cluster_method2
 }
 
 
@@ -80,7 +80,7 @@ def new_clust(clust_list, cluster, hit, n_pixels, process_func, **kwargs):
 
 
 # TODO speed -> https://pandas.pydata.org/docs/user_guide/basics.html#iteration
-def pixelHits2pixelClusters(pixelHits, npix, window_ns, func, **kwargs):
+def pixelHits2pixelClusters(pixelHits, npix, window_ns, f, **kwargs):
     global_log.info(f"Offline [pixelClusters]: START")
     global_log.debug(f"Input pixel hits dataframe")
     stime = time.time()
@@ -97,10 +97,10 @@ def pixelHits2pixelClusters(pixelHits, npix, window_ns, func, **kwargs):
         if hit[TOA] - wst <= window_ns and is_adjacent(hit, clust, npix):
             clust = pd.concat([clust, hit.to_frame().T], ignore_index=True)
         else:
-            clust, wst = new_clust(clusters, clust, hit, npix, func, **kwargs)
+            clust, wst = new_clust(clusters, clust, hit, npix, f, **kwargs)
 
     # Last cluster
-    new_clust(clusters, clust, hit, npix, func, **kwargs)
+    new_clust(clusters, clust, hit, npix, f, **kwargs)
 
     df = pd.concat(clusters, ignore_index=True)
     global_log.debug(f"{len(clusters)} clusters")
