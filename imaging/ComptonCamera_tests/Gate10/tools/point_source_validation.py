@@ -26,7 +26,8 @@ except ImportError:
 
 def validate_psource(cones_df, source_pos, vpitch, vsize, plot_seq=False,
                      plot_stack=False, plot_napari=False):
-    global_log.info(f'Offline: validating point source')
+    global_log.info(f'Offline [point source validation]: START')
+    stime = time.time()
 
     # Source position must be in units of voxels in vol
     sp_vox = [int(source_pos[i] / vpitch) + (vsize[i] // 2) for i in range(3)]
@@ -57,7 +58,7 @@ def validate_psource(cones_df, source_pos, vpitch, vsize, plot_seq=False,
             plt.tight_layout()
             plt.show()
 
-    print(n_bad_cones, 'cones not intersecting at the source point')
+    global_log.info(f"Offline [point source validation]: {n_bad_cones} cones not intersecting at the source point")
 
     # ##############################################################
     # # Display stack with matplotlib (summed)
@@ -74,16 +75,17 @@ def validate_psource(cones_df, source_pos, vpitch, vsize, plot_seq=False,
         plt.tight_layout()
         plt.show()
 
+    ##############################################################
+    # Display stack with napari (scrolling)
+    ##############################################################
     if plot_napari:
-        ##############################################################
-        # Display stack with napari (scrolling)
-        ##############################################################
-        vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2),
-                     axis_labels=["cone number", "x", "y"])
+        vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2), axis_labels=["cone", "x", "y"])
         if xp.__name__ == 'cupy': z_slice_stack = xp.asnumpy(z_slice_stack)
         viewer = napari.view_image(z_slice_stack, **vargs)
         viewer.axes.visible = True
         napari.run()
+
+    global_log.info(f"Offline [point source validation]: {get_stop_string(stime)}")
 
 
 def add_secondary_axes(ax, vpitch):

@@ -88,7 +88,7 @@ def gHits2cones_byEvtID(file_path, source_MeV):
     df = pandas.DataFrame(cones, columns=cones_columns)
     global_log.debug(f"{n_events_primary} events with primary particles")
     global_log.debug(f"{n_events_full_edep} events with full energy deposit")
-    global_log.debug(f"{len(cones)} cones")
+    global_log.info(f"Offline [cones ghits]: {len(cones)} cones")
     global_log_debug_df(df)
     global_log.info(f"Offline [cones ghits]: {get_stop_string(stime)}")
     return df
@@ -154,7 +154,7 @@ def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_mm, npix=Fa
         # TODO make order flexible
 
     df = pandas.DataFrame(cones, columns=cones_columns)
-    global_log.debug(f"{len(cones)} cones")
+    global_log.info(f"Offline [cones tpx]: {len(cones)} cones")
     global_log_debug_df(df)
     global_log.info(f"Offline [cones tpx]: {get_stop_string(stime)}")
     return df
