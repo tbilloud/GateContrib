@@ -104,8 +104,8 @@ def gHits2cones_byEvtID(file_path, source_MeV):
 # - Direction (X,Y,Z)
 # - cosT
 # - error
-def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_mm, charge_speed_mm_ns, npix=False,
-                                sensor=False):
+def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_mm,
+                                charge_speed_mm_ns, npix=False, sensor=False):
     global_log.info(f"Offline [cones tpx]: START")
     global_log.debug(f"Input pixel clusters dataframe")
     stime = time.time()
