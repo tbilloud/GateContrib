@@ -90,8 +90,7 @@ if __name__ == "__main__":
     # ################# PIXEL CLUSTERS ####################
     pixelClusters = pixelHits2pixelClusters(pixelHits, npix=npix,
                                             window_ns=100,
-                                            func='method2',
-                                            pitch_um=pitch * 1000)
+                                            func='method2')
 
     # #################### CONES ##########################
     # =======> GROUND TRUTH <=======

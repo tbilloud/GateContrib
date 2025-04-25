@@ -45,7 +45,7 @@ def process_cluster_method1(cluster_df):
     })
 
 
-def process_cluster_method2(cluster, n_pixels, pitch_um):
+def process_cluster_method2(cluster, n_pixels):
     """
     X and Y are in the sensor's local coordinates system, as in Allpix2
     => origin = center of the lower-left pixel
