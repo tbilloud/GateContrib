@@ -56,7 +56,7 @@ def validate_psource(cones_df, source_pos, vpitch, vsize, plot_seq=False,
             plt.tight_layout()
             plt.show()
 
-    global_log.info(f"Offline [source validation]: {nb} cones not intersecting source")
+    global_log.debug(f"Offline [source validation]: {nb} cones not intersecting source")
 
     # ##############################################################
     # # Display stack with matplotlib (summed)
