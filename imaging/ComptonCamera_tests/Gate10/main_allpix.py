@@ -100,7 +100,7 @@ if __name__ == "__main__":
                                             source_MeV=source.energy.mono,
                                             thickness_mm=thickness,
                                             charge_speed_mm_ns=sp,
-                                            npix=npix, sensor=sensor  # for global coord
+                                            to_global=[npix,sensor]  # for global coord
                                             )
 
     # # ################## RECONSTRUCTION ####################

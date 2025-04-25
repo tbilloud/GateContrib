@@ -105,7 +105,7 @@ def gHits2cones_byEvtID(file_path, source_MeV):
 # - cosT
 # - error
 def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_mm,
-                                charge_speed_mm_ns, npix=False, sensor=False):
+                                charge_speed_mm_ns, to_global = False):
     global_log.info(f"Offline [cones tpx]: START")
     global_log.debug(f"Input pixel clusters dataframe")
     stime = time.time()
@@ -137,7 +137,8 @@ def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_mm,
         # 5) Construct cone
         E1_MeV = cl_compton[ENERGY_keV] / 1000
         cosT = 1 - (0.511 * E1_MeV) / (source_MeV * (source_MeV - E1_MeV))
-        if npix and sensor:
+        if to_global:
+            npix, sensor = to_global
             apex = localFractional2globalCoordinates(pos_compton, sensor, npix)
             pos_photoel = localFractional2globalCoordinates(pos_photoel, sensor, npix)
             direction = np.array(apex) - np.array(pos_photoel)
