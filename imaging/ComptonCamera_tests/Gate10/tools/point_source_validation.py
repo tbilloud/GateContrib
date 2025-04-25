@@ -26,7 +26,7 @@ except ImportError:
 
 def validate_psource(cones_df, source_pos, vpitch, vsize, plot_seq=False,
                      plot_stack=False, plot_napari=False):
-    global_log.info(f'Offline [point source validation]: START')
+    global_log.info(f'Offline [source validation]: START')
     stime = time.time()
 
     # Source position must be in units of voxels in vol
@@ -34,16 +34,14 @@ def validate_psource(cones_df, source_pos, vpitch, vsize, plot_seq=False,
 
     # ######## RECONSTRUCT CONE BY CONE #######################################
     z_slice_stack = xp.zeros((len(cones_df), vsize[0], vsize[1]), dtype=xp.float32)
-    n_bad_cones = 0
+    nb = 0 # number of bad cones
     cones_df = cones_df.reset_index(drop=True)
     for idx, cone in cones_df.iterrows():
         vol = reco_bp(cone.to_frame().T, vpitch, vsize, napari=False)
         z_slice = vol[:, :, sp_vox[2]]
         z_slice_stack[idx, :, :] = z_slice
         if z_slice[sp_vox[0], sp_vox[1]] == 0:
-            # TODO sometime cone is bad but z_slice is not 0
-            n_bad_cones += 1
-            # print('bad cone in event',int(event))
+            nb += 1 # TODO: sometime cone is bad but z_slice is not 0 (due to error)
 
         # ##############################################################
         # # Display stack with matplotlib (one by one)
@@ -58,7 +56,7 @@ def validate_psource(cones_df, source_pos, vpitch, vsize, plot_seq=False,
             plt.tight_layout()
             plt.show()
 
-    global_log.info(f"Offline [point source validation]: {n_bad_cones} cones not intersecting at the source point")
+    global_log.info(f"Offline [source validation]: {nb} cones not intersecting source")
 
     # ##############################################################
     # # Display stack with matplotlib (summed)
@@ -85,7 +83,7 @@ def validate_psource(cones_df, source_pos, vpitch, vsize, plot_seq=False,
         viewer.axes.visible = True
         napari.run()
 
-    global_log.info(f"Offline [point source validation]: {get_stop_string(stime)}")
+    global_log.info(f"Offline [source validation]: {get_stop_string(stime)}")
 
 
 def add_secondary_axes(ax, vpitch):

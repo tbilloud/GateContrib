@@ -14,7 +14,7 @@ if __name__ == "__main__":
     sim.random_engine, sim.random_seed = "MersenneTwister", 1
     sim.visu = False
     # sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # useless if visu
-    sim.verbose_level = 'DEBUG'
+    # sim.verbose_level = 'INFO'
 
     # ===========================
     # ==   GEOMETRY            ==
