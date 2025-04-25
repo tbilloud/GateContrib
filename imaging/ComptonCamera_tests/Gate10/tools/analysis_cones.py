@@ -129,7 +129,7 @@ def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_mm,
 
     for eventid, group in grouped:
         # 1) Distinguish compton vs photo-electric interactions
-        # TODO Use limits of Compton equation (e.g. -1 < cosT < 1) to switch
+        # TODO Use limits of Compton equation to help selection
         group = group.sort_values(ENERGY_keV)
         cl_photoel = group.iloc[1]
         cl_compton = group.iloc[0]
