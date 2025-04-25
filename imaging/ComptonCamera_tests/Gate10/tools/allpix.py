@@ -28,8 +28,7 @@ def run_allpix(sim,
     try:
         pixel = sim.volume_manager.get_volume("pixel_param")
     except Exception:
-        sys.exit(f"Running Allpix2 this way requires pixels to be defined with"
-                 f" RepeatParametrisedVolume(repeated_volume=pixel)")
+        sys.exit(f"Pixels must be defined with RepeatParametrisedVolume() in Gate")
 
     sensor = sim.volume_manager.get_volume("sensor")
     source = sim.source_manager.get_source("source")
@@ -85,8 +84,14 @@ include = "PixelHit"
 
     subprocess.run([binary_path, '-c', output_dir + 'main.conf'], check=True)
 
-    global_log.info(
-        f"Offline [Allpix2]: {get_stop_string(stime)}")
+    event_time_offset_flag = False
+    if source.n:
+        global_log.warning(f"Use source.activity instead of source.n, I add 1us offset")
+        event_time_offset_flag = True
+
+    global_log.info(f"Offline [Allpix2]: {get_stop_string(stime)}")
+
+    return event_time_offset_flag
 
 
 configurations = {
@@ -142,9 +147,12 @@ qdc_resolution = 16bit # if 0 (default) ToA is in ns, not clock cycles
 # TODO: I've seen negative ToT values in data.txt
 def gHits2allpix2pixelHits(sim, npix,
                            binary_path='allpix/allpix-squared/install-noG4/bin/allpix',
-                           config='default'):
-    run_allpix(sim, binary_path, output_dir='allpix/',
-               log_level='FATAL', config=config)  # INFO, FATAL, ...
-    return allpixTxt2pixelHit('allpix/data.txt', n_pixels=npix)
-    # Lines starting with PixelHit in data.txt have the following format:
-    # PixelHit pixelX, pixelY, TOT, TOA, global_time, pos_x, pos_y, pos_z
+                           config='default',
+                           log_level='FATAL'):
+    time_offset = run_allpix(sim, binary_path, output_dir='allpix/',
+                             log_level=log_level, config=config)
+    pixelHits = allpixTxt2pixelHit('allpix/data.txt', n_pixels=npix)
+    if time_offset: pixelHits[TOA] += pixelHits.groupby(EVENTID).ngroup() * 1e3
+    return pixelHits
+    # Lines starting with PixelHit in data.txt have:
+    # PixelHit X_ID, Y_ID, TOT, TOA, global_time, X_global, Y_global, Z_global

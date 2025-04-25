@@ -118,8 +118,8 @@ def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_mm, npix=Fa
         # 1) Distinguish compton vs photo-electric interactions
         # TODO Use limits of Compton equation (e.g. -1 < cosT < 1) to switch
         group = group.sort_values(ENERGY_keV)
-        cl_photoel = group.iloc[1]
-        cl_compton = group.iloc[0]
+        cl_photoel = group.iloc[0]
+        cl_compton = group.iloc[1]
 
         # 2) Calculate depth difference
         # delta_z = charge_carrier_speed * (TOA_photoelec - TOA_compton)

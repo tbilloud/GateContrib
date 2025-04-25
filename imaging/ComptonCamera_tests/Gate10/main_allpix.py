@@ -14,7 +14,7 @@ if __name__ == "__main__":
     sim.random_engine, sim.random_seed = "MersenneTwister", 1
     sim.visu = False
     # sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # useless if visu
-    sim.verbose_level = 'INFO'
+    sim.verbose_level = 'DEBUG'
 
     # ===========================
     # ==   GEOMETRY            ==
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.n = 1000
+    source.n = 10
     # source.activity, sim.run_timing_intervals = 100_000 * Bq, [[0, 2 * ms]]
     source.particle = "gamma"
     source.energy.mono = 200 * keV
@@ -86,8 +86,6 @@ if __name__ == "__main__":
 
     # ################# PIXEL HITS ########################
     pixelHits = gHits2allpix2pixelHits(sim, npix, config='fast')
-    if source.n: pixelHits[TOA] += pixelHits.groupby(EVENTID).ngroup() * 1000
-    # TODO include above line in gHits2allpix2pixelHits or pixelHits2pixelClusters?
 
     # ################# PIXEL CLUSTERS ####################
     pixelClusters = pixelHits2pixelClusters(pixelHits, npix=npix,
