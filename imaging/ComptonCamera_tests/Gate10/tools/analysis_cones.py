@@ -104,7 +104,7 @@ def gHits2cones_byEvtID(file_path, source_MeV):
 # - Direction (X,Y,Z)
 # - cosT
 # - error
-def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_mm, npix=False,
+def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_mm, charge_speed_mm_ns, npix=False,
                                 sensor=False):
     global_log.info(f"Offline [cones tpx]: START")
     global_log.debug(f"Input pixel clusters dataframe")
@@ -119,17 +119,11 @@ def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_mm, npix=Fa
         # 1) Distinguish compton vs photo-electric interactions
         # TODO Use limits of Compton equation (e.g. -1 < cosT < 1) to switch
         group = group.sort_values(ENERGY_keV)
-        cl_photoel = group.iloc[0]
-        cl_compton = group.iloc[1]
+        cl_photoel = group.iloc[1]
+        cl_compton = group.iloc[0]
 
         # 2) Calculate depth difference
-        # delta_z = charge_carrier_speed * (TOA_photoelec - TOA_compton)
-        thickness_cm = thickness_mm / 10  # cm
-        bias_V = 1000  # V
-        E_field = bias_V / thickness_cm  # [V/cm]
-        mobility = 1000  # [cm*cm/V/s]
-        elec_speed = mobility * E_field  # [cm*cm/V/s] * [V/cm] => [cm/s]
-        dZ_mm = elec_speed * (cl_compton[TOA] - cl_photoel[TOA]) * 1e-8
+        dZ_mm = charge_speed_mm_ns * (cl_compton[TOA] - cl_photoel[TOA])
         dZ_frac = dZ_mm / thickness_mm
 
         # 3) Calculate absolute depth of Compton interaction (apex)

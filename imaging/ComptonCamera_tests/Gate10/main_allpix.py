@@ -62,7 +62,7 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.n = 10
+    source.n = 1000
     # source.activity, sim.run_timing_intervals = 100_000 * Bq, [[0, 2 * ms]]
     source.particle = "gamma"
     source.energy.mono = 200 * keV
@@ -97,10 +97,12 @@ if __name__ == "__main__":
     cones_truth = gHits2cones_byEvtID(hits_path, source.energy.mono)
     # eventIDs = cones_truth['EventID'].unique()
     # # =========> TIMEPIX <==========
+    sp = charge_speed_mm_ns(mobility_cm2_Vs=1000, bias_V=1000, thick_mm=sensor.size[2])
     cones_tpx = pixelClusters2cones_byEvtID(pixelClusters,
                                             source_MeV=source.energy.mono,
                                             thickness_mm=thickness,
-                                            npix=npix, sensor=sensor
+                                            charge_speed_mm_ns=sp,
+                                            npix=npix, sensor=sensor  # for global coord
                                             )
 
     # # ################## RECONSTRUCTION ####################

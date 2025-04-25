@@ -186,6 +186,7 @@ def localFractional2globalCoordinates(c, sensor, npix):
 
     return g.tolist()
 
+
 def global2localFractionalCoordinates(g, sensor, npix):
     pitch = sensor.size[0] / npix  # mm
 
@@ -200,3 +201,14 @@ def global2localFractionalCoordinates(g, sensor, npix):
     c = bc - b
 
     return c.tolist()
+
+
+def charge_speed_mm_ns(mobility_cm2_Vs, bias_V, thick_mm):
+    """
+    Assuming constant electric field (ohmic type sensors) and mobility, calculate speed of charges
+    In mm per ns
+    """
+
+    efield = bias_V / (thick_mm / 10)  # [V/cm]
+    elec_speed = mobility_cm2_Vs * efield  # [cm*cm/V/s] * [V/cm] => [cm/s]
+    return elec_speed * 1e-8  # [mm/ns]
