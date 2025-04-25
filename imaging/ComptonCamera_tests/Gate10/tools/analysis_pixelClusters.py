@@ -93,7 +93,7 @@ def pixelHits2pixelClusters(pixelHits, npix, window_ns, func, **kwargs):
     clusters = []
 
     # Loop over hits
-    for index, hit in pixelHits.iterrows():
+    for index, hit in pixelHits.iloc[1:].iterrows():
         if hit[TOA] - wst <= window_ns and is_adjacent(hit, clust, npix):
             clust = pd.concat([clust, hit.to_frame().T], ignore_index=True)
         else:

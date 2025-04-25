@@ -92,7 +92,6 @@ if __name__ == "__main__":
                                             window_ns=100,
                                             func='method2',
                                             pitch_um=pitch * 1000)
-    # TODO Check cluster energies (1st in dataframe is wrong, duplicate values in cluster[ENERGY_keV]
 
     # #################### CONES ##########################
     # =======> GROUND TRUTH <=======
