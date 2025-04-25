@@ -115,39 +115,41 @@ def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_mm, npix=Fa
     cones = []
 
     for eventid, group in grouped:
-        # TODO: 1) Distinguish compton vs photo-electric interactions
+        # 1) Distinguish compton vs photo-electric interactions
+        # TODO Use limits of Compton equation (e.g. -1 < cosT < 1) to switch
         group = group.sort_values(ENERGY_keV)
-        clust_photoel = group.iloc[0]
-        clust_compton = group.iloc[1]
+        cl_photoel = group.iloc[1]
+        cl_compton = group.iloc[0]
 
-
-        # TODO: 2) Calculate depth difference
+        # 2) Calculate depth difference
         # delta_z = charge_carrier_speed * (TOA_photoelec - TOA_compton)
-        thickness_cm = thickness_mm / 10 # cm
-        bias_V = 1000 # V
-        E_field = bias_V / thickness_cm # [V/cm]
-        mobility = 1000 # [cm*cm/V/s]
-        elec_speed = mobility * E_field # [cm*cm/V/s] * [V/cm] => [cm/s]
-        delta_z_mm = elec_speed * (clust_compton[TOA] - clust_photoel[TOA]) * 1e-8
-        delta_z_fractional = delta_z_mm / thickness_mm
+        thickness_cm = thickness_mm / 10  # cm
+        bias_V = 1000  # V
+        E_field = bias_V / thickness_cm  # [V/cm]
+        mobility = 1000  # [cm*cm/V/s]
+        elec_speed = mobility * E_field  # [cm*cm/V/s] * [V/cm] => [cm/s]
+        dZ_mm = elec_speed * (cl_compton[TOA] - cl_photoel[TOA]) * 1e-8
+        dZ_frac = dZ_mm / thickness_mm
 
-        # TODO: 3) Calculate absolute depth of Compton interaction (apex)
-        z_compton = 0 # middle of sensor (in local fractional unit)
+        # 3) Calculate absolute depth of Compton interaction (apex)
+        z_compton = 0  # middle of sensor (in local fractional unit)
         # OR use cluster size (and energy?)
 
-        # TODO: 4) Complete 3D positions
-        pos_compton = [clust_compton[PIX_X_ID], clust_compton[PIX_Y_ID], z_compton]
-        pos_photoel = [clust_photoel[PIX_X_ID], clust_photoel[PIX_Y_ID], z_compton+delta_z_fractional]
+        # 4) Complete 3D positions
+        pos_compton = [cl_compton[PIX_X_ID], cl_compton[PIX_Y_ID], z_compton]
+        pos_photoel = [cl_photoel[PIX_X_ID], cl_photoel[PIX_Y_ID], z_compton + dZ_frac]
 
-        # TODO: 5) Construct cone
-        direction = np.array(pos_compton) - np.array(pos_photoel)
-        direction = (direction / np.linalg.norm(direction)).tolist()
-        E1_MeV = clust_compton[ENERGY_keV] / 1000
+        # 5) Construct cone
+        E1_MeV = cl_compton[ENERGY_keV] / 1000
         cosT = 1 - (0.511 * E1_MeV) / (source_MeV * (source_MeV - E1_MeV))
-        apex = pos_compton
         if npix and sensor:
-            apex = localFractional2globalCoordinates(apex, sensor, npix)
-            direction = np.dot(sensor.rotation, direction).tolist()
+            apex = localFractional2globalCoordinates(pos_compton, sensor, npix)
+            pos_photoel = localFractional2globalCoordinates(pos_photoel, sensor, npix)
+            direction = np.array(apex) - np.array(pos_photoel)
+        else:
+            apex = pos_compton
+            direction = np.array(apex) - np.array(pos_photoel)
+        direction = (direction / np.linalg.norm(direction)).tolist()
         cones.append([eventid] + apex + direction + [cosT] + [200])
         # TODO make order flexible
 

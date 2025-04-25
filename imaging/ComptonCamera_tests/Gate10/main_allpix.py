@@ -14,7 +14,7 @@ if __name__ == "__main__":
     sim.random_engine, sim.random_seed = "MersenneTwister", 1
     sim.visu = False
     # sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # useless if visu
-    sim.verbose_level = 'DEBUG'
+    # sim.verbose_level = 'DEBUG'
 
     # ===========================
     # ==   GEOMETRY            ==
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     ## ===========================
     ## ==  PHYSICS              ==
     ## ===========================
-    doppler = False
+    doppler = True
     fluo = False
     if doppler: sim.physics_manager.physics_list_name = 'G4EmLivermorePhysics'
     if fluo:
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.n = 164
+    source.n = 10000
     # source.activity, sim.run_timing_intervals = 100_000 * Bq, [[0, 2 * ms]]
     source.particle = "gamma"
     source.energy.mono = 200 * keV
@@ -95,9 +95,6 @@ if __name__ == "__main__":
                                             func='method2',
                                             pitch_um=pitch * 1000)
     # TODO Check cluster energies (1st in dataframe is wrong, duplicate values in cluster[ENERGY_keV]
-    print_hits_inG4format(hits_df[hits_df[EVENTID]==163])
-    print(pixelHits[pixelHits[EVENTID]==163])
-    print(pixelClusters[pixelClusters[EVENTID]==163])
 
     # #################### CONES ##########################
     # =======> GROUND TRUTH <=======

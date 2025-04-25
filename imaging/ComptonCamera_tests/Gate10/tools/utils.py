@@ -171,33 +171,32 @@ def global_log_debug_df(df):
         global_log.debug(f"Output preview:\n{df.head().to_string(index=False)}")
 
 
-def localFractional2globalCoordinates(local_point, sensor, npix):
-    """
-    Transforms coordinates from sensor's (local) to world's coordinate system.
-    => local origin = center of the lower-left pixel (as in Allpix2)
-    Here local coordinate is in fractional pixel units
-    """
+def localFractional2globalCoordinates(c, sensor, npix):
+    pitch = sensor.size[0] / npix  # mm
 
-    pitch = sensor.size[0] / npix # mm
-    local_sensor_center = [npix / 2 - 0.5] * 2 + [0]
-    local_point_centered = np.array(local_point) - np.array(local_sensor_center)
-    local_vector_centered_rotated = np.dot(sensor.rotation, local_point_centered)
-    local_vector_centered_rotated_absolute = local_vector_centered_rotated * [pitch, pitch, sensor.size[2]]
-    global_vector = sensor.translation + local_vector_centered_rotated_absolute
+    a = sensor.translation
+    b = [-(npix / 2 - 0.5)] * 2 + [0]
 
-    return global_vector.tolist()
+    a, b, c = np.array(a), np.array(b), np.array(c)
 
-# def localFractional2globalCoordinates(c, sensor, npix):
-#     pitch = sensor.size[0] / npix  # mm
-#
-#     a = sensor.translation
-#     b = [npix / 2 - 0.5] * 2 + [0]
-#
-#     a, b, c = np.array(a), np.array(b), np.array(c)
-#
-#     b = np.dot(sensor.rotation, b) * [pitch, pitch, sensor.size[2]]
-#     c = np.dot(sensor.rotation, c) * [pitch, pitch, sensor.size[2]]
-#
-#     g = a - b + c
-#
-#     return g.tolist()
+    bc = b + c
+    bc = np.dot(sensor.rotation, bc) * [pitch, pitch, sensor.size[2]]
+
+    g = a + bc
+
+    return g.tolist()
+
+def global2localFractionalCoordinates(g, sensor, npix):
+    pitch = sensor.size[0] / npix  # mm
+
+    a = sensor.translation
+    b = [-(npix / 2 - 0.5)] * 2 + [0]
+
+    a, b, g = np.array(a), np.array(b), np.array(g)
+
+    bc = -a + g
+    bc = np.dot(sensor.rotation.T, bc) / [pitch, pitch, sensor.size[2]]
+
+    c = bc - b
+
+    return c.tolist()
