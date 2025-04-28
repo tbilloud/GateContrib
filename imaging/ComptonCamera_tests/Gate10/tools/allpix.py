@@ -86,7 +86,7 @@ include = "PixelHit"
 
     event_time_offset_flag = False
     if source.n:
-        global_log.warning(f"Use source.activity instead of source.n, I add 1us offset")
+        global_log.warning(f"Use source.activity (not source.n) for realistic TOA. Adding 1us/event.")
         event_time_offset_flag = True
 
     global_log.info(f"Offline [Allpix2]: {get_stop_string(stime)}")
