@@ -1,6 +1,6 @@
 # Utility functions to analyse output files
 # Can be used in the main simulation script after sim.run() or offline (i.e. reading root files without simulation)
-# Calling E1 the energy deposited in the Compton scattering, as in CCMod paper
+# E1 = energy deposited in the Compton scattering, as in CCMod paper
 
 import os
 import sys
@@ -95,7 +95,6 @@ def gHits2cones_byEvtID(file_path, source_MeV):
     return df
 
 
-
 def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_mm,
                                 charge_speed_mm_ns, to_global=False):
     """
@@ -129,10 +128,13 @@ def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_mm,
 
     for eventid, group in grouped:
         # 1) Distinguish compton vs photo-electric interactions
-        # TODO Use limits of Compton equation to help selection
         group = group.sort_values(ENERGY_keV)
-        cl_photoel = group.iloc[1]
-        cl_compton = group.iloc[0]
+        Esum_MeV = 0.001 * (group.iloc[0][ENERGY_keV] + group.iloc[1][ENERGY_keV])
+        if abs(Esum_MeV - source_MeV) < 0.1 and group.iloc[1][ENERGY_keV] > get_E1max(source_MeV):
+            cl_photoel = group.iloc[1]
+            cl_compton = group.iloc[0]
+        else:
+            continue
 
         # 2) Calculate depth difference
         dZ_mm = charge_speed_mm_ns * (cl_compton[TOA] - cl_photoel[TOA])
@@ -166,3 +168,9 @@ def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_mm,
     global_log_debug_df(df)
     global_log.info(f"Offline [cones tpx]: {get_stop_string(stime)}")
     return df
+
+
+def get_E1max(source_MeV):
+    me = 0.511  # MeV
+    E1max = source_MeV ** 2 / (source_MeV + me / 2)
+    return E1max

@@ -19,7 +19,7 @@ if __name__ == "__main__":
     # ===========================
     # ==   GEOMETRY            ==
     # ===========================
-    npix, pitch, thickness = 10, 50 * um, 1 * mm
+    npix, pitch, thickness = 256, 55 * um, 1 * mm
     sim.world.material = "Vacuum"
     sensor = sim.add_volume("Box", "sensor")
     sensor.material = "cadmium_telluride"
